@@ -112,7 +112,8 @@ class _MyHomePageState extends State<MyHomePage> {
       videos = z['content']['data'];
       if (videos.isEmpty ||
           z['title'].contains('event') ||
-          z['code'] == 'highlights_HOME') {
+          z['code'] == 'highlights_HOME' ||
+          z['code'] == 'cbde5425-226c-4638-b9f6-6847e509db7f') {
         continue;
       }
       thumbnails.add(Container(
@@ -167,24 +168,38 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-          child: FutureBuilder(
-              future: _home,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  final thumbnails = _buildCarouselList(snapshot.data!);
-                  return SingleChildScrollView(
-                      child: Container(
-                          color: Colors.grey[100],
-                          padding: const EdgeInsets.all(10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: thumbnails,
-                          )));
-                } else {
-                  return const SizedBox(width: 5555);
-                }
-              })),
+      body: Row(children: [
+        NavigationRail(
+            labelType: NavigationRailLabelType.all,
+            destinations: [
+              const NavigationRailDestination(
+                  icon: const Icon(Icons.home), label: const Text('Home')),
+              const NavigationRailDestination(
+                  icon: const Icon(Icons.category),
+                  label: const Text(
+                    'Catégories',
+                  )),
+            ],
+            selectedIndex: 0),
+        Center(
+            child: FutureBuilder(
+                future: _home,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final thumbnails = _buildCarouselList(snapshot.data!);
+                    return SingleChildScrollView(
+                        child: Container(
+                            color: Colors.grey[100],
+                            padding: const EdgeInsets.all(10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: thumbnails,
+                            )));
+                  } else {
+                    return const SizedBox(width: 5555);
+                  }
+                }))
+      ]),
     );
   }
 }
@@ -208,7 +223,7 @@ class _CarouselState extends State<Carousel> {
     return Stack(children: [
       SizedBox(
           height: 230,
-          width: MediaQuery.of(context).size.width,
+          width: MediaQuery.of(context).size.width - 120,
           child: ListView(
             controller: _controller,
             prototypeItem: const SizedBox(width: 285, height: 230),
