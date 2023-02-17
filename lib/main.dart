@@ -125,38 +125,36 @@ class _MyHomePageState extends State<MyHomePage> {
         final imageUrl = (v['mainImage']['url'])
             .replaceFirst('__SIZE__', '400x225')
             .replaceFirst('?type=TEXT', '');
-        return SizedBox(
-            height: 230,
-            width: 295,
-            child: InkWell(
-                onTap: () {
-                  _showDialogProgram(context, v, imageUrl);
-                },
-                child: Card(
-                    child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Center(
-                            child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                              Image(
-                                image: CachedNetworkImageProvider(imageUrl),
-                                height: 148,
-                                width: 265,
-                              ),
-                              ListTile(
-                                contentPadding: EdgeInsets.zero,
-                                title: Text(
-                                  v['title'],
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                subtitle: Text(
-                                  v['subtitle'] ?? '',
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ]))))));
+        return InkWell(
+            onTap: () {
+              _showDialogProgram(context, v, imageUrl);
+            },
+            child: Card(
+                child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Center(
+                        child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                          Image(
+                            image: CachedNetworkImageProvider(imageUrl),
+                            // image size divided by 1.5
+                            height: 148,
+                            width: 265,
+                          ),
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(
+                              v['title'],
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            subtitle: Text(
+                              v['subtitle'] ?? '',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ])))));
       }).toList()));
     }
     return thumbnails;
@@ -188,7 +186,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   if (snapshot.hasData) {
                     final thumbnails = _buildCarouselList(snapshot.data!);
                     return SingleChildScrollView(
+                        // subtract NavigationRail width
                         child: Container(
+                            width: MediaQuery.of(context).size.width - 100,
                             color: Colors.grey[100],
                             padding: const EdgeInsets.all(10),
                             child: Column(
@@ -223,7 +223,6 @@ class _CarouselState extends State<Carousel> {
     return Stack(children: [
       SizedBox(
           height: 230,
-          width: MediaQuery.of(context).size.width - 120,
           child: ListView(
             controller: _controller,
             prototypeItem: const SizedBox(width: 285, height: 230),
