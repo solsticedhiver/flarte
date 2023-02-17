@@ -51,6 +51,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final Future<Map<String, dynamic>> _home = fetchHome();
+  final _controller = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -79,59 +80,103 @@ class _MyHomePageState extends State<MyHomePage> {
                       break;
                     }
                   }
-                  int itemCount =
-                      (MediaQuery.of(context).size.width / 285).floor();
                   return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            padding: const EdgeInsets.all(10),
                             child: Text(
                                 'Les incontournables (${videos.length})',
-                                style: TextStyle(fontSize: 25))),
-                        SizedBox(
-                            height: MediaQuery.of(context).size.height - 130,
-                            width: (285 * itemCount).toDouble(),
-                            child: GridView.count(
-                              childAspectRatio: 1.15,
-                              crossAxisCount: itemCount == 0 ? 1 : itemCount,
-                              scrollDirection: Axis.vertical,
-                              children: videos.map((v) {
-                                final imageUrl = (v['mainImage']['url'])
-                                    .replaceFirst('__SIZE__', '400x225')
-                                    .replaceFirst('?type=TEXT', '');
-                                return Card(
-                                    child: Container(
-                                        padding: const EdgeInsets.all(10),
-                                        child: Center(
-                                            child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                              Image(
-                                                image:
-                                                    CachedNetworkImageProvider(
-                                                        imageUrl),
-                                                height: 148,
-                                                width: 265,
-                                              ),
-                                              ListTile(
-                                                contentPadding: EdgeInsets.zero,
-                                                title: Text(
-                                                  v['title'],
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                                subtitle: Text(
-                                                  v['subtitle'],
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                            ]))));
-                              }).toList(),
-                            ))
+                                style: const TextStyle(fontSize: 25))),
+                        Stack(children: [
+                          SizedBox(
+                              height: 230,
+                              width: MediaQuery.of(context).size.width,
+                              child: ListView(
+                                controller: _controller,
+                                prototypeItem:
+                                    const SizedBox(width: 285, height: 230),
+                                scrollDirection: Axis.horizontal,
+                                children: videos.map((v) {
+                                  final imageUrl = (v['mainImage']['url'])
+                                      .replaceFirst('__SIZE__', '400x225')
+                                      .replaceFirst('?type=TEXT', '');
+                                  return SizedBox(
+                                      height: 230,
+                                      width: 285,
+                                      child: Card(
+                                          margin: EdgeInsets.zero,
+                                          child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10),
+                                              child: Center(
+                                                  child: Column(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                    Image(
+                                                      image:
+                                                          CachedNetworkImageProvider(
+                                                              imageUrl),
+                                                      height: 148,
+                                                      width: 265,
+                                                    ),
+                                                    ListTile(
+                                                      contentPadding:
+                                                          EdgeInsets.zero,
+                                                      title: Text(
+                                                        v['title'],
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                      subtitle: Text(
+                                                        v['subtitle'],
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                    ),
+                                                  ])))));
+                                }).toList(),
+                              )),
+                          Positioned(
+                              left: 5,
+                              top: 80,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  _controller.animateTo(
+                                      _controller.offset - 265 * 2,
+                                      duration:
+                                          const Duration(milliseconds: 500),
+                                      curve: Curves.easeInOut);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  shape: const CircleBorder(),
+                                  padding: const EdgeInsets.all(20),
+                                ),
+                                child: const Icon(Icons.chevron_left),
+                              )),
+                          Positioned(
+                              right: 5,
+                              top: 80,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  _controller.animateTo(
+                                      _controller.offset + 265 * 2,
+                                      duration:
+                                          const Duration(milliseconds: 500),
+                                      curve: Curves.easeInOut);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  shape: const CircleBorder(),
+                                  padding: const EdgeInsets.all(20),
+                                ),
+                                child: const Icon(Icons.chevron_right),
+                              )),
+                        ])
                       ]);
                 } else {
                   return const SizedBox(width: 5555);
