@@ -51,6 +51,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final Future<Map<String, dynamic>> _home = fetchHome();
+  int _selectedIndex = 0;
 
   void _showDialogProgram(
       BuildContext bcontext, Map<String, dynamic> v, String imageUrl) {
@@ -61,9 +62,9 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Container(
                   padding: const EdgeInsets.all(15),
                   width: 600,
-                  height: 420,
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
                           v['title'],
@@ -168,17 +169,26 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Row(children: [
         NavigationRail(
+            onDestinationSelected: (value) {
+              setState(() {
+                _selectedIndex = value;
+              });
+            },
             labelType: NavigationRailLabelType.all,
             destinations: const <NavigationRailDestination>[
               NavigationRailDestination(
-                  icon: Icon(Icons.home), label: Text('Home')),
+                icon: Icon(Icons.home_outlined),
+                selectedIcon: Icon(Icons.home),
+                label: Text('Home'),
+              ),
               NavigationRailDestination(
-                  icon: Icon(Icons.category),
+                  icon: Icon(Icons.category_outlined),
+                  selectedIcon: Icon(Icons.category),
                   label: Text(
                     'Catégories',
                   )),
             ],
-            selectedIndex: 0),
+            selectedIndex: _selectedIndex),
         Center(
             child: FutureBuilder(
                 future: _home,
