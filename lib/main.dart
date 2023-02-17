@@ -169,12 +169,12 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Row(children: [
         NavigationRail(
             labelType: NavigationRailLabelType.all,
-            destinations: [
-              const NavigationRailDestination(
-                  icon: const Icon(Icons.home), label: const Text('Home')),
-              const NavigationRailDestination(
-                  icon: const Icon(Icons.category),
-                  label: const Text(
+            destinations: const <NavigationRailDestination>[
+              NavigationRailDestination(
+                  icon: Icon(Icons.home), label: Text('Home')),
+              NavigationRailDestination(
+                  icon: Icon(Icons.category),
+                  label: Text(
                     'Catégories',
                   )),
             ],
