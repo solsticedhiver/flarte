@@ -51,7 +51,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final Future<Map<String, dynamic>> _home = fetchHome();
-  final _controller = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -74,119 +73,225 @@ class _MyHomePageState extends State<MyHomePage> {
                 if (snapshot.hasData) {
                   final zones = snapshot.data?['value']['zones'];
                   List<dynamic> videos = [];
+                  List<Widget> thumbnails = [];
                   for (var z in zones) {
-                    if (z['code'] == '52bbf37b-b7e9-45ab-b2fb-317ae3fd5215') {
-                      videos = z['content']['data'];
-                      break;
+                    videos = z['content']['data'];
+                    if (videos.isEmpty ||
+                        z['title'].contains('event') ||
+                        z['code'] == 'highlights_HOME') {
+                      continue;
                     }
-                  }
-                  return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                            padding: const EdgeInsets.all(10),
-                            child: Text(
-                                'Les incontournables (${videos.length})',
-                                style: const TextStyle(fontSize: 25))),
-                        Stack(children: [
-                          SizedBox(
-                              height: 230,
-                              width: MediaQuery.of(context).size.width,
-                              child: ListView(
-                                controller: _controller,
-                                prototypeItem:
-                                    const SizedBox(width: 285, height: 230),
-                                scrollDirection: Axis.horizontal,
-                                children: videos.map((v) {
-                                  final imageUrl = (v['mainImage']['url'])
-                                      .replaceFirst('__SIZE__', '400x225')
-                                      .replaceFirst('?type=TEXT', '');
-                                  return SizedBox(
-                                      height: 230,
-                                      width: 285,
-                                      child: Card(
-                                          margin: EdgeInsets.zero,
+                    thumbnails.add(Container(
+                        padding: const EdgeInsets.all(15),
+                        child: Text('${z['title']} (${videos.length})',
+                            style: const TextStyle(fontSize: 25))));
+                    thumbnails.add(Carousel(
+                        children: videos.map((v) {
+                      final imageUrl = (v['mainImage']['url'])
+                          .replaceFirst('__SIZE__', '400x225')
+                          .replaceFirst('?type=TEXT', '');
+                      return SizedBox(
+                          height: 230,
+                          width: 295,
+                          child: InkWell(
+                              onTap: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return Dialog(
                                           child: Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 10),
-                                              child: Center(
-                                                  child: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
+                                              padding: const EdgeInsets.all(15),
+                                              width: 600,
+                                              height: 420,
+                                              child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(v['title'],
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 35)),
+                                                    v['subtitle'] != null
+                                                        ? Text(v['subtitle'],
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style:
+                                                                const TextStyle(
+                                                              color:
+                                                                  Colors.grey,
+                                                            ))
+                                                        : const SizedBox
+                                                            .shrink(),
+                                                    const SizedBox(height: 15),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
                                                       crossAxisAlignment:
                                                           CrossAxisAlignment
                                                               .start,
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
                                                       children: [
-                                                    Image(
-                                                      image:
-                                                          CachedNetworkImageProvider(
-                                                              imageUrl),
-                                                      height: 148,
-                                                      width: 265,
-                                                    ),
-                                                    ListTile(
-                                                      contentPadding:
-                                                          EdgeInsets.zero,
-                                                      title: Text(
-                                                        v['title'],
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                      subtitle: Text(
-                                                        v['subtitle'],
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                    ),
-                                                  ])))));
-                                }).toList(),
-                              )),
-                          Positioned(
-                              left: 5,
-                              top: 80,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  _controller.animateTo(
-                                      _controller.offset - 265 * 2,
-                                      duration:
-                                          const Duration(milliseconds: 500),
-                                      curve: Curves.easeInOut);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  shape: const CircleBorder(),
-                                  padding: const EdgeInsets.all(20),
-                                ),
-                                child: const Icon(Icons.chevron_left),
-                              )),
-                          Positioned(
-                              right: 5,
-                              top: 80,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  _controller.animateTo(
-                                      _controller.offset + 265 * 2,
-                                      duration:
-                                          const Duration(milliseconds: 500),
-                                      curve: Curves.easeInOut);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  shape: const CircleBorder(),
-                                  padding: const EdgeInsets.all(20),
-                                ),
-                                child: const Icon(Icons.chevron_right),
-                              )),
-                        ])
-                      ]);
+                                                        Image(
+                                                          width: 200,
+                                                          height: 300,
+                                                          image: CachedNetworkImageProvider(
+                                                              '${imageUrl.replaceFirst('400x225', '300x450')}?type=TEXT'),
+                                                        ),
+                                                        const SizedBox(
+                                                            width: 15),
+                                                        Flexible(
+                                                            child: v['shortDescription'] !=
+                                                                    null
+                                                                ? Text(
+                                                                    v[
+                                                                        'shortDescription'],
+                                                                    style: DefaultTextStyle.of(
+                                                                            context)
+                                                                        .style)
+                                                                : const SizedBox
+                                                                    .shrink()),
+                                                      ],
+                                                    )
+                                                  ])));
+                                    });
+                              },
+                              child: Card(
+                                  child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      child: Center(
+                                          child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                            Image(
+                                              image: CachedNetworkImageProvider(
+                                                  imageUrl),
+                                              height: 148,
+                                              width: 265,
+                                            ),
+                                            ListTile(
+                                              contentPadding: EdgeInsets.zero,
+                                              title: Text(
+                                                v['title'],
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              subtitle: Text(
+                                                v['subtitle'] ?? '',
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ]))))));
+                    }).toList()));
+                  }
+                  return SingleChildScrollView(
+                      child: Container(
+                          color: Colors.grey[100],
+                          padding: const EdgeInsets.all(10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: thumbnails,
+                          )));
                 } else {
                   return const SizedBox(width: 5555);
                 }
               })),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+}
+
+class Carousel extends StatefulWidget {
+  final List<Widget> children;
+  @override
+  State<Carousel> createState() => _CarouselState();
+
+  const Carousel({super.key, required this.children});
+}
+
+class _CarouselState extends State<Carousel> {
+  final _controller = ScrollController();
+
+  bool isChevronRightVisible = true;
+  bool isChevronLeftVisible = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: [
+      SizedBox(
+          height: 230,
+          width: MediaQuery.of(context).size.width,
+          child: ListView(
+            controller: _controller,
+            prototypeItem: const SizedBox(width: 285, height: 230),
+            scrollDirection: Axis.horizontal,
+            children: widget.children,
+          )),
+      Positioned(
+          left: 5,
+          top: 65,
+          child: ElevatedButton(
+            onPressed: !isChevronLeftVisible
+                ? null
+                : () {
+                    final box = context.findRenderObject() as RenderBox;
+                    _controller.animateTo(_controller.offset - box.size.width,
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeInOut);
+                    setState(() {
+                      if (_controller.offset <
+                          _controller.position.viewportDimension) {
+                        isChevronLeftVisible = false;
+                      }
+                      isChevronRightVisible = true;
+                    });
+                  },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.onSecondary,
+              shape: const CircleBorder(),
+              padding: const EdgeInsets.all(20),
+            ),
+            child: Icon(
+              Icons.chevron_left,
+              color: Theme.of(context).colorScheme.secondary,
+            ),
+          )),
+      Positioned(
+          right: 5,
+          top: 65,
+          child: ElevatedButton(
+            onPressed: !isChevronRightVisible
+                ? null
+                : () {
+                    final box = context.findRenderObject() as RenderBox;
+                    _controller.animateTo(_controller.offset + box.size.width,
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeInOut);
+                    setState(() {
+                      if (_controller.offset >=
+                          _controller.position.maxScrollExtent -
+                              _controller.position.viewportDimension) {
+                        isChevronRightVisible = false;
+                      }
+                      isChevronLeftVisible = true;
+                    });
+                  },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.onSecondary,
+              shape: const CircleBorder(),
+              padding: const EdgeInsets.all(20),
+            ),
+            child: Icon(
+              Icons.chevron_right,
+              color: Theme.of(context).colorScheme.secondary,
+            ),
+          )),
+    ]);
   }
 }
