@@ -244,6 +244,8 @@ class CarouselList extends StatelessWidget {
                             Flexible(
                                 child: v['shortDescription'] != null
                                     ? Text(v['shortDescription'],
+                                        maxLines: 16,
+                                        overflow: TextOverflow.ellipsis,
                                         style: Theme.of(bcontext)
                                             .textTheme
                                             .bodyMedium)
