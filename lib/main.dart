@@ -108,79 +108,93 @@ class _CarouselState extends State<Carousel> {
   final _controller = ScrollController();
 
   bool isChevronRightVisible = true;
-  bool isChevronLeftVisible = false;
+  bool isChevronLeftVisible = true;
+  bool isChevronRightEnabled = true;
+  bool isChevronLeftEnabled = false;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(children: [
-      SizedBox(
-          height: 230,
-          child: ListView(
-            controller: _controller,
-            prototypeItem: const SizedBox(width: 285, height: 230),
-            scrollDirection: Axis.horizontal,
-            children: widget.children,
-          )),
-      Positioned(
-          left: 5,
-          top: 65,
-          child: ElevatedButton(
-            onPressed: !isChevronLeftVisible
-                ? null
-                : () {
-                    final box = context.findRenderObject() as RenderBox;
-                    _controller.animateTo(_controller.offset - box.size.width,
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeInOut);
-                    setState(() {
-                      if (_controller.offset <
-                          _controller.position.viewportDimension) {
-                        isChevronLeftVisible = false;
-                      }
-                      isChevronRightVisible = true;
-                    });
-                  },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.onSecondary,
-              shape: const CircleBorder(),
-              padding: const EdgeInsets.all(20),
-            ),
-            child: Icon(
-              Icons.chevron_left,
-              color: Theme.of(context).colorScheme.secondary,
-            ),
-          )),
-      Positioned(
-          right: 5,
-          top: 65,
-          child: ElevatedButton(
-            onPressed: !isChevronRightVisible
-                ? null
-                : () {
-                    final box = context.findRenderObject() as RenderBox;
-                    _controller.animateTo(_controller.offset + box.size.width,
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeInOut);
-                    setState(() {
-                      if (_controller.offset >=
-                          _controller.position.maxScrollExtent -
-                              _controller.position.viewportDimension) {
-                        isChevronRightVisible = false;
-                      }
-                      isChevronLeftVisible = true;
-                    });
-                  },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.onSecondary,
-              shape: const CircleBorder(),
-              padding: const EdgeInsets.all(20),
-            ),
-            child: Icon(
-              Icons.chevron_right,
-              color: Theme.of(context).colorScheme.secondary,
-            ),
-          )),
-    ]);
+    return LayoutBuilder(builder: (context, constraints) {
+      if (285 * widget.children.length < constraints.maxWidth) {
+        isChevronLeftVisible = false;
+        isChevronRightVisible = false;
+      }
+      return Stack(children: [
+        SizedBox(
+            height: 230,
+            child: ListView(
+              controller: _controller,
+              prototypeItem: const SizedBox(width: 285, height: 230),
+              scrollDirection: Axis.horizontal,
+              children: widget.children,
+            )),
+        Visibility(
+            visible: isChevronLeftVisible,
+            child: Positioned(
+                left: 5,
+                top: 65,
+                child: ElevatedButton(
+                  onPressed: !isChevronLeftEnabled
+                      ? null
+                      : () {
+                          final box = context.findRenderObject() as RenderBox;
+                          _controller.animateTo(
+                              _controller.offset - box.size.width,
+                              duration: const Duration(milliseconds: 500),
+                              curve: Curves.easeInOut);
+                          setState(() {
+                            if (_controller.offset <
+                                _controller.position.viewportDimension) {
+                              isChevronLeftEnabled = false;
+                            }
+                            isChevronRightEnabled = true;
+                          });
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.onSecondary,
+                    shape: const CircleBorder(),
+                    padding: const EdgeInsets.all(20),
+                  ),
+                  child: Icon(
+                    Icons.chevron_left,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+                ))),
+        Visibility(
+            visible: isChevronRightVisible,
+            child: Positioned(
+                right: 5,
+                top: 65,
+                child: ElevatedButton(
+                  onPressed: !isChevronRightEnabled
+                      ? null
+                      : () {
+                          final box = context.findRenderObject() as RenderBox;
+                          _controller.animateTo(
+                              _controller.offset + box.size.width,
+                              duration: const Duration(milliseconds: 500),
+                              curve: Curves.easeInOut);
+                          setState(() {
+                            if (_controller.offset >=
+                                _controller.position.maxScrollExtent -
+                                    _controller.position.viewportDimension) {
+                              isChevronRightEnabled = false;
+                            }
+                            isChevronLeftEnabled = true;
+                          });
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.onSecondary,
+                    shape: const CircleBorder(),
+                    padding: const EdgeInsets.all(20),
+                  ),
+                  child: Icon(
+                    Icons.chevron_right,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+                ))),
+      ]);
+    });
   }
 }
 
