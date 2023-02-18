@@ -34,15 +34,6 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -50,8 +41,62 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final Future<Map<String, dynamic>> _home = fetchHome();
+  final Future<Map<String, dynamic>> _home = fetchUrl(urlHOME);
   int _selectedIndex = 0;
+
+  Widget _buildScreen(int screen) {
+    switch (screen) {
+      case 0:
+        return FutureBuilder(
+            future: _home,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return CarouselList(data: snapshot.data!);
+              } else {
+                return const SizedBox(width: 555);
+              }
+            });
+      case 1:
+        return SingleChildScrollView(
+            child: SizedBox(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width - 100,
+                child: Row(children: [
+                  SizedBox(
+                      width: 350,
+                      child: ListView(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        semanticChildCount: 9,
+                        children: categories.map((c) {
+                          return ListTile(
+                            leading: CircleAvatar(
+                                backgroundColor: Color.fromARGB(
+                                    255,
+                                    c['color'][0],
+                                    c['color'][1],
+                                    c['color'][2]),
+                                child: Text(c['text'].substring(0, 1),
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .inversePrimary))),
+                            onTap: () async {
+                              String url =
+                                  "https://www.arte.tv/api/rproxy/emac/v4/fr/web/pages/${c['code']}/";
+                              final resp = await fetchUrl(url);
+                            },
+                            contentPadding: const EdgeInsets.only(
+                                left: 15, top: 10, bottom: 10),
+                            title: Text(c['text']),
+                          );
+                        }).toList(),
+                      ))
+                ])));
+      default:
+        return const SizedBox.shrink();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,11 +104,12 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
+      drawer: const Drawer(),
       body: Row(children: [
         NavigationRail(
-            onDestinationSelected: (value) {
+            onDestinationSelected: (index) {
               setState(() {
-                _selectedIndex = value;
+                _selectedIndex = index;
               });
             },
             labelType: NavigationRailLabelType.all,
@@ -81,16 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   )),
             ],
             selectedIndex: _selectedIndex),
-        Center(
-            child: FutureBuilder(
-                future: _home,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return CarouselList(data: snapshot.data!);
-                  } else {
-                    return const SizedBox(width: 5555);
-                  }
-                }))
+        Center(child: _buildScreen(_selectedIndex))
       ]),
     );
   }
@@ -268,7 +305,7 @@ class CarouselList extends StatelessWidget {
       if (videos.isEmpty ||
           z['title'].contains('event') ||
           z['code'] == 'highlights_HOME' ||
-          z['code'] == 'cbde5425-226c-4638-b9f6-6847e509db7f' ||
+          z['title'] == "Parcourir toute l'offre" ||
           z['title'].startsWith('ARTE ')) {
         continue;
       }
