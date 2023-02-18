@@ -114,7 +114,8 @@ class _MyHomePageState extends State<MyHomePage> {
       if (videos.isEmpty ||
           z['title'].contains('event') ||
           z['code'] == 'highlights_HOME' ||
-          z['code'] == 'cbde5425-226c-4638-b9f6-6847e509db7f') {
+          z['code'] == 'cbde5425-226c-4638-b9f6-6847e509db7f' ||
+          z['title'].startsWith('ARTE ')) {
         continue;
       }
       thumbnails.add(Container(
