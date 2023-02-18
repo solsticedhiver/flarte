@@ -1,3 +1,5 @@
+//import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flarte/api.dart';
 import 'package:flutter/material.dart';
@@ -77,49 +79,46 @@ class _MyHomePageState extends State<MyHomePage> {
               }
             });
       case 1:
-        return SingleChildScrollView(
-            child: SizedBox(
-                height: MediaQuery.of(context).size.height,
-                width: MediaQuery.of(context).size.width - 100,
-                child: Row(children: [
-                  SizedBox(
-                      width: 350,
-                      child: ListView(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        semanticChildCount: 9,
-                        children: categories.map((c) {
-                          return ListTile(
-                            leading: CircleAvatar(
-                                backgroundColor: Color.fromARGB(
-                                    255,
-                                    c['color'][0],
-                                    c['color'][1],
-                                    c['color'][2]),
-                                child: Text(c['text'].substring(0, 1),
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .inversePrimary))),
-                            onTap: () async {
-                              String url =
-                                  "https://www.arte.tv/api/rproxy/emac/v4/fr/web/pages/${c['code']}/";
-                              if (_cache[c['code']].isEmpty) {
-                                final resp = await fetchUrl(url);
-                                _cache[c['code']] = resp;
-                              }
-                              setState(() {
-                                _dataCategories = _cache[c['code']];
-                              });
-                            },
-                            contentPadding: const EdgeInsets.only(
-                                left: 15, top: 10, bottom: 10),
-                            title: Text(c['text']),
-                          );
-                        }).toList(),
-                      )),
-                  CarouselList(data: _dataCategories, shrink: 100 + 350)
-                ])));
+        //debugPrint('in _buildScreen/1');
+        return SizedBox(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width - 100,
+            child: Row(children: [
+              SizedBox(
+                  width: 350,
+                  child: ListView(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    semanticChildCount: 9,
+                    children: categories.map((c) {
+                      return ListTile(
+                        leading: CircleAvatar(
+                            backgroundColor: Color.fromARGB(255, c['color'][0],
+                                c['color'][1], c['color'][2]),
+                            child: Text(c['text'].substring(0, 1),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .inversePrimary))),
+                        onTap: () async {
+                          String url =
+                              "https://www.arte.tv/api/rproxy/emac/v4/fr/web/pages/${c['code']}/";
+                          if (_cache[c['code']].isEmpty) {
+                            final resp = await fetchUrl(url);
+                            _cache[c['code']] = resp;
+                          }
+                          setState(() {
+                            _dataCategories = _cache[c['code']];
+                          });
+                        },
+                        contentPadding: const EdgeInsets.only(
+                            left: 15, top: 10, bottom: 10),
+                        title: Text(c['text']),
+                      );
+                    }).toList(),
+                  )),
+              CarouselList(data: _dataCategories, shrink: 100 + 350)
+            ]));
       default:
         return const SizedBox.shrink();
     }
@@ -270,6 +269,9 @@ class CarouselList extends StatelessWidget {
 
   void _showDialogProgram(
       BuildContext bcontext, Map<String, dynamic> v, String imageUrl) {
+    //JsonEncoder encoder = const JsonEncoder.withIndent('  ');
+    //String prettyprint = encoder.convert(v);
+    //debugPrint(prettyprint);
     showDialog(
         context: bcontext,
         builder: (bcontext) {
@@ -307,14 +309,23 @@ class CarouselList extends StatelessWidget {
                             ),
                             const SizedBox(width: 15),
                             Flexible(
-                                child: v['shortDescription'] != null
-                                    ? Text(v['shortDescription'],
-                                        maxLines: 16,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: Theme.of(bcontext)
-                                            .textTheme
-                                            .bodyMedium)
-                                    : const SizedBox.shrink()),
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    v['shortDescription'] != null
+                                        ? Text(v['shortDescription'],
+                                            maxLines: 16,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: Theme.of(bcontext)
+                                                .textTheme
+                                                .bodyMedium)
+                                        : const SizedBox.shrink(),
+                                    if (v['durationLabel'] != null)
+                                      Chip(
+                                        label: Text(v['durationLabel']),
+                                      )
+                                  ]),
+                            )
                           ],
                         )
                       ])));
@@ -339,8 +350,9 @@ class CarouselList extends StatelessWidget {
           z['title'].contains('event') ||
           z['code'] == 'highlights_HOME' ||
           z['title'] == "Parcourir toute l'offre" ||
+          z['title'] == 'Les documentaires par thème' ||
           videos.length == 1) {
-        //debugPrint('skipped ${z['title']} (${videos.length})');
+        //debugPrint('skipped ${z['title']}/${z['code']} (${videos.length})');
         continue;
       }
       thumbnails.add(Container(
