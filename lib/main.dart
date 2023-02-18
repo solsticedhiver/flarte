@@ -42,7 +42,19 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final Future<Map<String, dynamic>> _home = fetchUrl(urlHOME);
-  Map<String, dynamic> _data = {};
+  Map<String, dynamic> _dataHome = {};
+  Map<String, dynamic> _dataCategories = {};
+  final Map<String, dynamic> _cache = {
+    'CIN': {},
+    'DOR': {},
+    'SER': {},
+    'EMI': {},
+    'SCI': {},
+    'HIS': {},
+    'DEC': {},
+    'ACT': {},
+    'CPO': {}
+  };
   int _selectedIndex = 0;
 
   Widget _buildScreen(int screen) {
@@ -50,14 +62,14 @@ class _MyHomePageState extends State<MyHomePage> {
       case 0:
         return FutureBuilder(
             future: _home,
-            initialData: _data,
+            initialData: _dataHome,
             builder: (context, snapshot) {
               //debugPrint(
               //    '${DateTime.now().toIso8601String().substring(11, 19)}: FutureBuilder.builder()');
               //debugPrint('${snapshot.hasData}');
               if (snapshot.hasData) {
-                _data = snapshot.data!;
-                return CarouselList(data: snapshot.data!);
+                _dataHome = snapshot.data!;
+                return CarouselList(data: snapshot.data!, shrink: 100);
               } else {
                 return const SizedBox(
                   width: 800,
@@ -92,14 +104,21 @@ class _MyHomePageState extends State<MyHomePage> {
                             onTap: () async {
                               String url =
                                   "https://www.arte.tv/api/rproxy/emac/v4/fr/web/pages/${c['code']}/";
-                              final resp = await fetchUrl(url);
+                              if (_cache[c['code']].isEmpty) {
+                                final resp = await fetchUrl(url);
+                                _cache[c['code']] = resp;
+                              }
+                              setState(() {
+                                _dataCategories = _cache[c['code']];
+                              });
                             },
                             contentPadding: const EdgeInsets.only(
                                 left: 15, top: 10, bottom: 10),
                             title: Text(c['text']),
                           );
                         }).toList(),
-                      ))
+                      )),
+                  CarouselList(data: _dataCategories, shrink: 100 + 350)
                 ])));
       default:
         return const SizedBox.shrink();
@@ -166,10 +185,10 @@ class _CarouselState extends State<Carousel> {
       }
       return Stack(children: [
         SizedBox(
-            height: 240,
+            height: 250,
             child: ListView(
               controller: _controller,
-              prototypeItem: const SizedBox(width: 285, height: 230),
+              prototypeItem: const SizedBox(width: 285, height: 250),
               scrollDirection: Axis.horizontal,
               children: widget.children,
             )),
@@ -245,8 +264,9 @@ class _CarouselState extends State<Carousel> {
 
 class CarouselList extends StatelessWidget {
   final Map<String, dynamic> data;
+  final int shrink;
 
-  const CarouselList({super.key, required this.data});
+  const CarouselList({super.key, required this.data, required this.shrink});
 
   void _showDialogProgram(
       BuildContext bcontext, Map<String, dynamic> v, String imageUrl) {
@@ -319,7 +339,8 @@ class CarouselList extends StatelessWidget {
           z['title'].contains('event') ||
           z['code'] == 'highlights_HOME' ||
           z['title'] == "Parcourir toute l'offre" ||
-          z['title'].startsWith('ARTE ')) {
+          videos.length == 1) {
+        //debugPrint('skipped ${z['title']} (${videos.length})');
         continue;
       }
       thumbnails.add(Container(
@@ -365,7 +386,7 @@ class CarouselList extends StatelessWidget {
     return SingleChildScrollView(
         // subtract NavigationRail width
         child: Container(
-            width: MediaQuery.of(context).size.width - 100,
+            width: MediaQuery.of(context).size.width - shrink,
             color: Colors.grey[100],
             padding: const EdgeInsets.all(10),
             child: Column(
