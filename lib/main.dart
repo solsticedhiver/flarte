@@ -121,7 +121,7 @@ class _CarouselState extends State<Carousel> {
       }
       return Stack(children: [
         SizedBox(
-            height: 230,
+            height: 240,
             child: ListView(
               controller: _controller,
               prototypeItem: const SizedBox(width: 285, height: 230),
@@ -285,12 +285,11 @@ class CarouselList extends StatelessWidget {
             },
             child: Card(
                 child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Center(
-                        child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                           Image(
                             image: CachedNetworkImageProvider(imageUrl),
                             // image size divided by 1.5
@@ -308,7 +307,7 @@ class CarouselList extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                        ])))));
+                        ]))));
       }).toList()));
     }
     return SingleChildScrollView(
