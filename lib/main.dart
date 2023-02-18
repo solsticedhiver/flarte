@@ -53,115 +53,6 @@ class _MyHomePageState extends State<MyHomePage> {
   final Future<Map<String, dynamic>> _home = fetchHome();
   int _selectedIndex = 0;
 
-  void _showDialogProgram(
-      BuildContext bcontext, Map<String, dynamic> v, String imageUrl) {
-    showDialog(
-        context: bcontext,
-        builder: (bcontext) {
-          return Dialog(
-              child: Container(
-                  padding: const EdgeInsets.all(15),
-                  width: 600,
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          v['title'],
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(bcontext).textTheme.titleLarge,
-                        ),
-                        v['subtitle'] != null
-                            ? Text(
-                                v['subtitle'],
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(bcontext).textTheme.titleMedium,
-                              )
-                            : const SizedBox.shrink(),
-                        const SizedBox(height: 15),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Image(
-                              width: 200,
-                              height: 300,
-                              image: CachedNetworkImageProvider(
-                                  '${imageUrl.replaceFirst('400x225', '300x450')}?type=TEXT'),
-                            ),
-                            const SizedBox(width: 15),
-                            Flexible(
-                                child: v['shortDescription'] != null
-                                    ? Text(v['shortDescription'],
-                                        style: Theme.of(bcontext)
-                                            .textTheme
-                                            .bodyMedium)
-                                    : const SizedBox.shrink()),
-                          ],
-                        )
-                      ])));
-        });
-  }
-
-  List<Widget> _buildCarouselList(Map<String, dynamic> data) {
-    List<Widget> thumbnails = [];
-    final zones = data['value']['zones'];
-    List<dynamic> videos = [];
-
-    for (var z in zones) {
-      videos = z['content']['data'];
-      if (videos.isEmpty ||
-          z['title'].contains('event') ||
-          z['code'] == 'highlights_HOME' ||
-          z['code'] == 'cbde5425-226c-4638-b9f6-6847e509db7f' ||
-          z['title'].startsWith('ARTE ')) {
-        continue;
-      }
-      thumbnails.add(Container(
-          padding: const EdgeInsets.all(15),
-          child: Text('${z['title']} (${videos.length})',
-              style: Theme.of(context).textTheme.headlineSmall)));
-      thumbnails.add(Carousel(
-          children: videos.map((v) {
-        final imageUrl = (v['mainImage']['url'])
-            .replaceFirst('__SIZE__', '400x225')
-            .replaceFirst('?type=TEXT', '');
-        return InkWell(
-            onTap: () {
-              _showDialogProgram(context, v, imageUrl);
-            },
-            child: Card(
-                child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Center(
-                        child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                          Image(
-                            image: CachedNetworkImageProvider(imageUrl),
-                            // image size divided by 1.5
-                            height: 148,
-                            width: 265,
-                          ),
-                          ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            title: Text(
-                              v['title'],
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            subtitle: Text(
-                              v['subtitle'] ?? '',
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ])))));
-      }).toList()));
-    }
-    return thumbnails;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -195,17 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 future: _home,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    final thumbnails = _buildCarouselList(snapshot.data!);
-                    return SingleChildScrollView(
-                        // subtract NavigationRail width
-                        child: Container(
-                            width: MediaQuery.of(context).size.width - 100,
-                            color: Colors.grey[100],
-                            padding: const EdgeInsets.all(10),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: thumbnails,
-                            )));
+                    return CarouselList(data: snapshot.data!);
                   } else {
                     return const SizedBox(width: 5555);
                   }
@@ -300,5 +181,131 @@ class _CarouselState extends State<Carousel> {
             ),
           )),
     ]);
+  }
+}
+
+class CarouselList extends StatelessWidget {
+  final Map<String, dynamic> data;
+
+  const CarouselList({super.key, required this.data});
+
+  void _showDialogProgram(
+      BuildContext bcontext, Map<String, dynamic> v, String imageUrl) {
+    showDialog(
+        context: bcontext,
+        builder: (bcontext) {
+          return Dialog(
+              child: Container(
+                  padding: const EdgeInsets.all(15),
+                  width: 600,
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          v['title'],
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(bcontext).textTheme.titleLarge,
+                        ),
+                        v['subtitle'] != null
+                            ? Text(
+                                v['subtitle'],
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(bcontext).textTheme.titleMedium,
+                              )
+                            : const SizedBox.shrink(),
+                        const SizedBox(height: 15),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image(
+                              width: 200,
+                              height: 300,
+                              image: CachedNetworkImageProvider(
+                                  '${imageUrl.replaceFirst('400x225', '300x450')}?type=TEXT'),
+                            ),
+                            const SizedBox(width: 15),
+                            Flexible(
+                                child: v['shortDescription'] != null
+                                    ? Text(v['shortDescription'],
+                                        style: Theme.of(bcontext)
+                                            .textTheme
+                                            .bodyMedium)
+                                    : const SizedBox.shrink()),
+                          ],
+                        )
+                      ])));
+        });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    List<Widget> thumbnails = [];
+    List<dynamic> videos = [];
+
+    //debugPrint('in CarouselList.build()');
+    final zones = data['value']['zones'];
+    for (var z in zones) {
+      videos = z['content']['data'];
+      if (videos.isEmpty ||
+          z['title'].contains('event') ||
+          z['code'] == 'highlights_HOME' ||
+          z['code'] == 'cbde5425-226c-4638-b9f6-6847e509db7f' ||
+          z['title'].startsWith('ARTE ')) {
+        continue;
+      }
+      thumbnails.add(Container(
+          padding: const EdgeInsets.all(15),
+          child: Text('${z['title']} (${videos.length})',
+              style: Theme.of(context).textTheme.headlineSmall)));
+      thumbnails.add(Carousel(
+          children: videos.map((v) {
+        final imageUrl = (v['mainImage']['url'])
+            .replaceFirst('__SIZE__', '400x225')
+            .replaceFirst('?type=TEXT', '');
+        return InkWell(
+            onTap: () {
+              _showDialogProgram(context, v, imageUrl);
+            },
+            child: Card(
+                child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Center(
+                        child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                          Image(
+                            image: CachedNetworkImageProvider(imageUrl),
+                            // image size divided by 1.5
+                            height: 148,
+                            width: 265,
+                          ),
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(
+                              v['title'],
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            subtitle: Text(
+                              v['subtitle'] ?? '',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ])))));
+      }).toList()));
+    }
+    return SingleChildScrollView(
+        // subtract NavigationRail width
+        child: Container(
+            width: MediaQuery.of(context).size.width - 100,
+            color: Colors.grey[100],
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: thumbnails,
+            )));
   }
 }
