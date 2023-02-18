@@ -42,6 +42,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final Future<Map<String, dynamic>> _home = fetchUrl(urlHOME);
+  Map<String, dynamic> _data = {};
   int _selectedIndex = 0;
 
   Widget _buildScreen(int screen) {
@@ -49,11 +50,18 @@ class _MyHomePageState extends State<MyHomePage> {
       case 0:
         return FutureBuilder(
             future: _home,
+            initialData: _data,
             builder: (context, snapshot) {
+              //debugPrint(
+              //    '${DateTime.now().toIso8601String().substring(11, 19)}: FutureBuilder.builder()');
+              //debugPrint('${snapshot.hasData}');
               if (snapshot.hasData) {
+                _data = snapshot.data!;
                 return CarouselList(data: snapshot.data!);
               } else {
-                return const SizedBox(width: 555);
+                return const SizedBox(
+                  width: 800,
+                );
               }
             });
       case 1:
@@ -299,7 +307,12 @@ class CarouselList extends StatelessWidget {
     List<dynamic> videos = [];
 
     //debugPrint('in CarouselList.build()');
-    final zones = data['value']['zones'];
+    final List<dynamic> zones;
+    if (data.isEmpty) {
+      zones = [];
+    } else {
+      zones = data['value']['zones'];
+    }
     for (var z in zones) {
       videos = z['content']['data'];
       if (videos.isEmpty ||
