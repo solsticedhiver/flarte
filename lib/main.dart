@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.deepOrange,
       ),
-      home: const MyHomePage(title: 'Flarte'),
+      home: const MyHomePage(title: 'arte.tv'),
     );
   }
 }
