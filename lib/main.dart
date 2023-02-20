@@ -3,9 +3,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flarte/api.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider<Cache>(
+      create: (_) => Cache(), child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -17,15 +19,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flarte',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.deepOrange,
       ),
       home: const MyHomePage(title: 'arte.tv'),
@@ -42,107 +35,29 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   final Future<Map<String, dynamic>> _home = fetchUrl(urlHOME);
-  Map<String, dynamic> _dataHome = {};
-  Map<String, dynamic> _dataCategories = {};
-  final Map<String, dynamic> _cache = {
-    'CIN': {},
-    'DOR': {},
-    'SER': {},
-    'EMI': {},
-    'SCI': {},
-    'HIS': {},
-    'DEC': {},
-    'ACT': {},
-    'CPO': {}
-  };
   int _selectedIndex = 0;
+  late TabController _tabController;
+  late TabController _tabController2;
 
-  Widget _buildScreen(int screen) {
-    debugPrint('in _buildScreen()');
-    switch (screen) {
-      case 0:
-        return FutureBuilder(
-            future: _home,
-            initialData: _dataHome,
-            builder: (context, snapshot) {
-              //debugPrint(
-              //    '${DateTime.now().toIso8601String().substring(11, 19)}: FutureBuilder.builder()');
-              //debugPrint('${snapshot.hasData}');
-              if (snapshot.hasData) {
-                _dataHome = snapshot.data!;
-                return CarouselList(data: snapshot.data!, shrink: 100);
-              } else {
-                return const SizedBox(
-                  width: 800,
-                );
-              }
-            });
-      case 1:
-        double leftSideWidth = 350;
-        bool isLeftSideSmall = false;
-        if (MediaQuery.of(context).size.width < 1300) {
-          leftSideWidth = 200;
-          isLeftSideSmall = true;
-        }
-        return SizedBox(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width - 100,
-            child: Row(children: [
-              SizedBox(
-                  width: leftSideWidth,
-                  child: ListView(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    semanticChildCount: 9,
-                    children: categories.map((c) {
-                      String text = c['text'];
-                      if (isLeftSideSmall) {
-                        text = c['text'].split(' ').first;
-                      }
-                      return ListTile(
-                        leading: CircleAvatar(
-                            backgroundColor: Color.fromARGB(255, c['color'][0],
-                                c['color'][1], c['color'][2]),
-                            child: Text(text.substring(0, 1),
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .inversePrimary))),
-                        onTap: () async {
-                          String url =
-                              "https://www.arte.tv/api/rproxy/emac/v4/fr/web/pages/${c['code']}/";
-                          if (_cache[c['code']].isEmpty) {
-                            final resp = await fetchUrl(url);
-                            _cache[c['code']] = resp;
-                          }
-                          setState(() {
-                            _dataCategories = _cache[c['code']];
-                          });
-                        },
-                        contentPadding: const EdgeInsets.only(
-                            left: 15, top: 10, bottom: 10),
-                        title: Text(text),
-                      );
-                    }).toList(),
-                  )),
-              CarouselList(
-                  data: _dataCategories, shrink: 100 + leftSideWidth.toInt())
-            ]));
-      default:
-        return const SizedBox.shrink();
-    }
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController2 = TabController(length: 9, vsync: this);
   }
 
   @override
   Widget build(BuildContext context) {
+    bool isLeftSideSmall = (MediaQuery.of(context).size.width < 1300);
     return Scaffold(
       drawer: const Drawer(),
       body: Row(children: [
         NavigationRail(
             onDestinationSelected: (index) {
               setState(() {
+                _tabController.animateTo(index);
                 _selectedIndex = index;
               });
             },
@@ -161,7 +76,53 @@ class _MyHomePageState extends State<MyHomePage> {
                   )),
             ],
             selectedIndex: _selectedIndex),
-        Expanded(child: _buildScreen(_selectedIndex))
+        Expanded(
+            child: TabBarView(controller: _tabController, children: [
+          FutureBuilder(
+              future: _home,
+              initialData: const {},
+              builder: (context, snapshot) {
+                //debugPrint(
+                //    '${DateTime.now().toIso8601String().substring(11, 19)}: FutureBuilder.builder()');
+                //debugPrint('${snapshot.hasData}');
+                return CarouselList(data: snapshot.data!, shrink: 100);
+              }),
+          Row(children: [
+            CategoriesList(small: isLeftSideSmall, controller: _tabController2),
+            Expanded(
+              flex: 1,
+              child: TabBarView(controller: _tabController2, children: [
+                Consumer<Cache>(builder: (context, cache, child) {
+                  return CarouselList(data: cache.data['DOR'], shrink: 100);
+                }),
+                Consumer<Cache>(builder: (context, cache, child) {
+                  return CarouselList(data: cache.data['SER'], shrink: 100);
+                }),
+                Consumer<Cache>(builder: (context, cache, child) {
+                  return CarouselList(data: cache.data['CIN'], shrink: 100);
+                }),
+                Consumer<Cache>(builder: (context, cache, child) {
+                  return CarouselList(data: cache.data['EMI'], shrink: 100);
+                }),
+                Consumer<Cache>(builder: (context, cache, child) {
+                  return CarouselList(data: cache.data['HIS'], shrink: 100);
+                }),
+                Consumer<Cache>(builder: (context, cache, child) {
+                  return CarouselList(data: cache.data['DEC'], shrink: 100);
+                }),
+                Consumer<Cache>(builder: (context, cache, child) {
+                  return CarouselList(data: cache.data['SCI'], shrink: 100);
+                }),
+                Consumer<Cache>(builder: (context, cache, child) {
+                  return CarouselList(data: cache.data['ACT'], shrink: 100);
+                }),
+                Consumer<Cache>(builder: (context, cache, child) {
+                  return CarouselList(data: cache.data['CPO'], shrink: 100);
+                }),
+              ]),
+            )
+          ])
+        ]))
       ]),
     );
   }
@@ -270,7 +231,7 @@ class _CarouselState extends State<Carousel> {
 }
 
 class CarouselList extends StatelessWidget {
-  final Map<String, dynamic> data;
+  final Map<dynamic, dynamic> data;
   final int shrink;
 
   const CarouselList({super.key, required this.data, required this.shrink});
@@ -345,7 +306,7 @@ class CarouselList extends StatelessWidget {
     List<Widget> thumbnails = [];
     List<dynamic> videos = [];
 
-    //debugPrint('in CarouselList.build()');
+    debugPrint('in CarouselList.build()');
     final List<dynamic> zones;
     if (data.isEmpty) {
       zones = [];
@@ -411,7 +372,77 @@ class CarouselList extends StatelessWidget {
             padding: const EdgeInsets.all(10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: thumbnails,
             )));
+  }
+}
+
+class CategoriesList extends StatefulWidget {
+  final bool small;
+  final TabController controller;
+  late final double _leftSideWidth;
+
+  CategoriesList({super.key, required this.small, required this.controller}) {
+    if (small) {
+      _leftSideWidth = 200;
+    } else {
+      _leftSideWidth = 300;
+    }
+  }
+
+  @override
+  State<CategoriesList> createState() => _CategoriesListState();
+}
+
+class _CategoriesListState extends State<CategoriesList> {
+  int selectedIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+        width: widget._leftSideWidth,
+        child: ListView.builder(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          semanticChildCount: categories.length,
+          itemCount: categories.length,
+          itemBuilder: (context, index) {
+            final c = categories[index];
+            String text = c['text'];
+            if (widget.small) {
+              text = c['text'].split(' ').first;
+            }
+            return ListTile(
+              selectedTileColor: Theme.of(context).highlightColor,
+              selected: index == selectedIndex,
+              leading: CircleAvatar(
+                  backgroundColor: Color.fromARGB(
+                      255, c['color'][0], c['color'][1], c['color'][2]),
+                  child: Text(text.substring(0, 1),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color:
+                              Theme.of(context).colorScheme.inversePrimary))),
+              onTap: () async {
+                String url =
+                    "https://www.arte.tv/api/rproxy/emac/v4/fr/web/pages/${c['code']}/";
+                final cache = Provider.of<Cache>(context, listen: false);
+                //debugPrint('${c['code']}');
+                if (cache.data[c['code']].isEmpty) {
+                  final resp = await fetchUrl(url);
+                  cache.set(c['code'], resp);
+                }
+                setState(() {
+                  selectedIndex = index;
+                  widget.controller.animateTo(index);
+                });
+              },
+              contentPadding:
+                  const EdgeInsets.only(left: 15, top: 10, bottom: 10),
+              title: Text(text,
+                  style: const TextStyle(fontWeight: FontWeight.w500)),
+            );
+          },
+        ));
   }
 }

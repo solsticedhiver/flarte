@@ -6,8 +6,8 @@ const String urlHOME =
     "https://www.arte.tv/api/rproxy/emac/v4/fr/web/pages/HOME/";
 
 Future<Map<String, dynamic>> fetchUrl(String url) async {
-  //debugPrint(
-  //    '${DateTime.now().toIso8601String().substring(11, 19)}: in fetchUrl()');
+  debugPrint(
+      '${DateTime.now().toIso8601String().substring(11, 19)}: in fetchUrl()');
   final http.Response resp = await http.get(Uri.parse(url));
   if (resp.statusCode != 200) {
     return {};
@@ -63,3 +63,25 @@ const List<Map<String, dynamic>> categories = [
     'code': 'CPO',
   }
 ];
+
+class Cache extends ChangeNotifier {
+  final Map<String, dynamic> data = {
+    'HOM': {},
+    'DOR': {},
+    'SER': {},
+    'CIN': {},
+    'EMI': {},
+    'HIS': {},
+    'DEC': {},
+    'SCI': {},
+    'ACT': {},
+    'CPO': {}
+  };
+  //int index = 0;
+
+  void set(String key, Map<dynamic, dynamic> dict) {
+    data[key] = dict;
+    //index = data.keys.toList().indexOf(key);
+    notifyListeners();
+  }
+}
