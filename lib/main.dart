@@ -369,7 +369,7 @@ class _CategoriesListState extends State<CategoriesList> {
     return SizedBox(
         width: widget._leftSideWidth,
         child: ListView.builder(
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          //padding: const EdgeInsets.symmetric(vertical: 10),
           semanticChildCount: categories.length,
           itemCount: categories.length,
           itemBuilder: (context, index) {
