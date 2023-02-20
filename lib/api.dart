@@ -18,6 +18,11 @@ Future<Map<String, dynamic>> fetchUrl(String url) async {
 
 const List<Map<String, dynamic>> categories = [
   {
+    'text': 'Home',
+    'color': [124, 124, 124],
+    'code': 'HOM'
+  },
+  {
     'text': 'Documentaires et reportages',
     'color': [225, 143, 71],
     'code': 'DOR'

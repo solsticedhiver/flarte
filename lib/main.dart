@@ -36,95 +36,61 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
-  final Future<Map<String, dynamic>> _home = fetchUrl(urlHOME);
-  int _selectedIndex = 0;
   late TabController _tabController;
-  late TabController _tabController2;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    _tabController2 = TabController(length: 9, vsync: this);
+    _tabController = TabController(initialIndex: 0, length: 10, vsync: this);
+    final cache = Provider.of<Cache>(context, listen: false);
+    Future.delayed(Duration.zero, () async {
+      cache.set('HOM', await fetchUrl(urlHOME));
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     bool isLeftSideSmall = (MediaQuery.of(context).size.width < 1300);
     return Scaffold(
-      drawer: const Drawer(),
-      body: Row(children: [
-        NavigationRail(
-            onDestinationSelected: (index) {
-              setState(() {
-                _tabController.animateTo(index);
-                _selectedIndex = index;
-              });
-            },
-            labelType: NavigationRailLabelType.all,
-            destinations: const <NavigationRailDestination>[
-              NavigationRailDestination(
-                icon: Icon(Icons.home_outlined),
-                selectedIcon: Icon(Icons.home),
-                label: Text('Home'),
-              ),
-              NavigationRailDestination(
-                  icon: Icon(Icons.category_outlined),
-                  selectedIcon: Icon(Icons.category),
-                  label: Text(
-                    'Catégories',
-                  )),
-            ],
-            selectedIndex: _selectedIndex),
-        Expanded(
+        drawer: const Drawer(),
+        body: Row(children: [
+          CategoriesList(small: isLeftSideSmall, controller: _tabController),
+          Expanded(
+            flex: 1,
             child: TabBarView(controller: _tabController, children: [
-          FutureBuilder(
-              future: _home,
-              initialData: const {},
-              builder: (context, snapshot) {
-                //debugPrint(
-                //    '${DateTime.now().toIso8601String().substring(11, 19)}: FutureBuilder.builder()');
-                //debugPrint('${snapshot.hasData}');
-                return CarouselList(data: snapshot.data!, shrink: 100);
+              Consumer<Cache>(builder: (context, cache, child) {
+                return CarouselList(data: cache.data['HOM'], shrink: 100);
               }),
-          Row(children: [
-            CategoriesList(small: isLeftSideSmall, controller: _tabController2),
-            Expanded(
-              flex: 1,
-              child: TabBarView(controller: _tabController2, children: [
-                Consumer<Cache>(builder: (context, cache, child) {
-                  return CarouselList(data: cache.data['DOR'], shrink: 100);
-                }),
-                Consumer<Cache>(builder: (context, cache, child) {
-                  return CarouselList(data: cache.data['SER'], shrink: 100);
-                }),
-                Consumer<Cache>(builder: (context, cache, child) {
-                  return CarouselList(data: cache.data['CIN'], shrink: 100);
-                }),
-                Consumer<Cache>(builder: (context, cache, child) {
-                  return CarouselList(data: cache.data['EMI'], shrink: 100);
-                }),
-                Consumer<Cache>(builder: (context, cache, child) {
-                  return CarouselList(data: cache.data['HIS'], shrink: 100);
-                }),
-                Consumer<Cache>(builder: (context, cache, child) {
-                  return CarouselList(data: cache.data['DEC'], shrink: 100);
-                }),
-                Consumer<Cache>(builder: (context, cache, child) {
-                  return CarouselList(data: cache.data['SCI'], shrink: 100);
-                }),
-                Consumer<Cache>(builder: (context, cache, child) {
-                  return CarouselList(data: cache.data['ACT'], shrink: 100);
-                }),
-                Consumer<Cache>(builder: (context, cache, child) {
-                  return CarouselList(data: cache.data['CPO'], shrink: 100);
-                }),
-              ]),
-            )
-          ])
-        ]))
-      ]),
-    );
+              Consumer<Cache>(builder: (context, cache, child) {
+                return CarouselList(data: cache.data['DOR'], shrink: 100);
+              }),
+              Consumer<Cache>(builder: (context, cache, child) {
+                return CarouselList(data: cache.data['SER'], shrink: 100);
+              }),
+              Consumer<Cache>(builder: (context, cache, child) {
+                return CarouselList(data: cache.data['CIN'], shrink: 100);
+              }),
+              Consumer<Cache>(builder: (context, cache, child) {
+                return CarouselList(data: cache.data['EMI'], shrink: 100);
+              }),
+              Consumer<Cache>(builder: (context, cache, child) {
+                return CarouselList(data: cache.data['HIS'], shrink: 100);
+              }),
+              Consumer<Cache>(builder: (context, cache, child) {
+                return CarouselList(data: cache.data['DEC'], shrink: 100);
+              }),
+              Consumer<Cache>(builder: (context, cache, child) {
+                return CarouselList(data: cache.data['SCI'], shrink: 100);
+              }),
+              Consumer<Cache>(builder: (context, cache, child) {
+                return CarouselList(data: cache.data['ACT'], shrink: 100);
+              }),
+              Consumer<Cache>(builder: (context, cache, child) {
+                return CarouselList(data: cache.data['CPO'], shrink: 100);
+              }),
+            ]),
+          )
+        ]));
   }
 }
 
