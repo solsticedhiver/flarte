@@ -60,6 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
   Widget _buildScreen(int screen) {
+    debugPrint('in _buildScreen()');
     switch (screen) {
       case 0:
         return FutureBuilder(
@@ -79,7 +80,6 @@ class _MyHomePageState extends State<MyHomePage> {
               }
             });
       case 1:
-        //debugPrint('in _buildScreen/1');
         return SizedBox(
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width - 100,
@@ -127,9 +127,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
       drawer: const Drawer(),
       body: Row(children: [
         NavigationRail(
