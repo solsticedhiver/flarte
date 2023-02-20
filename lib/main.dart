@@ -60,63 +60,43 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             child: TabBarView(controller: _tabController, children: [
               Consumer<Cache>(builder: (context, cache, child) {
                 return CarouselList(
-                    data: cache.data['HOM'],
-                    shrink: 100,
-                    small: isLeftSideSmall);
+                    data: cache.data['HOM'], small: isLeftSideSmall);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
                 return CarouselList(
-                    data: cache.data['DOR'],
-                    shrink: 100,
-                    small: isLeftSideSmall);
+                    data: cache.data['DOR'], small: isLeftSideSmall);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
                 return CarouselList(
-                    data: cache.data['SER'],
-                    shrink: 100,
-                    small: isLeftSideSmall);
+                    data: cache.data['SER'], small: isLeftSideSmall);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
                 return CarouselList(
-                    data: cache.data['CIN'],
-                    shrink: 100,
-                    small: isLeftSideSmall);
+                    data: cache.data['CIN'], small: isLeftSideSmall);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
                 return CarouselList(
-                    data: cache.data['EMI'],
-                    shrink: 100,
-                    small: isLeftSideSmall);
+                    data: cache.data['EMI'], small: isLeftSideSmall);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
                 return CarouselList(
-                    data: cache.data['HIS'],
-                    shrink: 100,
-                    small: isLeftSideSmall);
+                    data: cache.data['HIS'], small: isLeftSideSmall);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
                 return CarouselList(
-                    data: cache.data['DEC'],
-                    shrink: 100,
-                    small: isLeftSideSmall);
+                    data: cache.data['DEC'], small: isLeftSideSmall);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
                 return CarouselList(
-                    data: cache.data['SCI'],
-                    shrink: 100,
-                    small: isLeftSideSmall);
+                    data: cache.data['SCI'], small: isLeftSideSmall);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
                 return CarouselList(
-                    data: cache.data['ACT'],
-                    shrink: 100,
-                    small: isLeftSideSmall);
+                    data: cache.data['ACT'], small: isLeftSideSmall);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
                 return CarouselList(
-                    data: cache.data['CPO'],
-                    shrink: 100,
-                    small: isLeftSideSmall);
+                    data: cache.data['CPO'], small: isLeftSideSmall);
               }),
             ]),
           )
@@ -239,15 +219,10 @@ class _CarouselState extends State<Carousel> {
 
 class CarouselList extends StatelessWidget {
   final Map<dynamic, dynamic> data;
-  final int shrink;
   final bool small;
   late final double _imageHeight, _imageWidth;
 
-  CarouselList(
-      {super.key,
-      required this.data,
-      required this.shrink,
-      this.small = false}) {
+  CarouselList({super.key, required this.data, this.small = false}) {
     if (small) {
       // image size divided by 2
       _imageHeight = 112;
@@ -390,7 +365,7 @@ class CarouselList extends StatelessWidget {
     return SingleChildScrollView(
         // subtract NavigationRail width
         child: Container(
-            width: MediaQuery.of(context).size.width - shrink,
+            width: MediaQuery.of(context).size.width,
             color: Colors.grey[100],
             padding: const EdgeInsets.all(10),
             child: Column(
