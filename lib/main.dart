@@ -80,21 +80,31 @@ class _MyHomePageState extends State<MyHomePage> {
               }
             });
       case 1:
+        double leftSideWidth = 350;
+        bool isLeftSideSmall = false;
+        if (MediaQuery.of(context).size.width < 1300) {
+          leftSideWidth = 200;
+          isLeftSideSmall = true;
+        }
         return SizedBox(
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width - 100,
             child: Row(children: [
               SizedBox(
-                  width: 350,
+                  width: leftSideWidth,
                   child: ListView(
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     semanticChildCount: 9,
                     children: categories.map((c) {
+                      String text = c['text'];
+                      if (isLeftSideSmall) {
+                        text = c['text'].split(' ').first;
+                      }
                       return ListTile(
                         leading: CircleAvatar(
                             backgroundColor: Color.fromARGB(255, c['color'][0],
                                 c['color'][1], c['color'][2]),
-                            child: Text(c['text'].substring(0, 1),
+                            child: Text(text.substring(0, 1),
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Theme.of(context)
@@ -113,11 +123,12 @@ class _MyHomePageState extends State<MyHomePage> {
                         },
                         contentPadding: const EdgeInsets.only(
                             left: 15, top: 10, bottom: 10),
-                        title: Text(c['text']),
+                        title: Text(text),
                       );
                     }).toList(),
                   )),
-              CarouselList(data: _dataCategories, shrink: 100 + 350)
+              CarouselList(
+                  data: _dataCategories, shrink: 100 + leftSideWidth.toInt())
             ]));
       default:
         return const SizedBox.shrink();
@@ -150,7 +161,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   )),
             ],
             selectedIndex: _selectedIndex),
-        Center(child: _buildScreen(_selectedIndex))
+        Expanded(child: _buildScreen(_selectedIndex))
       ]),
     );
   }
