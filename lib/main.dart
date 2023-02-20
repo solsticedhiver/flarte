@@ -59,34 +59,64 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             flex: 1,
             child: TabBarView(controller: _tabController, children: [
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['HOM'], shrink: 100);
+                return CarouselList(
+                    data: cache.data['HOM'],
+                    shrink: 100,
+                    small: isLeftSideSmall);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['DOR'], shrink: 100);
+                return CarouselList(
+                    data: cache.data['DOR'],
+                    shrink: 100,
+                    small: isLeftSideSmall);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['SER'], shrink: 100);
+                return CarouselList(
+                    data: cache.data['SER'],
+                    shrink: 100,
+                    small: isLeftSideSmall);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['CIN'], shrink: 100);
+                return CarouselList(
+                    data: cache.data['CIN'],
+                    shrink: 100,
+                    small: isLeftSideSmall);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['EMI'], shrink: 100);
+                return CarouselList(
+                    data: cache.data['EMI'],
+                    shrink: 100,
+                    small: isLeftSideSmall);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['HIS'], shrink: 100);
+                return CarouselList(
+                    data: cache.data['HIS'],
+                    shrink: 100,
+                    small: isLeftSideSmall);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['DEC'], shrink: 100);
+                return CarouselList(
+                    data: cache.data['DEC'],
+                    shrink: 100,
+                    small: isLeftSideSmall);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['SCI'], shrink: 100);
+                return CarouselList(
+                    data: cache.data['SCI'],
+                    shrink: 100,
+                    small: isLeftSideSmall);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['ACT'], shrink: 100);
+                return CarouselList(
+                    data: cache.data['ACT'],
+                    shrink: 100,
+                    small: isLeftSideSmall);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['CPO'], shrink: 100);
+                return CarouselList(
+                    data: cache.data['CPO'],
+                    shrink: 100,
+                    small: isLeftSideSmall);
               }),
             ]),
           )
@@ -96,10 +126,20 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
 class Carousel extends StatefulWidget {
   final List<Widget> children;
+  final bool small;
+  late final double _width, _height;
   @override
   State<Carousel> createState() => _CarouselState();
 
-  const Carousel({super.key, required this.children});
+  Carousel({super.key, required this.children, this.small = false}) {
+    if (small) {
+      _width = 220;
+      _height = 112 + 100;
+    } else {
+      _width = 285;
+      _height = 250;
+    }
+  }
 }
 
 class _CarouselState extends State<Carousel> {
@@ -119,10 +159,11 @@ class _CarouselState extends State<Carousel> {
       }
       return Stack(children: [
         SizedBox(
-            height: 250,
+            height: widget._height,
             child: ListView(
               controller: _controller,
-              prototypeItem: const SizedBox(width: 285, height: 250),
+              prototypeItem:
+                  SizedBox(width: widget._width, height: widget._height),
               scrollDirection: Axis.horizontal,
               children: widget.children,
             )),
@@ -199,8 +240,24 @@ class _CarouselState extends State<Carousel> {
 class CarouselList extends StatelessWidget {
   final Map<dynamic, dynamic> data;
   final int shrink;
+  final bool small;
+  late final double _imageHeight, _imageWidth;
 
-  const CarouselList({super.key, required this.data, required this.shrink});
+  CarouselList(
+      {super.key,
+      required this.data,
+      required this.shrink,
+      this.small = false}) {
+    if (small) {
+      // image size divided by 2
+      _imageHeight = 112;
+      _imageWidth = 200;
+    } else {
+      // image size divided by 1.5
+      _imageHeight = 148;
+      _imageWidth = 265;
+    }
+  }
 
   void _showDialogProgram(
       BuildContext bcontext, Map<String, dynamic> v, String imageUrl) {
@@ -295,40 +352,40 @@ class CarouselList extends StatelessWidget {
           child: Text('${z['title']} (${videos.length})',
               style: Theme.of(context).textTheme.headlineSmall)));
       thumbnails.add(Carousel(
+          small: small,
           children: videos.map((v) {
-        final imageUrl = (v['mainImage']['url'])
-            .replaceFirst('__SIZE__', '400x225')
-            .replaceFirst('?type=TEXT', '');
-        return InkWell(
-            onTap: () {
-              _showDialogProgram(context, v, imageUrl);
-            },
-            child: Card(
-                child: Container(
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Image(
-                            image: CachedNetworkImageProvider(imageUrl),
-                            // image size divided by 1.5
-                            height: 148,
-                            width: 265,
-                          ),
-                          ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            title: Text(
-                              v['title'],
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            subtitle: Text(
-                              v['subtitle'] ?? '',
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ]))));
-      }).toList()));
+            final imageUrl = (v['mainImage']['url'])
+                .replaceFirst('__SIZE__', '400x225')
+                .replaceFirst('?type=TEXT', '');
+            return InkWell(
+                onTap: () {
+                  _showDialogProgram(context, v, imageUrl);
+                },
+                child: Card(
+                    child: Container(
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Image(
+                                image: CachedNetworkImageProvider(imageUrl),
+                                height: _imageHeight,
+                                width: _imageWidth,
+                              ),
+                              ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                title: Text(
+                                  v['title'],
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                subtitle: Text(
+                                  v['subtitle'] ?? '',
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ]))));
+          }).toList()));
     }
     return SingleChildScrollView(
         // subtract NavigationRail width
