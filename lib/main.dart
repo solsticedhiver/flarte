@@ -1,4 +1,5 @@
 //import 'dart:convert';
+import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flarte/api.dart';
@@ -372,12 +373,14 @@ class CarouselList extends StatelessWidget {
             height: MediaQuery.of(context).size.height,
             color: Colors.grey[100],
             padding: const EdgeInsets.all(10),
-            child: ListView.builder(
-              itemCount: thumbnails.length,
-              itemBuilder: (context, index) {
-                return thumbnails[index];
-              },
-            )));
+            child: thumbnails.isNotEmpty
+                ? ListView.builder(
+                    itemCount: thumbnails.length,
+                    itemBuilder: (context, index) {
+                      return thumbnails[index];
+                    },
+                  )
+                : const Center(child: Text('Fetching data ...'))));
   }
 }
 
@@ -431,14 +434,14 @@ class _CategoriesListState extends State<CategoriesList> {
                     "https://www.arte.tv/api/rproxy/emac/v4/fr/web/pages/${c['code']}/";
                 final cache = Provider.of<Cache>(context, listen: false);
                 //debugPrint('${c['code']}');
-                if (cache.data[c['code']].isEmpty) {
-                  final resp = await fetchUrl(url);
-                  cache.set(c['code'], resp);
-                }
                 setState(() {
                   selectedIndex = index;
                   widget.controller.animateTo(index);
                 });
+                if (cache.data[c['code']].isEmpty) {
+                  final resp = await fetchUrl(url);
+                  cache.set(c['code'], resp);
+                }
               },
               contentPadding:
                   const EdgeInsets.only(left: 15, top: 10, bottom: 10),
