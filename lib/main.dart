@@ -100,7 +100,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     data: cache.data['CPO'], small: isLeftSideSmall);
               }),
             ]),
-          )
+          ),
         ]));
   }
 }
@@ -235,68 +235,14 @@ class CarouselList extends StatelessWidget {
     }
   }
 
-  void _showDialogProgram(
-      BuildContext bcontext, Map<String, dynamic> v, String imageUrl) {
+  void _showDialogProgram(BuildContext bcontext, Map<String, dynamic> v) {
     //JsonEncoder encoder = const JsonEncoder.withIndent('  ');
     //String prettyprint = encoder.convert(v);
     //debugPrint(prettyprint);
     showDialog(
         context: bcontext,
         builder: (bcontext) {
-          return Dialog(
-              child: Container(
-                  padding: const EdgeInsets.all(15),
-                  width: 600,
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          v['title'],
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(bcontext).textTheme.titleLarge,
-                        ),
-                        v['subtitle'] != null
-                            ? Text(
-                                v['subtitle'],
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(bcontext).textTheme.titleMedium,
-                              )
-                            : const SizedBox.shrink(),
-                        const SizedBox(height: 15),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Image(
-                              width: 200,
-                              height: 300,
-                              image: CachedNetworkImageProvider(
-                                  '${imageUrl.replaceFirst('400x225', '300x450')}?type=TEXT'),
-                            ),
-                            const SizedBox(width: 15),
-                            Flexible(
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    v['shortDescription'] != null
-                                        ? Text(v['shortDescription'],
-                                            maxLines: 16,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: Theme.of(bcontext)
-                                                .textTheme
-                                                .bodyMedium)
-                                        : const SizedBox.shrink(),
-                                    if (v['durationLabel'] != null)
-                                      Chip(
-                                        label: Text(v['durationLabel']),
-                                      )
-                                  ]),
-                            )
-                          ],
-                        )
-                      ])));
+          return Dialog(child: ShowDetail(video: v));
         });
   }
 
@@ -337,7 +283,7 @@ class CarouselList extends StatelessWidget {
                   .replaceFirst('?type=TEXT', '');
               return InkWell(
                   onTap: () {
-                    _showDialogProgram(context, v, imageUrl);
+                    _showDialogProgram(context, v);
                   },
                   child: Card(
                       child: Container(
@@ -450,5 +396,206 @@ class _CategoriesListState extends State<CategoriesList> {
             );
           },
         ));
+  }
+}
+
+class ZoneList extends StatefulWidget {
+  final Map<dynamic, dynamic> data;
+  final List<Map<String, dynamic>> _zones = [];
+  final bool small;
+
+  ZoneList({super.key, required this.data, this.small = false}) {
+    final List<dynamic> dvz;
+    List<Map<String, dynamic>> tmp = [];
+    if (data.isEmpty) {
+      dvz = [];
+    } else {
+      dvz = data['value']['zones'];
+    }
+    for (var z in dvz) {
+      final shows = z['content']['data'];
+      if (shows.isEmpty ||
+          z['title'].contains('event') ||
+          z['code'] == 'highlights_HOME' ||
+          z['title'] == "Parcourir toute l'offre" ||
+          z['title'] == 'Les documentaires par thème' ||
+          shows.length == 1) {
+        //debugPrint('skipped ${z['title']}/${z['code']} (${videos.length})');
+        continue;
+      }
+      tmp.add({'title': z['title'], 'shows': shows});
+    }
+    _zones.addAll(tmp);
+  }
+
+  @override
+  State<ZoneList> createState() => _ZoneListState();
+}
+
+class _ZoneListState extends State<ZoneList> {
+  int selectedZoneIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget._zones.isEmpty) {
+      return const Center(child: Text('Fetching data...'));
+    }
+    return Row(mainAxisSize: MainAxisSize.max, children: [
+      SizedBox(
+          height: MediaQuery.of(context).size.height,
+          width: widget.small ? 300 : 350,
+          child: ListView.builder(
+            //padding: const EdgeInsets.symmetric(vertical: 10),
+            semanticChildCount: widget._zones.length,
+            itemCount: widget._zones.length,
+            itemBuilder: (context, index) {
+              if (widget._zones.isNotEmpty) {
+                return ListTile(
+                    selectedTileColor: Theme.of(context).highlightColor,
+                    selected: index == selectedZoneIndex,
+                    onTap: () {
+                      setState(() {
+                        selectedZoneIndex = index;
+                      });
+                    },
+                    title: Text(
+                      '${widget._zones[index]['title']} (${widget._zones[index]['shows'].length})',
+                      softWrap: true,
+                    ));
+              } else {
+                return null;
+              }
+            },
+          )),
+      Expanded(
+          flex: 1,
+          child: ShowList(
+              key: Key('$selectedZoneIndex'),
+              videos: widget._zones.isNotEmpty
+                  ? widget._zones[selectedZoneIndex]['shows']
+                  : [])),
+    ]);
+  }
+}
+
+class ShowList extends StatefulWidget {
+  final List<dynamic> videos;
+
+  const ShowList({super.key, required this.videos});
+
+  @override
+  State<ShowList> createState() => _ShowListState();
+}
+
+class _ShowListState extends State<ShowList> {
+  int selectedShowIndex = -1;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedShowIndex = -1;
+  }
+
+  @override
+  void dispose() {
+    selectedShowIndex = -1;
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      SizedBox(
+          width: 450,
+          child: ListView.builder(
+              itemCount: widget.videos.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  selectedTileColor: Theme.of(context).highlightColor,
+                  selected: index == selectedShowIndex,
+                  title: Text(widget.videos[index]['title']),
+                  subtitle: (widget.videos[index]['subtitle'] != null)
+                      ? Text(widget.videos[index]['subtitle'])
+                      : null,
+                  onTap: () {
+                    setState(() {
+                      selectedShowIndex = index;
+                    });
+                  },
+                );
+              })),
+      Expanded(
+          child: selectedShowIndex != -1
+              ? ShowDetail(video: widget.videos[selectedShowIndex])
+              : const SizedBox.shrink())
+    ]);
+  }
+}
+
+class ShowDetail extends StatelessWidget {
+  final Map<String, dynamic> video;
+
+  const ShowDetail({super.key, required this.video});
+
+  @override
+  Widget build(BuildContext context) {
+    final imageUrl = (video['mainImage']['url'])
+        .replaceFirst('__SIZE__', '400x225')
+        .replaceFirst('?type=TEXT', '');
+    return Container(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                video['title'],
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              video['subtitle'] != null
+                  ? Text(
+                      video['subtitle'],
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    )
+                  : const SizedBox.shrink(),
+              const SizedBox(height: 15),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image(
+                    width: 200,
+                    height: 300,
+                    image: CachedNetworkImageProvider(
+                        '${imageUrl.replaceFirst('400x225', '300x450')}?type=TEXT'),
+                  ),
+                  const SizedBox(width: 15),
+                  Flexible(
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          video['shortDescription'] != null
+                              ? Text(video['shortDescription'],
+                                  maxLines: 16,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context).textTheme.bodyMedium)
+                              : const SizedBox.shrink(),
+                          if (video['durationLabel'] != null)
+                            Chip(
+                              label: Text(video['durationLabel']),
+                            )
+                        ]),
+                  )
+                ],
+              )
+            ]));
   }
 }
