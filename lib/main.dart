@@ -322,56 +322,61 @@ class CarouselList extends StatelessWidget {
         //debugPrint('skipped ${z['title']}/${z['code']} (${videos.length})');
         continue;
       }
-      thumbnails.add(Container(
-          padding: const EdgeInsets.all(15),
-          child: Text('${z['title']} (${videos.length})',
-              style: Theme.of(context).textTheme.headlineSmall)));
-      thumbnails.add(Carousel(
-          small: small,
-          children: videos.map((v) {
-            final imageUrl = (v['mainImage']['url'])
-                .replaceFirst('__SIZE__', '400x225')
-                .replaceFirst('?type=TEXT', '');
-            return InkWell(
-                onTap: () {
-                  _showDialogProgram(context, v, imageUrl);
-                },
-                child: Card(
-                    child: Container(
-                        padding: const EdgeInsets.all(10),
-                        child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Image(
-                                image: CachedNetworkImageProvider(imageUrl),
-                                height: _imageHeight,
-                                width: _imageWidth,
-                              ),
-                              ListTile(
-                                contentPadding: EdgeInsets.zero,
-                                title: Text(
-                                  v['title'],
-                                  overflow: TextOverflow.ellipsis,
+      thumbnails
+          .add(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Container(
+            padding: const EdgeInsets.all(15),
+            child: Text('${z['title']} (${videos.length})',
+                style: Theme.of(context).textTheme.headlineSmall)),
+        Carousel(
+            small: small,
+            children: videos.map((v) {
+              final imageUrl = (v['mainImage']['url'])
+                  .replaceFirst('__SIZE__', '400x225')
+                  .replaceFirst('?type=TEXT', '');
+              return InkWell(
+                  onTap: () {
+                    _showDialogProgram(context, v, imageUrl);
+                  },
+                  child: Card(
+                      child: Container(
+                          padding: const EdgeInsets.all(10),
+                          child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Image(
+                                  image: CachedNetworkImageProvider(imageUrl),
+                                  height: _imageHeight,
+                                  width: _imageWidth,
                                 ),
-                                subtitle: Text(
-                                  v['subtitle'] ?? '',
-                                  overflow: TextOverflow.ellipsis,
+                                ListTile(
+                                  contentPadding: EdgeInsets.zero,
+                                  title: Text(
+                                    v['title'],
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  subtitle: Text(
+                                    v['subtitle'] ?? '',
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
-                              ),
-                            ]))));
-          }).toList()));
+                              ]))));
+            }).toList())
+      ]));
     }
     return SingleChildScrollView(
         // subtract NavigationRail width
         child: Container(
             width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
             color: Colors.grey[100],
             padding: const EdgeInsets.all(10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: thumbnails,
+            child: ListView.builder(
+              itemCount: thumbnails.length,
+              itemBuilder: (context, index) {
+                return thumbnails[index];
+              },
             )));
   }
 }
