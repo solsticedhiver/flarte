@@ -1,5 +1,6 @@
 //import 'dart:convert';
 import 'dart:async';
+import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flarte/api.dart';
@@ -235,14 +236,17 @@ class CarouselList extends StatelessWidget {
     }
   }
 
-  void _showDialogProgram(BuildContext bcontext, Map<String, dynamic> v) {
+  void _showDialogProgram(BuildContext context, Map<String, dynamic> v) {
     //JsonEncoder encoder = const JsonEncoder.withIndent('  ');
     //String prettyprint = encoder.convert(v);
     //debugPrint(prettyprint);
     showDialog(
-        context: bcontext,
-        builder: (bcontext) {
-          return Dialog(child: ShowDetail(video: v));
+        context: context,
+        builder: (context) {
+          return Dialog(
+              child: SizedBox(
+                  width: min(MediaQuery.of(context).size.width - 100, 600),
+                  child: ShowDetail(video: v)));
         });
   }
 
@@ -251,7 +255,7 @@ class CarouselList extends StatelessWidget {
     List<Widget> thumbnails = [];
     List<dynamic> videos = [];
 
-    debugPrint('in CarouselList.build()');
+    //debugPrint('in CarouselList.build()');
     final List<dynamic> zones;
     if (data.isEmpty) {
       zones = [];
