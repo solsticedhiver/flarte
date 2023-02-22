@@ -20,9 +20,24 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flarte',
+      //theme: ThemeData(
+      //  primarySwatch: Colors.deepOrange,
+      //),
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
+        brightness: Brightness.light,
+        /* light theme settings */
       ),
+      darkTheme: ThemeData(
+        primarySwatch: Colors.deepOrange,
+        brightness: Brightness.dark,
+        /* dark theme settings */
+      ),
+      themeMode: ThemeMode.dark,
+      /* ThemeMode.system to follow system theme,
+         ThemeMode.light for light theme,
+         ThemeMode.dark for dark theme
+      */
       home: const MyHomePage(title: 'arte.tv'),
     );
   }
@@ -52,53 +67,49 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    bool isLeftSideSmall = (MediaQuery.of(context).size.width < 1300);
+    CategoriesListSize size = CategoriesListSize.normal;
+    if (MediaQuery.of(context).size.width < 1500) {
+      size = CategoriesListSize.small;
+    }
+    if (MediaQuery.of(context).size.width < 1200) {
+      size = CategoriesListSize.tiny;
+    }
     return Scaffold(
         drawer: const Drawer(),
         body: Row(children: [
-          CategoriesList(small: isLeftSideSmall, controller: _tabController),
+          CategoriesList(size: size, controller: _tabController),
           Expanded(
             flex: 1,
             child: TabBarView(controller: _tabController, children: [
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(
-                    data: cache.data['HOM'], small: isLeftSideSmall);
+                return CarouselList(data: cache.data['HOM'], size: size);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(
-                    data: cache.data['DOR'], small: isLeftSideSmall);
+                return CarouselList(data: cache.data['DOR'], size: size);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(
-                    data: cache.data['SER'], small: isLeftSideSmall);
+                return CarouselList(data: cache.data['SER'], size: size);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(
-                    data: cache.data['CIN'], small: isLeftSideSmall);
+                return CarouselList(data: cache.data['CIN'], size: size);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(
-                    data: cache.data['EMI'], small: isLeftSideSmall);
+                return CarouselList(data: cache.data['EMI'], size: size);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(
-                    data: cache.data['HIS'], small: isLeftSideSmall);
+                return CarouselList(data: cache.data['HIS'], size: size);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(
-                    data: cache.data['DEC'], small: isLeftSideSmall);
+                return CarouselList(data: cache.data['DEC'], size: size);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(
-                    data: cache.data['SCI'], small: isLeftSideSmall);
+                return CarouselList(data: cache.data['SCI'], size: size);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(
-                    data: cache.data['ACT'], small: isLeftSideSmall);
+                return CarouselList(data: cache.data['ACT'], size: size);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(
-                    data: cache.data['CPO'], small: isLeftSideSmall);
+                return CarouselList(data: cache.data['CPO'], size: size);
               }),
             ]),
           ),
@@ -108,18 +119,28 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
 class Carousel extends StatefulWidget {
   final List<Widget> children;
-  final bool small;
+  final CategoriesListSize size;
   late final double _width, _height;
   @override
   State<Carousel> createState() => _CarouselState();
 
-  Carousel({super.key, required this.children, this.small = false}) {
-    if (small) {
-      _width = 220;
-      _height = 112 + 100;
-    } else {
-      _width = 285;
-      _height = 250;
+  Carousel(
+      {super.key,
+      required this.children,
+      this.size = CategoriesListSize.normal}) {
+    switch (size) {
+      case CategoriesListSize.normal:
+        _width = 285;
+        _height = 250;
+        break;
+      case CategoriesListSize.small:
+        _width = 220;
+        _height = 112 + 100;
+        break;
+      case CategoriesListSize.tiny:
+        _width = 180;
+        _height = 90 + 100;
+        break;
     }
   }
 }
@@ -221,18 +242,27 @@ class _CarouselState extends State<Carousel> {
 
 class CarouselList extends StatelessWidget {
   final Map<dynamic, dynamic> data;
-  final bool small;
+  final CategoriesListSize size;
   late final double _imageHeight, _imageWidth;
 
-  CarouselList({super.key, required this.data, this.small = false}) {
-    if (small) {
-      // image size divided by 2
-      _imageHeight = 112;
-      _imageWidth = 200;
-    } else {
-      // image size divided by 1.5
-      _imageHeight = 148;
-      _imageWidth = 265;
+  CarouselList(
+      {super.key, required this.data, this.size = CategoriesListSize.normal}) {
+    switch (size) {
+      case CategoriesListSize.normal:
+        // image size divided by 1.5
+        _imageHeight = 148;
+        _imageWidth = 265;
+        break;
+      case CategoriesListSize.small:
+        // image size divided by 2
+        _imageHeight = 112;
+        _imageWidth = 200;
+        break;
+      case CategoriesListSize.tiny:
+        // image size divided by 2.5
+        _imageHeight = 90;
+        _imageWidth = 160;
+        break;
     }
   }
 
@@ -280,7 +310,7 @@ class CarouselList extends StatelessWidget {
             child: Text('${z['title']} (${videos.length})',
                 style: Theme.of(context).textTheme.headlineSmall)),
         Carousel(
-            small: small,
+            size: size,
             children: videos.map((v) {
               final imageUrl = (v['mainImage']['url'])
                   .replaceFirst('__SIZE__', '400x225')
@@ -321,7 +351,6 @@ class CarouselList extends StatelessWidget {
         child: Container(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
-            color: Colors.grey[100],
             padding: const EdgeInsets.all(10),
             child: thumbnails.isNotEmpty
                 ? ListView.builder(
@@ -335,15 +364,21 @@ class CarouselList extends StatelessWidget {
 }
 
 class CategoriesList extends StatefulWidget {
-  final bool small;
+  final CategoriesListSize size;
   final TabController controller;
   late final double _leftSideWidth;
 
-  CategoriesList({super.key, required this.small, required this.controller}) {
-    if (small) {
-      _leftSideWidth = 200;
-    } else {
-      _leftSideWidth = 300;
+  CategoriesList({super.key, required this.size, required this.controller}) {
+    switch (size) {
+      case CategoriesListSize.normal:
+        _leftSideWidth = 300;
+        break;
+      case CategoriesListSize.small:
+        _leftSideWidth = 200;
+        break;
+      case CategoriesListSize.tiny:
+        _leftSideWidth = 64;
+        break;
     }
   }
 
@@ -365,20 +400,30 @@ class _CategoriesListState extends State<CategoriesList> {
           itemBuilder: (context, index) {
             final c = categories[index];
             String text = c['text'];
-            if (widget.small) {
+            Widget avatar = CircleAvatar(
+                backgroundColor: Color.fromARGB(
+                    255, c['color'][0], c['color'][1], c['color'][2]),
+                child: Text(text.substring(0, 1),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.inversePrimary)));
+            Widget leading;
+            if (widget.size != CategoriesListSize.normal) {
               text = c['text'].split(' ').first;
+            }
+            Widget? title;
+            if (widget.size == CategoriesListSize.tiny) {
+              leading = Tooltip(message: text, child: avatar);
+              title = null;
+            } else {
+              leading = avatar;
+              title = Text(text,
+                  style: const TextStyle(fontWeight: FontWeight.w500));
             }
             return ListTile(
               selectedTileColor: Theme.of(context).highlightColor,
               selected: index == selectedIndex,
-              leading: CircleAvatar(
-                  backgroundColor: Color.fromARGB(
-                      255, c['color'][0], c['color'][1], c['color'][2]),
-                  child: Text(text.substring(0, 1),
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color:
-                              Theme.of(context).colorScheme.inversePrimary))),
+              leading: leading,
               onTap: () async {
                 String url =
                     "https://www.arte.tv/api/rproxy/emac/v4/fr/web/pages/${c['code']}/";
@@ -395,8 +440,7 @@ class _CategoriesListState extends State<CategoriesList> {
               },
               contentPadding:
                   const EdgeInsets.only(left: 15, top: 10, bottom: 10),
-              title: Text(text,
-                  style: const TextStyle(fontWeight: FontWeight.w500)),
+              title: title,
             );
           },
         ));
@@ -592,8 +636,11 @@ class ShowDetail extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                   style: Theme.of(context).textTheme.bodyMedium)
                               : const SizedBox.shrink(),
+                          const SizedBox(height: 10),
                           if (video['durationLabel'] != null)
                             Chip(
+                              backgroundColor:
+                                  Theme.of(context).primaryColorDark,
                               label: Text(video['durationLabel']),
                             )
                         ]),
@@ -603,3 +650,5 @@ class ShowDetail extends StatelessWidget {
             ]));
   }
 }
+
+enum CategoriesListSize { tiny, small, normal }
