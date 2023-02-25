@@ -1,11 +1,15 @@
 //import 'dart:convert';
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flarte/api.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'package:process/process.dart';
 
 void main() {
   runApp(ChangeNotifierProvider<Cache>(
@@ -663,11 +667,47 @@ class ShowDetail extends StatelessWidget {
                               backgroundColor:
                                   Theme.of(context).primaryColorDark,
                               label: Text(video['durationLabel']),
-                            )
+                            ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.play_arrow),
+                                onPressed: () async {
+                                  final programId = video['programId'];
+                                  final resp = await http.get(Uri.parse(
+                                      'https://api.arte.tv/api/player/v2/config/fr/$programId'));
+                                  final Map<String, dynamic> jr =
+                                      json.decode(resp.body);
+                                  ProcessManager mgr =
+                                      const LocalProcessManager();
+                                  final url = jr['data']['attributes']
+                                      ['streams'][0]['url'];
+                                  final cmd =
+                                      '/usr/bin/vlc --verbose 0 --play-and-exit --one-instance --playlist-enqueue $url';
+                                  //final cmd = '/usr/bin/ffplay -loglevel error $url';
+                                  //final cmd = '/usr/bin/mpv $url'
+                                  debugPrint(cmd);
+                                  mgr.run(cmd.split(' ')).then((result) {
+                                    stdout.write(result.stdout);
+                                    stderr.write(result.stderr);
+                                  });
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.download),
+                                onPressed: () {},
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.copy),
+                                onPressed: () {},
+                              ),
+                            ],
+                          )
                         ]),
                   )
                 ],
-              )
+              ),
             ]));
   }
 }
