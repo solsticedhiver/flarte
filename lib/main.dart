@@ -78,6 +78,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       size = CategoriesListSize.tiny;
       leftSideWidth = 64;
     }
+    double padding = 10;
+    if (MediaQuery.of(context).size.height < 720) {
+      padding = 5;
+    }
     return Scaffold(
         drawer: const Drawer(),
         body: Row(children: [
@@ -91,10 +95,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                         CategoriesList(size: size, controller: _tabController)),
                 ListTile(
                   selectedTileColor: Theme.of(context).highlightColor,
-                  contentPadding: const EdgeInsets.only(
+                  contentPadding: EdgeInsets.only(
                     left: 25,
-                    top: 10,
-                    bottom: 10,
+                    top: padding,
+                    bottom: padding,
                   ),
                   minLeadingWidth: 30,
                   leading: const Icon(Icons.settings),
@@ -409,6 +413,13 @@ class _CategoriesListState extends State<CategoriesList> {
 
   @override
   Widget build(BuildContext context) {
+    double padding = 10;
+    if (MediaQuery.of(context).size.height < 720) {
+      padding = 5;
+      if (MediaQuery.of(context).size.height < 640) {
+        padding = 0;
+      }
+    }
     return ListView.builder(
       //padding: const EdgeInsets.symmetric(vertical: 10),
       shrinkWrap: true,
@@ -448,7 +459,8 @@ class _CategoriesListState extends State<CategoriesList> {
             final cache = Provider.of<Cache>(context, listen: false);
             cache.fetch(c['code']);
           },
-          contentPadding: const EdgeInsets.only(left: 15, top: 10, bottom: 10),
+          contentPadding:
+              EdgeInsets.only(left: 15, top: padding, bottom: padding),
           title: title,
         );
       },
