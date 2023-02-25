@@ -67,17 +67,36 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    double _leftSideWidth;
     CategoriesListSize size = CategoriesListSize.normal;
+    _leftSideWidth = 300;
     if (MediaQuery.of(context).size.width < 1500) {
       size = CategoriesListSize.small;
+      _leftSideWidth = 200;
     }
     if (MediaQuery.of(context).size.width < 1200) {
       size = CategoriesListSize.tiny;
+      _leftSideWidth = 64;
     }
     return Scaffold(
         drawer: const Drawer(),
         body: Row(children: [
-          CategoriesList(size: size, controller: _tabController),
+          SizedBox(
+              width: _leftSideWidth,
+              child:
+                  Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+                Expanded(
+                    flex: 1,
+                    child:
+                        CategoriesList(size: size, controller: _tabController)),
+                ListTile(
+                  selectedTileColor: Theme.of(context).highlightColor,
+                  contentPadding: const EdgeInsets.all(10),
+                  leading: const Icon(Icons.settings),
+                  title: const Text('Settings'),
+                  onTap: () {},
+                ),
+              ])),
           Expanded(
             flex: 1,
             child: TabBarView(controller: _tabController, children: [
@@ -131,7 +150,7 @@ class Carousel extends StatefulWidget {
     switch (size) {
       case CategoriesListSize.normal:
         _width = 285;
-        _height = 250;
+        _height = 260;
         break;
       case CategoriesListSize.small:
         _width = 220;
@@ -275,7 +294,7 @@ class CarouselList extends StatelessWidget {
         builder: (context) {
           return Dialog(
               child: SizedBox(
-                  width: min(MediaQuery.of(context).size.width - 100, 600),
+                  width: min(MediaQuery.of(context).size.width - 100, 500),
                   child: ShowDetail(video: v)));
         });
   }
@@ -336,11 +355,17 @@ class CarouselList extends StatelessWidget {
                                   title: Text(
                                     v['title'],
                                     overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
                                   ),
-                                  subtitle: Text(
-                                    v['subtitle'] ?? '',
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
+                                  subtitle: (size == CategoriesListSize.normal)
+                                      ? Text(
+                                          v['subtitle'] ?? '',
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 2,
+                                        )
+                                      : null,
+                                  isThreeLine:
+                                      size == CategoriesListSize.normal,
                                 ),
                               ]))));
             }).toList())
@@ -391,59 +416,56 @@ class _CategoriesListState extends State<CategoriesList> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-        width: widget._leftSideWidth,
-        child: ListView.builder(
-          //padding: const EdgeInsets.symmetric(vertical: 10),
-          semanticChildCount: categories.length,
-          itemCount: categories.length,
-          itemBuilder: (context, index) {
-            final c = categories[index];
-            String text = c['text'];
-            Widget avatar = CircleAvatar(
-                backgroundColor: Color.fromARGB(
-                    255, c['color'][0], c['color'][1], c['color'][2]),
-                child: Text(text.substring(0, 1),
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.inversePrimary)));
-            Widget leading;
-            if (widget.size != CategoriesListSize.normal) {
-              text = c['text'].split(' ').first;
+    return ListView.builder(
+      //padding: const EdgeInsets.symmetric(vertical: 10),
+      shrinkWrap: true,
+      semanticChildCount: categories.length,
+      itemCount: categories.length,
+      itemBuilder: (context, index) {
+        final c = categories[index];
+        String text = c['text'];
+        Widget avatar = CircleAvatar(
+            backgroundColor: Color.fromARGB(
+                255, c['color'][0], c['color'][1], c['color'][2]),
+            child: Text(text.substring(0, 1),
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.inversePrimary)));
+        Widget leading;
+        if (widget.size != CategoriesListSize.normal) {
+          text = c['text'].split(' ').first;
+        }
+        Widget? title;
+        if (widget.size == CategoriesListSize.tiny) {
+          leading = Tooltip(message: text, child: avatar);
+          title = null;
+        } else {
+          leading = avatar;
+          title =
+              Text(text, style: const TextStyle(fontWeight: FontWeight.w500));
+        }
+        return ListTile(
+          selected: index == selectedIndex,
+          leading: leading,
+          onTap: () async {
+            String url =
+                "https://www.arte.tv/api/rproxy/emac/v4/fr/web/pages/${c['code']}/";
+            final cache = Provider.of<Cache>(context, listen: false);
+            //debugPrint('${c['code']}');
+            setState(() {
+              selectedIndex = index;
+              widget.controller.animateTo(index);
+            });
+            if (cache.data[c['code']].isEmpty) {
+              final resp = await fetchUrl(url);
+              cache.set(c['code'], resp);
             }
-            Widget? title;
-            if (widget.size == CategoriesListSize.tiny) {
-              leading = Tooltip(message: text, child: avatar);
-              title = null;
-            } else {
-              leading = avatar;
-              title = Text(text,
-                  style: const TextStyle(fontWeight: FontWeight.w500));
-            }
-            return ListTile(
-              selectedTileColor: Theme.of(context).highlightColor,
-              selected: index == selectedIndex,
-              leading: leading,
-              onTap: () async {
-                String url =
-                    "https://www.arte.tv/api/rproxy/emac/v4/fr/web/pages/${c['code']}/";
-                final cache = Provider.of<Cache>(context, listen: false);
-                //debugPrint('${c['code']}');
-                setState(() {
-                  selectedIndex = index;
-                  widget.controller.animateTo(index);
-                });
-                if (cache.data[c['code']].isEmpty) {
-                  final resp = await fetchUrl(url);
-                  cache.set(c['code'], resp);
-                }
-              },
-              contentPadding:
-                  const EdgeInsets.only(left: 15, top: 10, bottom: 10),
-              title: title,
-            );
           },
-        ));
+          contentPadding: const EdgeInsets.only(left: 15, top: 10, bottom: 10),
+          title: title,
+        );
+      },
+    );
   }
 }
 
