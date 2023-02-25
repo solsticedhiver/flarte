@@ -70,11 +70,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     double leftSideWidth;
     CategoriesListSize size = CategoriesListSize.normal;
     leftSideWidth = 300;
-    if (MediaQuery.of(context).size.width < 1500) {
+    if (MediaQuery.of(context).size.width < 1600) {
       size = CategoriesListSize.small;
       leftSideWidth = 200;
     }
-    if (MediaQuery.of(context).size.width < 1200) {
+    if (MediaQuery.of(context).size.width < 1280) {
       size = CategoriesListSize.tiny;
       leftSideWidth = 64;
     }
