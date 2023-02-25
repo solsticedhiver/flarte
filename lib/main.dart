@@ -303,7 +303,7 @@ class CarouselList extends StatelessWidget {
         builder: (context) {
           return Dialog(
               child: SizedBox(
-                  width: min(MediaQuery.of(context).size.width - 100, 500),
+                  width: min(MediaQuery.of(context).size.width - 100, 600),
                   child: ShowDetail(video: v)));
         });
   }
@@ -322,11 +322,11 @@ class CarouselList extends StatelessWidget {
     }
     for (var z in zones) {
       videos = z['content']['data'];
+      final programId = videos.where((v) => v['programId'] != null).toList();
       if (videos.isEmpty ||
-          z['title'].contains('event') ||
-          z['code'] == 'highlights_HOME' ||
-          z['title'] == "Parcourir toute l'offre" ||
-          z['title'] == 'Les documentaires par thème' ||
+          z['displayOptions']['template'].startsWith('event') ||
+          z['displayOptions']['template'].startsWith('single') ||
+          programId.isEmpty ||
           videos.length == 1) {
         //debugPrint('skipped ${z['title']}/${z['code']} (${videos.length})');
         continue;
@@ -483,11 +483,11 @@ class ZoneList extends StatefulWidget {
     }
     for (var z in dvz) {
       final shows = z['content']['data'];
+      final programId = shows.where((v) => v['programId'] != null).toList();
       if (shows.isEmpty ||
-          z['title'].contains('event') ||
-          z['code'] == 'highlights_HOME' ||
-          z['title'] == "Parcourir toute l'offre" ||
-          z['title'] == 'Les documentaires par thème' ||
+          z['displayOptions']['template'].startsWith('event') ||
+          z['displayOptions']['template'].startsWith('single') ||
+          programId.isEmpty ||
           shows.length == 1) {
         //debugPrint('skipped ${z['title']}/${z['code']} (${videos.length})');
         continue;
