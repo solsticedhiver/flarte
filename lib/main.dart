@@ -91,9 +91,14 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                         CategoriesList(size: size, controller: _tabController)),
                 ListTile(
                   selectedTileColor: Theme.of(context).highlightColor,
-                  contentPadding: const EdgeInsets.all(10),
+                  contentPadding: const EdgeInsets.only(
+                    left: 25,
+                    top: 10,
+                    bottom: 10,
+                  ),
+                  minLeadingWidth: 30,
                   leading: const Icon(Icons.settings),
-                  title: const Text('Settings'),
+                  title: leftSideWidth != 64 ? const Text('Settings') : null,
                   onTap: () {},
                 ),
               ])),
@@ -150,7 +155,7 @@ class Carousel extends StatefulWidget {
     switch (size) {
       case CategoriesListSize.normal:
         _width = 285;
-        _height = 260;
+        _height = 262;
         break;
       case CategoriesListSize.small:
         _width = 220;
