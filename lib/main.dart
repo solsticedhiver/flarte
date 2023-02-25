@@ -61,28 +61,28 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     _tabController = TabController(initialIndex: 0, length: 10, vsync: this);
     final cache = Provider.of<Cache>(context, listen: false);
     Future.delayed(Duration.zero, () async {
-      cache.set('HOM', await fetchUrl(urlHOME));
+      await cache.fetch('HOME');
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    double _leftSideWidth;
+    double leftSideWidth;
     CategoriesListSize size = CategoriesListSize.normal;
-    _leftSideWidth = 300;
+    leftSideWidth = 300;
     if (MediaQuery.of(context).size.width < 1500) {
       size = CategoriesListSize.small;
-      _leftSideWidth = 200;
+      leftSideWidth = 200;
     }
     if (MediaQuery.of(context).size.width < 1200) {
       size = CategoriesListSize.tiny;
-      _leftSideWidth = 64;
+      leftSideWidth = 64;
     }
     return Scaffold(
         drawer: const Drawer(),
         body: Row(children: [
           SizedBox(
-              width: _leftSideWidth,
+              width: leftSideWidth,
               child:
                   Column(mainAxisAlignment: MainAxisAlignment.start, children: [
                 Expanded(
@@ -101,7 +101,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             flex: 1,
             child: TabBarView(controller: _tabController, children: [
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['HOM'], size: size);
+                return CarouselList(data: cache.data['HOME'], size: size);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
                 return CarouselList(data: cache.data['DOR'], size: size);
@@ -391,21 +391,9 @@ class CarouselList extends StatelessWidget {
 class CategoriesList extends StatefulWidget {
   final CategoriesListSize size;
   final TabController controller;
-  late final double _leftSideWidth;
 
-  CategoriesList({super.key, required this.size, required this.controller}) {
-    switch (size) {
-      case CategoriesListSize.normal:
-        _leftSideWidth = 300;
-        break;
-      case CategoriesListSize.small:
-        _leftSideWidth = 200;
-        break;
-      case CategoriesListSize.tiny:
-        _leftSideWidth = 64;
-        break;
-    }
-  }
+  const CategoriesList(
+      {super.key, required this.size, required this.controller});
 
   @override
   State<CategoriesList> createState() => _CategoriesListState();
@@ -448,18 +436,12 @@ class _CategoriesListState extends State<CategoriesList> {
           selected: index == selectedIndex,
           leading: leading,
           onTap: () async {
-            String url =
-                "https://www.arte.tv/api/rproxy/emac/v4/fr/web/pages/${c['code']}/";
-            final cache = Provider.of<Cache>(context, listen: false);
-            //debugPrint('${c['code']}');
             setState(() {
               selectedIndex = index;
               widget.controller.animateTo(index);
             });
-            if (cache.data[c['code']].isEmpty) {
-              final resp = await fetchUrl(url);
-              cache.set(c['code'], resp);
-            }
+            final cache = Provider.of<Cache>(context, listen: false);
+            cache.fetch(c['code']);
           },
           contentPadding: const EdgeInsets.only(left: 15, top: 10, bottom: 10),
           title: title,

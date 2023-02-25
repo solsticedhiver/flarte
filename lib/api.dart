@@ -2,25 +2,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-const String urlHOME =
-    "https://www.arte.tv/api/rproxy/emac/v4/fr/web/pages/HOME/";
-
-Future<Map<String, dynamic>> fetchUrl(String url) async {
-  debugPrint(
-      '${DateTime.now().toIso8601String().substring(11, 19)}: in fetchUrl()');
-  final http.Response resp = await http.get(Uri.parse(url));
-  if (resp.statusCode != 200) {
-    return {};
-  }
-  final jr = json.decode(resp.body);
-  return jr;
-}
-
 const List<Map<String, dynamic>> categories = [
   {
     'text': 'Home',
     'color': [124, 124, 124],
-    'code': 'HOM'
+    'code': 'HOME'
   },
   {
     'text': 'Documentaires et reportages',
@@ -71,7 +57,7 @@ const List<Map<String, dynamic>> categories = [
 
 class Cache extends ChangeNotifier {
   final Map<String, dynamic> data = {
-    'HOM': {},
+    'HOME': {},
     'DOR': {},
     'SER': {},
     'CIN': {},
@@ -83,6 +69,29 @@ class Cache extends ChangeNotifier {
     'CPO': {}
   };
   //int index = 0;
+
+  Future<void> fetch(String key) async {
+    if (data[key].isNotEmpty) {
+      return;
+    }
+    debugPrint(
+        '${DateTime.now().toIso8601String().substring(11, 19)}: in Cache.fetch($key)');
+    final String url =
+        "https://www.arte.tv/api/rproxy/emac/v4/fr/web/pages/$key/";
+    final http.Response resp = await http.get(Uri.parse(url));
+    if (resp.statusCode == 200) {
+      final jr = json.decode(resp.body);
+      data[key] = jr;
+      notifyListeners();
+    }
+  }
+
+  dynamic get(String key) async {
+    if (data[key].isEmpty) {
+      await fetch(key);
+    }
+    return data[key];
+  }
 
   void set(String key, Map<dynamic, dynamic> dict) {
     data[key] = dict;
