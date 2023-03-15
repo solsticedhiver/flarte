@@ -299,9 +299,6 @@ class CarouselList extends StatelessWidget {
   }
 
   void _showDialogProgram(BuildContext context, Map<String, dynamic> v) {
-    //JsonEncoder encoder = const JsonEncoder.withIndent('  ');
-    //String prettyprint = encoder.convert(v);
-    //debugPrint(prettyprint);
     showDialog(
         context: context,
         builder: (context) {
@@ -309,6 +306,84 @@ class CarouselList extends StatelessWidget {
               child: SizedBox(
                   width: min(MediaQuery.of(context).size.width - 100, 600),
                   child: ShowDetail(video: v)));
+        });
+  }
+
+  Future<Map<String, dynamic>> _getProgramDetail(String programId) async {
+    final url =
+        'https://www.arte.tv/api/rproxy/emac/v4/fr/web/programs/$programId';
+    final resp = await http.get(Uri.parse(url));
+    final Map<String, dynamic> jr = json.decode(resp.body);
+    return jr;
+  }
+
+  void _showBigDialogProgram(
+      BuildContext context, Map<String, dynamic> v) async {
+    final programId = v['programId'];
+    showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+              child: SizedBox(
+            width: min(MediaQuery.of(context).size.width - 50, 900),
+            child: FutureBuilder(
+              future: _getProgramDetail(programId),
+              builder: (context, snapshot) {
+                Widget trailer = const Text('');
+                if (snapshot.hasData) {
+                  if (snapshot.data != null) {
+                    final content = snapshot.data?['value']['zones'][0]
+                        ['content']['data'][0];
+                    String? description = content['fullDescription'];
+                    description ??= content['shortDescription'];
+                    description = description
+                        ?.replaceAll('<p>', '')
+                        .replaceAll('</p>', '\n')
+                        .replaceAll('<br>', '\n')
+                        .replaceAll('<br />', '\n')
+                        .replaceAll(RegExp('\n{2,}'), '\n\n')
+                        .replaceFirst(RegExp(r'\n$'), '');
+                    trailer = Text(description!,
+                        style: Theme.of(context).textTheme.bodyMedium);
+                  }
+                }
+                return Container(
+                    padding: const EdgeInsets.all(15),
+                    child: Stack(children: [
+                      /*ColorFiltered(
+                          colorFilter: ColorFilter.mode(
+                            Colors.black.withOpacity(0.6),
+                            BlendMode.darken,
+                          ),
+                          child: Image(
+                              image: CachedNetworkImageProvider(v['mainImage']
+                                      ['url']
+                                  .replaceFirst('__SIZE__', '1280x720')
+                                  .replaceFirst('?type=TEXT', '')))),
+                                  */
+                      Container(
+                          padding: const EdgeInsets.all(10),
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(v['title'],
+                                    style:
+                                        Theme.of(context).textTheme.titleLarge),
+                                if (v['subtile'] != null)
+                                  const SizedBox(height: 10),
+                                if (v['subtile'] != null)
+                                  Text(v['subtitle'],
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium),
+                                const SizedBox(height: 10),
+                                trailer,
+                              ])),
+                    ]));
+              },
+            ),
+          ));
         });
   }
 
@@ -684,7 +759,7 @@ class ShowDetail extends StatelessWidget {
                                   final url = jr['data']['attributes']
                                       ['streams'][0]['url'];
                                   final cmd =
-                                      '/usr/bin/vlc --verbose 0 --play-and-exit --one-instance --playlist-enqueue $url';
+                                      'vlc --verbose 0 --play-and-exit --one-instance --playlist-enqueue $url';
                                   //final cmd = '/usr/bin/ffplay -loglevel error $url';
                                   //final cmd = '/usr/bin/mpv $url'
                                   debugPrint(cmd);
