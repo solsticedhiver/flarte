@@ -44,7 +44,7 @@ class _MyScreenState extends State<MyScreen> {
         String? subtitle = jr['data']['attributes']['metadata']['subtitle'];
         if (subtitle != null && subtitle.isNotEmpty) {
           title =
-              '${jr['data']['attributes']['metadata']['title']} / ${jr['data']['attributes']['metadata']['subtitle']}';
+              '${jr['data']['attributes']['metadata']['title']} / $subtitle}';
         } else {
           title = jr['data']['attributes']['metadata']['title'];
         }
@@ -166,7 +166,7 @@ class _SeekBarState extends State<SeekBar> {
           ),
           child: Icon(
             isPlaying ? Icons.pause : Icons.play_arrow,
-            //color: Theme.of(context).colorScheme.primary,
+            color: Theme.of(context).colorScheme.secondary,
           ),
         ),
         const SizedBox(width: 10.0),
@@ -201,7 +201,10 @@ class _SeekBarState extends State<SeekBar> {
               shape: const CircleBorder(),
               padding: const EdgeInsets.all(24),
             ),
-            child: const Icon(Icons.volume_down)),
+            child: Icon(
+              Icons.volume_down,
+              color: Theme.of(context).colorScheme.secondary,
+            )),
         ElevatedButton(
             onPressed: () {
               widget.player.volume = widget.player.state.volume + 5 <= 100
@@ -213,7 +216,10 @@ class _SeekBarState extends State<SeekBar> {
               shape: const CircleBorder(),
               padding: const EdgeInsets.all(24),
             ),
-            child: const Icon(Icons.volume_up)),
+            child: Icon(
+              Icons.volume_up,
+              color: Theme.of(context).colorScheme.secondary,
+            )),
         const SizedBox(width: 24.0),
       ],
     );

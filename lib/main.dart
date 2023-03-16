@@ -6,6 +6,7 @@ import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flarte/api.dart';
+import 'package:flarte/config.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
@@ -316,6 +317,7 @@ class CarouselList extends StatelessWidget {
         context: context,
         builder: (context) {
           return Dialog(
+              elevation: 8.0,
               child: SizedBox(
                   width: min(MediaQuery.of(context).size.width - 100, 600),
                   child: ShowDetail(video: v)));
@@ -325,7 +327,8 @@ class CarouselList extends StatelessWidget {
   Future<Map<String, dynamic>> _getProgramDetail(String programId) async {
     final url =
         'https://www.arte.tv/api/rproxy/emac/v4/fr/web/programs/$programId';
-    final resp = await http.get(Uri.parse(url));
+    final resp = await http
+        .get(Uri.parse(url), headers: {'User-Agent': AppConfig.userAgent});
     final Map<String, dynamic> jr = json.decode(resp.body);
     return jr;
   }
@@ -363,9 +366,9 @@ class CarouselList extends StatelessWidget {
                 return Container(
                     padding: const EdgeInsets.all(15),
                     child: Stack(children: [
-                      /*ColorFiltered(
+                      ColorFiltered(
                           colorFilter: ColorFilter.mode(
-                            Colors.black.withOpacity(0.6),
+                            Colors.black.withOpacity(0.8),
                             BlendMode.darken,
                           ),
                           child: Image(
@@ -373,7 +376,6 @@ class CarouselList extends StatelessWidget {
                                       ['url']
                                   .replaceFirst('__SIZE__', '1280x720')
                                   .replaceFirst('?type=TEXT', '')))),
-                                  */
                       Container(
                           padding: const EdgeInsets.all(10),
                           child: Column(
@@ -698,14 +700,26 @@ class _ShowListState extends State<ShowList> {
   }
 }
 
-class ShowDetail extends StatelessWidget {
+class ShowDetail extends StatefulWidget {
   final Map<String, dynamic> video;
 
+  @override
+  State<ShowDetail> createState() => _ShowDetailState();
+
   const ShowDetail({super.key, required this.video});
+}
+
+class _ShowDetailState extends State<ShowDetail> {
+  int dropdownValue = 0;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = (video['mainImage']['url'])
+    final imageUrl = (widget.video['mainImage']['url'])
         .replaceFirst('__SIZE__', '400x225')
         .replaceFirst('?type=TEXT', '');
     return Container(
@@ -715,13 +729,13 @@ class ShowDetail extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                video['title'],
+                widget.video['title'],
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
-              video['subtitle'] != null
+              widget.video['subtitle'] != null
                   ? Text(
-                      video['subtitle'],
+                      widget.video['subtitle'],
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.titleMedium,
                     )
@@ -743,18 +757,18 @@ class ShowDetail extends StatelessWidget {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          video['shortDescription'] != null
-                              ? Text(video['shortDescription'],
+                          widget.video['shortDescription'] != null
+                              ? Text(widget.video['shortDescription'],
                                   maxLines: 16,
                                   overflow: TextOverflow.ellipsis,
                                   style: Theme.of(context).textTheme.bodyMedium)
                               : const SizedBox.shrink(),
                           const SizedBox(height: 10),
-                          if (video['durationLabel'] != null)
+                          if (widget.video['durationLabel'] != null)
                             Chip(
                               backgroundColor:
                                   Theme.of(context).primaryColorDark,
-                              label: Text(video['durationLabel']),
+                              label: Text(widget.video['durationLabel']),
                             ),
                           const SizedBox(height: 10),
                           Row(
@@ -762,7 +776,7 @@ class ShowDetail extends StatelessWidget {
                               IconButton(
                                 icon: const Icon(Icons.play_arrow),
                                 onPressed: () {
-                                  final programId = video['programId'];
+                                  final programId = widget.video['programId'];
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -771,16 +785,61 @@ class ShowDetail extends StatelessWidget {
                                   );
                                 },
                               ),
+                              const SizedBox(width: 24),
                               IconButton(
                                 icon: const Icon(Icons.download),
                                 onPressed: () {},
                               ),
+                              const SizedBox(width: 24),
                               IconButton(
                                 icon: const Icon(Icons.copy),
                                 onPressed: () {},
                               ),
                             ],
-                          )
+                          ),
+                          FutureBuilder(future: Future<Set<String>>(() async {
+                            final programId = widget.video['programId'];
+
+                            final resp = await http.get(Uri.parse(
+                                'https://api.arte.tv/api/player/v2/config/fr/$programId'));
+                            final Map<String, dynamic> jr =
+                                json.decode(resp.body);
+                            final streams = jr['data']['attributes']['streams'];
+                            Set<String> versions = {};
+                            for (var s in streams) {
+                              for (var v in s['versions']) {
+                                versions.add(v['label']);
+                              }
+                            }
+                            return versions;
+                          }), builder: (context, snapshot) {
+                            List<DropdownMenuItem> items = [];
+                            if (snapshot.hasData) {
+                              final data = snapshot.data!.toList();
+                              items = data
+                                  .map((e) => DropdownMenuItem(
+                                        value: data.indexOf(e),
+                                        child: Text(e),
+                                      ))
+                                  .toList();
+                            }
+                            return DropdownButton(
+                                hint: const Text('Version'),
+                                value: dropdownValue,
+                                icon: const Icon(Icons.list),
+                                items: items,
+                                onChanged: (value) {
+                                  setState(() {
+                                    dropdownValue = value!;
+                                  });
+                                });
+                          }),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text('Fermer'),
+                          ),
                         ]),
                   )
                 ],
