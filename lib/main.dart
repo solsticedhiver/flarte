@@ -1,7 +1,7 @@
 //import 'dart:convert';
 import 'dart:async';
+
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -9,7 +9,8 @@ import 'package:flarte/api.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
-import 'package:process/process.dart';
+
+import 'player.dart';
 
 void main() {
   runApp(ChangeNotifierProvider<Cache>(
@@ -22,6 +23,16 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    const pageTransitionsTheme = PageTransitionsTheme(
+      builders: {
+        // TODO: change transition to ZoomPageTransitionsBuilder() when media_kit fixes their issue#64
+        TargetPlatform.android: OpenUpwardsPageTransitionsBuilder(),
+        TargetPlatform.iOS: OpenUpwardsPageTransitionsBuilder(),
+        TargetPlatform.linux: OpenUpwardsPageTransitionsBuilder(),
+        TargetPlatform.macOS: OpenUpwardsPageTransitionsBuilder(),
+        TargetPlatform.windows: OpenUpwardsPageTransitionsBuilder(),
+      },
+    );
     return MaterialApp(
       title: 'Flarte',
       //theme: ThemeData(
@@ -30,11 +41,13 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
         brightness: Brightness.light,
+        pageTransitionsTheme: pageTransitionsTheme,
         /* light theme settings */
       ),
       darkTheme: ThemeData(
         primarySwatch: Colors.deepOrange,
         brightness: Brightness.dark,
+        pageTransitionsTheme: pageTransitionsTheme,
         /* dark theme settings */
       ),
       themeMode: ThemeMode.dark,
@@ -748,25 +761,14 @@ class ShowDetail extends StatelessWidget {
                             children: [
                               IconButton(
                                 icon: const Icon(Icons.play_arrow),
-                                onPressed: () async {
+                                onPressed: () {
                                   final programId = video['programId'];
-                                  final resp = await http.get(Uri.parse(
-                                      'https://api.arte.tv/api/player/v2/config/fr/$programId'));
-                                  final Map<String, dynamic> jr =
-                                      json.decode(resp.body);
-                                  ProcessManager mgr =
-                                      const LocalProcessManager();
-                                  final url = jr['data']['attributes']
-                                      ['streams'][0]['url'];
-                                  final cmd =
-                                      'vlc --verbose 0 --play-and-exit --one-instance --playlist-enqueue $url';
-                                  //final cmd = '/usr/bin/ffplay -loglevel error $url';
-                                  //final cmd = '/usr/bin/mpv $url'
-                                  debugPrint(cmd);
-                                  mgr.run(cmd.split(' ')).then((result) {
-                                    stdout.write(result.stdout);
-                                    stderr.write(result.stderr);
-                                  });
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            MyScreen(programId: programId)),
+                                  );
                                 },
                               ),
                               IconButton(
