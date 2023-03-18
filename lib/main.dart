@@ -565,9 +565,10 @@ class _CategoriesListState extends State<CategoriesList> {
 class ZoneList extends StatefulWidget {
   final Map<dynamic, dynamic> data;
   final List<Map<String, dynamic>> _zones = [];
-  final bool small;
+  final CategoriesListSize size;
 
-  ZoneList({super.key, required this.data, this.small = false}) {
+  ZoneList(
+      {super.key, required this.data, this.size = CategoriesListSize.normal}) {
     final List<dynamic> dvz;
     List<Map<String, dynamic>> tmp = [];
     if (data.isEmpty) {
@@ -611,7 +612,7 @@ class _ZoneListState extends State<ZoneList> {
     return Row(mainAxisSize: MainAxisSize.max, children: [
       SizedBox(
           height: MediaQuery.of(context).size.height,
-          width: widget.small ? 300 : 350,
+          width: widget.size == CategoriesListSize.small ? 300 : 350,
           child: ListView.builder(
             //padding: const EdgeInsets.symmetric(vertical: 10),
             semanticChildCount: widget._zones.length,
