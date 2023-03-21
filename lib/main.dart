@@ -1,6 +1,5 @@
 //import 'dart:convert';
 import 'dart:async';
-
 import 'dart:convert';
 import 'dart:math';
 
@@ -245,7 +244,7 @@ class _CarouselState extends State<Carousel> {
                   ),
                   child: Icon(
                     Icons.chevron_left,
-                    color: Theme.of(context).colorScheme.secondary,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ))),
         Visibility(
@@ -278,7 +277,7 @@ class _CarouselState extends State<Carousel> {
                   ),
                   child: Icon(
                     Icons.chevron_right,
-                    color: Theme.of(context).colorScheme.secondary,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ))),
       ]);
@@ -711,7 +710,8 @@ class ShowDetail extends StatefulWidget {
 }
 
 class _ShowDetailState extends State<ShowDetail> {
-  int dropdownValue = 0;
+  late Version selectedVersion;
+  List<Version> versions = [];
 
   @override
   void initState() {
@@ -777,12 +777,21 @@ class _ShowDetailState extends State<ShowDetail> {
                               IconButton(
                                 icon: const Icon(Icons.play_arrow),
                                 onPressed: () {
-                                  final programId = widget.video['programId'];
+                                  String title = '';
+                                  String? subtitle = widget.video['subtitle'];
+                                  if (subtitle != null && subtitle.isNotEmpty) {
+                                    title =
+                                        '${widget.video['title']} / $subtitle';
+                                  } else {
+                                    title = widget.video['title'];
+                                  }
+
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) =>
-                                            MyScreen(programId: programId)),
+                                        builder: (context) => MyScreen(
+                                            title: title,
+                                            url: selectedVersion.url)),
                                   );
                                 },
                               ),
@@ -798,44 +807,71 @@ class _ShowDetailState extends State<ShowDetail> {
                               ),
                             ],
                           ),
-                          FutureBuilder(future: Future<Set<String>>(() async {
+                          const SizedBox(height: 10),
+                          FutureBuilder(future: Future<List<Version>>(() async {
                             final programId = widget.video['programId'];
 
+                            //debugPrint(programId);
                             final resp = await http.get(Uri.parse(
                                 'https://api.arte.tv/api/player/v2/config/fr/$programId'));
                             final Map<String, dynamic> jr =
                                 json.decode(resp.body);
                             final streams = jr['data']['attributes']['streams'];
-                            Set<String> versions = {};
+                            //debugPrint(json.encode(streams).toString());
+                            List<Version> versions = [];
                             for (var s in streams) {
-                              for (var v in s['versions']) {
-                                versions.add(v['label']);
-                              }
+                              final v = s['versions'][0];
+                              //debugPrint(v['shortLabel']);
+                              versions.add(Version(
+                                  shortLabel: v['shortLabel'],
+                                  label: v['label'],
+                                  url: s['url']));
                             }
                             return versions;
                           }), builder: (context, snapshot) {
-                            List<DropdownMenuItem> items = [];
+                            List<DropdownMenuItem<Version>> items = [];
                             if (snapshot.hasData) {
-                              final data = snapshot.data!.toList();
-                              items = data
-                                  .map((e) => DropdownMenuItem(
-                                        value: data.indexOf(e),
-                                        child: Text(e),
-                                      ))
+                              if (versions.isEmpty) {
+                                versions = snapshot.data!;
+                                selectedVersion = versions.first;
+                              }
+                              items = versions
+                                  .map((e) => DropdownMenuItem<Version>(
+                                      value: e, child: Text(e.label)))
                                   .toList();
-                            }
-                            return DropdownButton(
-                                hint: const Text('Version'),
-                                value: dropdownValue,
-                                icon: const Icon(Icons.list),
-                                items: items,
-                                onChanged: (value) {
-                                  setState(() {
-                                    dropdownValue = value!;
+                              return DropdownButton<Version>(
+                                  underline: const SizedBox.shrink(),
+                                  hint: const Text('Version'),
+                                  selectedItemBuilder: (BuildContext context) {
+                                    return versions.map<Widget>((v) {
+                                      return Container(
+                                        padding:
+                                            const EdgeInsets.only(left: 10),
+                                        alignment: Alignment.centerLeft,
+                                        constraints:
+                                            const BoxConstraints(minWidth: 100),
+                                        child: Text(
+                                          v.shortLabel,
+                                          style: const TextStyle(
+                                              color: Colors.deepOrange,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                      );
+                                    }).toList();
+                                  },
+                                  value: selectedVersion,
+                                  items: items,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedVersion = value!;
+                                    });
                                   });
-                                });
+                            } else {
+                              return const SizedBox.shrink();
+                            }
                           }),
-                          TextButton(
+                          const SizedBox(height: 10),
+                          ElevatedButton(
                             onPressed: () {
                               Navigator.pop(context);
                             },
@@ -850,3 +886,15 @@ class _ShowDetailState extends State<ShowDetail> {
 }
 
 enum CategoriesListSize { tiny, small, normal }
+
+class Version {
+  String shortLabel;
+  String label;
+  String url;
+  Version({required this.shortLabel, required this.label, required this.url});
+
+  @override
+  String toString() {
+    return 'Version($shortLabel, $label)';
+  }
+}

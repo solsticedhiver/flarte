@@ -9,47 +9,24 @@ import 'package:media_kit_video/media_kit_video.dart';
 import 'config.dart';
 
 class MyScreen extends StatefulWidget {
-  final String programId;
-  const MyScreen({super.key, required this.programId});
+  final String url;
+  final String title;
+  const MyScreen({super.key, required this.url, required this.title});
 
   @override
   State<MyScreen> createState() => _MyScreenState();
 }
 
 class _MyScreenState extends State<MyScreen> {
-  // Create a [Player] instance from `package:media_kit`.
   final Player player = Player();
-  // Reference to the [VideoController] instance from `package:media_kit_video`.
   VideoController? controller;
-  String? url;
-  String title = '';
-  bool isBuffering = true;
 
   @override
   void initState() {
     super.initState();
     Future.microtask(() async {
-      // Create a [VideoController] instance from `package:media_kit_video`.
-      // Pass the [handle] of the [Player] from `package:media_kit` to the [VideoController] constructor.
-      controller = await VideoController.create(
-        player.handle,
-        //enableHardwareAcceleration: false,
-      );
-      // Must be created before opening any media. Otherwise, a separate window will be created.
-      final resp = await http.get(Uri.parse(
-          'https://api.arte.tv/api/player/v2/config/fr/${widget.programId}'));
-      final Map<String, dynamic> jr = json.decode(resp.body);
-      setState(() {
-        url = jr['data']['attributes']['streams'][0]['url'];
-        String? subtitle = jr['data']['attributes']['metadata']['subtitle'];
-        if (subtitle != null && subtitle.isNotEmpty) {
-          title =
-              '${jr['data']['attributes']['metadata']['title']} / $subtitle}';
-        } else {
-          title = jr['data']['attributes']['metadata']['title'];
-        }
-      });
-      debugPrint('Playing $url');
+      controller = await VideoController.create(player.handle);
+      setState(() {});
     });
   }
 
@@ -69,9 +46,11 @@ class _MyScreenState extends State<MyScreen> {
     (player.platform as libmpvPlayer)
         .setProperty('user-agent', AppConfig.userAgent);
     player.volume = 100;
-    player.open(Playlist([if (url != null && url!.isNotEmpty) Media(url!)]));
+    debugPrint('Playing ${widget.url}');
+    player.open(Playlist([Media(widget.url)]));
+
     return Scaffold(
-        appBar: AppBar(title: Text(title)),
+        appBar: AppBar(title: Text(widget.title)),
         body: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -166,11 +145,11 @@ class _SeekBarState extends State<SeekBar> {
           ),
           child: Icon(
             isPlaying ? Icons.pause : Icons.play_arrow,
-            color: Theme.of(context).colorScheme.secondary,
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
         const SizedBox(width: 10.0),
-        Text(position.toString().substring(2, 7)),
+        Text('0${position.toString().substring(0, 7)}'),
         Expanded(
           child: Slider(
             min: 0.0,
@@ -179,18 +158,19 @@ class _SeekBarState extends State<SeekBar> {
                   0,
                   duration.inMilliseconds.toDouble(),
                 ),
-            onChanged:
+            /*onChanged:
                 null, // disabled because seeking fails on most streamed video with mpv
-            /*
+            */
             onChanged: (e) {
               widget.player.seek(Duration(milliseconds: e ~/ 1));
             },
+            /*
             onChangeEnd: (e) {
               widget.player.seek(Duration(milliseconds: e ~/ 1));
             },*/
           ),
         ),
-        Text(duration.toString().substring(2, 7)),
+        Text('0${duration.toString().substring(0, 7)}'),
         const SizedBox(width: 10.0),
         ElevatedButton(
             onPressed: () {
@@ -203,7 +183,7 @@ class _SeekBarState extends State<SeekBar> {
             ),
             child: Icon(
               Icons.volume_down,
-              color: Theme.of(context).colorScheme.secondary,
+              color: Theme.of(context).colorScheme.primary,
             )),
         ElevatedButton(
             onPressed: () {
@@ -218,7 +198,7 @@ class _SeekBarState extends State<SeekBar> {
             ),
             child: Icon(
               Icons.volume_up,
-              color: Theme.of(context).colorScheme.secondary,
+              color: Theme.of(context).colorScheme.primary,
             )),
         const SizedBox(width: 24.0),
       ],
