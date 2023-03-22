@@ -7,6 +7,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flarte/api.dart';
 import 'package:flarte/config.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:process/process.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
@@ -798,12 +800,21 @@ class _ShowDetailState extends State<ShowDetail> {
                               const SizedBox(width: 24),
                               IconButton(
                                 icon: const Icon(Icons.download),
-                                onPressed: () {},
+                                onPressed: () async {
+                                  ProcessManager mgr =
+                                      const LocalProcessManager();
+                                  final cmd = 'yt-dlp ${selectedVersion.url}';
+                                  final result = await mgr.run(cmd.split(' '));
+                                  debugPrint(result.toString());
+                                },
                               ),
                               const SizedBox(width: 24),
                               IconButton(
                                 icon: const Icon(Icons.copy),
-                                onPressed: () {},
+                                onPressed: () {
+                                  _copyToClipboard(
+                                      context, selectedVersion.url);
+                                },
                               ),
                             ],
                           ),
@@ -867,21 +878,35 @@ class _ShowDetailState extends State<ShowDetail> {
                                     });
                                   });
                             } else {
-                              return const SizedBox.shrink();
+                              return const SizedBox(height: 24);
                             }
                           }),
                           const SizedBox(height: 10),
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Text('Fermer'),
-                          ),
+                          Row(children: [
+                            const Expanded(
+                                flex: 1, child: SizedBox(height: 10)),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text('Fermer'),
+                            )
+                          ]),
                         ]),
                   )
                 ],
               ),
             ]));
+  }
+
+  Future<void> _copyToClipboard(BuildContext context, String text) async {
+    Clipboard.setData(ClipboardData(text: text));
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content:
+          Text('Copied to clipboard', style: TextStyle(color: Colors.white)),
+      backgroundColor: Colors.black87,
+      behavior: SnackBarBehavior.floating,
+    ));
   }
 }
 
