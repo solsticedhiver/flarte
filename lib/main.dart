@@ -713,11 +713,76 @@ class ShowDetail extends StatefulWidget {
 
 class _ShowDetailState extends State<ShowDetail> {
   late Version selectedVersion;
+  late Format selectedFormat;
   List<Version> versions = [];
+  List<DropdownMenuItem<Version>> versionItems = [];
+  List<DropdownMenuItem<Format>> formatItems = [];
+  List<Format> formats = [];
 
   @override
   void initState() {
     super.initState();
+    Future.microtask(() async {
+      final programId = widget.video['programId'];
+
+      //debugPrint(programId);
+      final resp = await http.get(
+          Uri.parse('https://api.arte.tv/api/player/v2/config/fr/$programId'));
+      Map<String, dynamic> jr = json.decode(resp.body);
+      final streams = jr['data']['attributes']['streams'];
+      //debugPrint(json.encode(streams).toString());
+      List<Version> cv = [];
+      for (var s in streams) {
+        final v = s['versions'][0];
+        //debugPrint(v['shortLabel']);
+        cv.add(Version(
+            shortLabel: v['shortLabel'], label: v['label'], url: s['url']));
+      }
+      debugPrint(cv.toString());
+      if (cv.isNotEmpty) {
+        setState(() {
+          versions.clear();
+          versions.addAll(cv);
+          selectedVersion = versions.first;
+          versionItems = versions
+              .map((e) =>
+                  DropdownMenuItem<Version>(value: e, child: Text(e.label)))
+              .toList();
+        });
+      }
+      _getFormats();
+    });
+  }
+
+  void _getFormats() async {
+    const lpm = LocalProcessManager();
+    final cmd = 'yt-dlp -J ${selectedVersion.url}';
+    debugPrint('running $cmd');
+    final pr = await lpm.run(cmd.split(' '));
+    if (pr.exitCode == 0) {
+      final Map<String, dynamic> jr = json.decode(pr.stdout);
+      List<Format> tf = [];
+      for (var f in jr['formats']) {
+        if (f['resolution'] == 'audio only') {
+          continue;
+        }
+        tf.add(Format(resolution: f['resolution']));
+      }
+      debugPrint(tf.toString());
+      if (tf.isNotEmpty) {
+        setState(() {
+          formats.clear();
+          formats.addAll(tf);
+          selectedFormat = formats[2];
+          formatItems = formats
+              .map((e) => DropdownMenuItem<Format>(
+                  value: e, child: Text('${e.resolution.split('x').last}p')))
+              .toList();
+        });
+      }
+    } else {
+      debugPrint(pr.stderr);
+    }
   }
 
   @override
@@ -778,109 +843,120 @@ class _ShowDetailState extends State<ShowDetail> {
                             children: [
                               IconButton(
                                 icon: const Icon(Icons.play_arrow),
-                                onPressed: () {
-                                  String title = '';
-                                  String? subtitle = widget.video['subtitle'];
-                                  if (subtitle != null && subtitle.isNotEmpty) {
-                                    title =
-                                        '${widget.video['title']} / $subtitle';
-                                  } else {
-                                    title = widget.video['title'];
-                                  }
+                                onPressed: versions.isNotEmpty
+                                    ? () {
+                                        String title = '';
+                                        String? subtitle =
+                                            widget.video['subtitle'];
+                                        if (subtitle != null &&
+                                            subtitle.isNotEmpty) {
+                                          title =
+                                              '${widget.video['title']} / $subtitle';
+                                        } else {
+                                          title = widget.video['title'];
+                                        }
 
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => MyScreen(
-                                            title: title,
-                                            url: selectedVersion.url)),
-                                  );
-                                },
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => MyScreen(
+                                                  title: title,
+                                                  url: selectedVersion.url,
+                                                  resolution: selectedFormat
+                                                      .resolution)),
+                                        );
+                                      }
+                                    : null,
                               ),
                               const SizedBox(width: 24),
                               IconButton(
                                 icon: const Icon(Icons.download),
-                                onPressed: () async {
-                                  ProcessManager mgr =
-                                      const LocalProcessManager();
-                                  final cmd = 'yt-dlp ${selectedVersion.url}';
-                                  final result = await mgr.run(cmd.split(' '));
-                                  debugPrint(result.toString());
-                                },
+                                onPressed: versions.isNotEmpty
+                                    ? () async {
+                                        ProcessManager mgr =
+                                            const LocalProcessManager();
+                                        final cmd =
+                                            'yt-dlp ${selectedVersion.url}';
+                                        final result =
+                                            await mgr.run(cmd.split(' '));
+                                        debugPrint(result.toString());
+                                      }
+                                    : null,
                               ),
                               const SizedBox(width: 24),
                               IconButton(
                                 icon: const Icon(Icons.copy),
-                                onPressed: () {
-                                  _copyToClipboard(
-                                      context, selectedVersion.url);
-                                },
+                                onPressed: versions.isNotEmpty
+                                    ? () {
+                                        _copyToClipboard(
+                                            context, selectedVersion.url);
+                                      }
+                                    : null,
                               ),
                             ],
                           ),
                           const SizedBox(height: 10),
-                          FutureBuilder(future: Future<List<Version>>(() async {
-                            final programId = widget.video['programId'];
-
-                            //debugPrint(programId);
-                            final resp = await http.get(Uri.parse(
-                                'https://api.arte.tv/api/player/v2/config/fr/$programId'));
-                            final Map<String, dynamic> jr =
-                                json.decode(resp.body);
-                            final streams = jr['data']['attributes']['streams'];
-                            //debugPrint(json.encode(streams).toString());
-                            List<Version> versions = [];
-                            for (var s in streams) {
-                              final v = s['versions'][0];
-                              //debugPrint(v['shortLabel']);
-                              versions.add(Version(
-                                  shortLabel: v['shortLabel'],
-                                  label: v['label'],
-                                  url: s['url']));
-                            }
-                            return versions;
-                          }), builder: (context, snapshot) {
-                            List<DropdownMenuItem<Version>> items = [];
-                            if (snapshot.hasData) {
-                              if (versions.isEmpty) {
-                                versions = snapshot.data!;
-                                selectedVersion = versions.first;
-                              }
-                              items = versions
-                                  .map((e) => DropdownMenuItem<Version>(
-                                      value: e, child: Text(e.label)))
-                                  .toList();
-                              return DropdownButton<Version>(
-                                  underline: const SizedBox.shrink(),
-                                  hint: const Text('Version'),
-                                  selectedItemBuilder: (BuildContext context) {
-                                    return versions.map<Widget>((v) {
-                                      return Container(
-                                        padding:
-                                            const EdgeInsets.only(left: 10),
-                                        alignment: Alignment.centerLeft,
-                                        constraints:
-                                            const BoxConstraints(minWidth: 100),
-                                        child: Text(
-                                          v.shortLabel,
-                                          style: const TextStyle(
-                                              color: Colors.deepOrange,
-                                              fontWeight: FontWeight.w600),
-                                        ),
-                                      );
-                                    }).toList();
-                                  },
-                                  value: selectedVersion,
-                                  items: items,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      selectedVersion = value!;
-                                    });
-                                  });
-                            } else {
-                              return const SizedBox(height: 24);
-                            }
-                          }),
+                          Row(children: [
+                            versionItems.isNotEmpty
+                                ? DropdownButton<Version>(
+                                    underline: const SizedBox.shrink(),
+                                    hint: const Text('Version'),
+                                    selectedItemBuilder:
+                                        (BuildContext context) {
+                                      return versions.map<Widget>((v) {
+                                        return Container(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          alignment: Alignment.centerLeft,
+                                          constraints: const BoxConstraints(
+                                              minWidth: 100),
+                                          child: Text(
+                                            v.shortLabel,
+                                            style: const TextStyle(
+                                                color: Colors.deepOrange,
+                                                fontWeight: FontWeight.w600),
+                                          ),
+                                        );
+                                      }).toList();
+                                    },
+                                    value: selectedVersion,
+                                    items: versionItems,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        selectedVersion = value!;
+                                        _getFormats();
+                                      });
+                                    })
+                                : const SizedBox(height: 24),
+                            const SizedBox(width: 10),
+                            formatItems.isNotEmpty
+                                ? DropdownButton<Format>(
+                                    underline: const SizedBox.shrink(),
+                                    hint: const Text('Format'),
+                                    value: selectedFormat,
+                                    selectedItemBuilder:
+                                        (BuildContext context) {
+                                      return formats.map<Widget>((f) {
+                                        return Container(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          alignment: Alignment.centerLeft,
+                                          constraints: const BoxConstraints(
+                                              minWidth: 100),
+                                          child: Text(
+                                            '${f.resolution.split('x').last}p',
+                                          ),
+                                        );
+                                      }).toList();
+                                    },
+                                    items: formatItems,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        selectedFormat = value!;
+                                      });
+                                    })
+                                : const SizedBox(height: 24),
+                          ]),
                           const SizedBox(height: 10),
                           Row(children: [
                             const Expanded(
@@ -921,5 +997,15 @@ class Version {
   @override
   String toString() {
     return 'Version($shortLabel, $label)';
+  }
+}
+
+class Format {
+  String resolution;
+  Format({required this.resolution});
+
+  @override
+  String toString() {
+    return 'Format($resolution)';
   }
 }

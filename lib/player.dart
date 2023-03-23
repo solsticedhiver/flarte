@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -11,7 +9,12 @@ import 'config.dart';
 class MyScreen extends StatefulWidget {
   final String url;
   final String title;
-  const MyScreen({super.key, required this.url, required this.title});
+  final String resolution;
+  const MyScreen(
+      {super.key,
+      required this.url,
+      required this.title,
+      required this.resolution});
 
   @override
   State<MyScreen> createState() => _MyScreenState();
@@ -43,11 +46,18 @@ class _MyScreenState extends State<MyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    (player.platform as libmpvPlayer)
-        .setProperty('user-agent', AppConfig.userAgent);
+    final pp = player.platform as libmpvPlayer;
+    pp.setProperty('user-agent', AppConfig.userAgent);
+    // usual resolutions: 1920x1080, 1280x720, 768x432, 640x360, 384x216
+    final res = widget.resolution.split('x');
+    pp.setProperty('ytdl', '');
+    pp.setProperty('script-opts', 'ytdl_hook-try_ytdl_first=yes');
+    pp.setProperty(
+        'ytdl-format', 'bestvideo[height<=${res[1]}]+bestaudio/best');
+
     player.volume = 100;
-    debugPrint('Playing ${widget.url}');
     player.open(Playlist([Media(widget.url)]));
+    debugPrint('Playing ${widget.url} at ${widget.resolution}');
 
     return Scaffold(
         appBar: AppBar(title: Text(widget.title)),
@@ -205,3 +215,13 @@ class _SeekBarState extends State<SeekBar> {
     );
   }
 }
+
+
+// mpv --ytdl --script-opts=ytdl_hook-try_ytdl_first=yes --ytdl-format='bestvideo[width<=960][height<=540]+bestaudio/best'
+/*
+final player = Player();
+// Check type. Only true for libmpv based platforms. Currently Windows & Linux.
+if (player?.platform is libmpvPlayer) {
+  await (player?.platform as libmpvPlayer?)?.setProperty("rtsp-transport", "udp");
+}
+*/
