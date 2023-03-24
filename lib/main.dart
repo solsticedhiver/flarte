@@ -799,6 +799,30 @@ class _ShowDetailState extends State<ShowDetail> {
     }
   }
 
+  String _dlDirectory() {
+    String workingDirectory = '';
+
+    if (Platform.isLinux) {
+      // download with yt-dlp in $XDG_DOWNLOAD_DIR if defined, else $HOME
+      Directory? downloadDir = getUserDirectory('DOWNLOAD');
+      if (downloadDir == null) {
+        workingDirectory = const String.fromEnvironment('HOME');
+      } else {
+        workingDirectory = downloadDir.path;
+      }
+    } else if (Platform.isWindows) {
+      // download to %USERPORFILE%\Downloads
+      workingDirectory =
+          path.join(Platform.environment['USERPROFILE']!, 'Downloads');
+    }
+    debugPrint('workingDirectory: $workingDirectory');
+    return workingDirectory;
+  }
+
+  String _outputFilename() {
+    return "${widget.video['programId']}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat.resolution}.mp4";
+  }
+
   void _ytdlp() async {
     ProcessManager mgr = const LocalProcessManager();
     // look for the format id that matches our resolution
@@ -831,20 +855,6 @@ class _ShowDetailState extends State<ShowDetail> {
       }
     }
     debugPrint('found format_id: $formatId');
-    String workingDirectory = '';
-    if (Platform.isLinux) {
-      // download with yt-dlp in $XDG_DOWNLOAD_DIR if defined, else $HOME
-      Directory? downloadDir = getUserDirectory('DOWNLOAD');
-      if (downloadDir == null) {
-        workingDirectory = const String.fromEnvironment('HOME');
-      } else {
-        workingDirectory = downloadDir.path;
-      }
-    } else if (Platform.isWindows) {
-      // download to %USERPORFILE%\Downloads
-      workingDirectory =
-          path.join(Platform.environment['USERPROFILE']!, 'Downloads');
-    }
     if (formatId.isNotEmpty) {
       cmd = [
         binary,
@@ -852,11 +862,65 @@ class _ShowDetailState extends State<ShowDetail> {
         AppConfig.userAgent,
         '-f',
         formatId,
+        '-o',
+        _outputFilename(),
         selectedVersion.url
       ];
-      debugPrint('workingDirectory: $workingDirectory');
-      result = await mgr.run(cmd, workingDirectory: workingDirectory);
+      result = await mgr.run(cmd, workingDirectory: _dlDirectory());
     }
+    if (result.exitCode != 0) {
+      debugPrint(result.stderr);
+      return;
+    }
+  }
+
+  void _ffmpeg() async {
+    ProcessManager mgr = const LocalProcessManager();
+    // look for the format id that matches our resolution
+    List<String> cmd = [
+      'ffprobe',
+      '-headers',
+      'User-Agent: ${AppConfig.userAgent}',
+      '-v',
+      'quiet',
+      '-print_format',
+      'json',
+      '-show_programs',
+      '-i',
+      selectedVersion.url
+    ];
+    ProcessResult result = await mgr.run(cmd);
+    if (result.exitCode != 0) {
+      debugPrint(result.stderr);
+      return;
+    }
+    Map<String, dynamic> jr = json.decode(result.stdout);
+    final res = selectedFormat.resolution.split('x');
+    final width = int.parse(res[0]);
+    final height = int.parse(res[1]);
+    int program = -1;
+    for (var p in jr['programs']) {
+      if (p['streams'][0]['height'] == height) {
+        program = p['streams'][0]['index'];
+        break;
+      }
+    }
+    if (program == -1) {
+      return;
+    }
+    cmd = [
+      'ffmpeg',
+      '-headers',
+      'User-Agent: ${AppConfig.userAgent}',
+      '-i',
+      selectedVersion.url,
+      '-map',
+      '0:p:$program',
+      '-c',
+      'copy',
+      _outputFilename()
+    ];
+    result = await mgr.run(cmd, workingDirectory: _dlDirectory());
     if (result.exitCode != 0) {
       debugPrint(result.stderr);
       return;
@@ -966,7 +1030,7 @@ class _ShowDetailState extends State<ShowDetail> {
                                     IconButton(
                                       icon: const Icon(Icons.download),
                                       onPressed:
-                                          versions.isNotEmpty ? _ytdlp : null,
+                                          versions.isNotEmpty ? _ffmpeg : null,
                                     ),
                                     const SizedBox(width: 24),
                                     IconButton(
