@@ -9,12 +9,12 @@ import 'config.dart';
 class MyScreen extends StatefulWidget {
   final String url;
   final String title;
-  final String resolution;
+  final String bitrate;
   const MyScreen(
       {super.key,
       required this.url,
       required this.title,
-      required this.resolution});
+      required this.bitrate});
 
   @override
   State<MyScreen> createState() => _MyScreenState();
@@ -48,16 +48,11 @@ class _MyScreenState extends State<MyScreen> {
   Widget build(BuildContext context) {
     final pp = player.platform as libmpvPlayer;
     pp.setProperty('user-agent', AppConfig.userAgent);
-    // usual resolutions: 1920x1080, 1280x720, 768x432, 640x360, 384x216
-    final res = widget.resolution.split('x');
-    pp.setProperty('ytdl', '');
-    pp.setProperty('script-opts', 'ytdl_hook-try_ytdl_first=yes');
-    pp.setProperty(
-        'ytdl-format', 'bestvideo[height<=${res[1]}]+bestaudio/best');
+    pp.setProperty('hls-bitrate', widget.bitrate);
 
     player.volume = 100;
     player.open(Playlist([Media(widget.url)]));
-    debugPrint('Playing ${widget.url} at ${widget.resolution}');
+    debugPrint('Playing ${widget.url} at ${widget.bitrate}');
 
     return Scaffold(
         appBar: AppBar(title: Text(widget.title)),

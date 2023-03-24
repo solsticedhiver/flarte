@@ -755,33 +755,40 @@ class _ShowDetailState extends State<ShowDetail> {
   }
 
   void _getFormats() async {
-    const lpm = LocalProcessManager();
-    final cmd = 'yt-dlp -J ${selectedVersion.url}';
-    debugPrint('running $cmd');
-    final pr = await lpm.run(cmd.split(' '));
-    if (pr.exitCode == 0) {
-      final Map<String, dynamic> jr = json.decode(pr.stdout);
-      List<Format> tf = [];
-      for (var f in jr['formats']) {
-        if (f['resolution'] == 'audio only') {
-          continue;
+    final resp = await http.get(Uri.parse(selectedVersion.url),
+        headers: {'User-Agent': AppConfig.userAgent});
+    final lines = resp.body.split('\n');
+    List<Format> tf = [];
+    for (var line in lines) {
+      if (line.startsWith('#EXT-X-STREAM-INF')) {
+        final info = line.split(':').last;
+        String resolution = '', bandwidth = '';
+        for (var i in info.split(',')) {
+          if (i.startsWith('RESOLUTION')) {
+            resolution = i.split('=').last;
+          } else if (i.startsWith('BANDWIDTH')) {
+            bandwidth = i.split('=').last;
+          }
         }
-        tf.add(Format(resolution: f['resolution']));
-      }
-      debugPrint(tf.toString());
-      if (tf.isNotEmpty) {
-        setState(() {
-          formats.clear();
-          formats.addAll(tf);
-          selectedFormat = formats[2];
-          formatItems = formats
-              .map((e) => DropdownMenuItem<Format>(
-                  value: e, child: Text('${e.resolution.split('x').last}p')))
-              .toList();
+        tf.add(Format(resolution: resolution, bandwidth: bandwidth));
+        tf.sort((a, b) {
+          int aa = int.parse(a.bandwidth.replaceFirst('p', ''));
+          int bb = int.parse(b.bandwidth.replaceFirst('p', ''));
+          return aa.compareTo(bb);
         });
       }
-    } else {
-      debugPrint(pr.stderr);
+    }
+    debugPrint(tf.toString());
+    if (tf.isNotEmpty) {
+      setState(() {
+        formats.clear();
+        formats.addAll(tf);
+        selectedFormat = formats[2];
+        formatItems = formats
+            .map((e) => DropdownMenuItem<Format>(
+                value: e, child: Text('${e.resolution.split('x').last}p')))
+            .toList();
+      });
     }
   }
 
@@ -862,8 +869,8 @@ class _ShowDetailState extends State<ShowDetail> {
                                               builder: (context) => MyScreen(
                                                   title: title,
                                                   url: selectedVersion.url,
-                                                  resolution: selectedFormat
-                                                      .resolution)),
+                                                  bitrate: selectedFormat
+                                                      .bandwidth)),
                                         );
                                       }
                                     : null,
@@ -1002,10 +1009,11 @@ class Version {
 
 class Format {
   String resolution;
-  Format({required this.resolution});
+  String bandwidth;
+  Format({required this.resolution, required this.bandwidth});
 
   @override
   String toString() {
-    return 'Format($resolution)';
+    return 'Format($resolution,$bandwidth)';
   }
 }
