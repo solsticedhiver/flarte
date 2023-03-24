@@ -810,9 +810,15 @@ class _ShowDetailState extends State<ShowDetail> {
     } else {
       return;
     }
-    String cmd = '$binary -J ${selectedVersion.url}';
+    List<String> cmd = [
+      binary,
+      '--user-agent',
+      AppConfig.userAgent,
+      '-J',
+      selectedVersion.url
+    ];
     String formatId = '';
-    ProcessResult result = await mgr.run(cmd.split(' '));
+    ProcessResult result = await mgr.run(cmd);
     if (result.exitCode != 0) {
       debugPrint(result.stderr);
       return;
@@ -821,6 +827,7 @@ class _ShowDetailState extends State<ShowDetail> {
     for (var f in jr['formats']) {
       if (f['resolution'] == selectedFormat.resolution) {
         formatId = f['format_id'];
+        break;
       }
     }
     debugPrint('found format_id: $formatId');
@@ -836,13 +843,19 @@ class _ShowDetailState extends State<ShowDetail> {
     } else if (Platform.isWindows) {
       // download to %USERPORFILE%\Downloads
       workingDirectory =
-          path.join(Platform.environment['USERPORFILE']!, 'Downloads');
+          path.join(Platform.environment['USERPROFILE']!, 'Downloads');
     }
     if (formatId.isNotEmpty) {
-      cmd = '$binary -f $formatId ${selectedVersion.url}';
+      cmd = [
+        binary,
+        '--user-agent',
+        AppConfig.userAgent,
+        '-f',
+        formatId,
+        selectedVersion.url
+      ];
       debugPrint('workingDirectory: $workingDirectory');
-      result =
-          await mgr.run(cmd.split(' '), workingDirectory: workingDirectory);
+      result = await mgr.run(cmd, workingDirectory: workingDirectory);
     }
     if (result.exitCode != 0) {
       debugPrint(result.stderr);
