@@ -48,6 +48,7 @@ class _MyScreenState extends State<MyScreen> {
   Widget build(BuildContext context) {
     final pp = player.platform as libmpvPlayer;
     pp.setProperty('user-agent', AppConfig.userAgent);
+    // use --hls-bitrate to select channel for a resolution by bitrate
     pp.setProperty('hls-bitrate', widget.bitrate);
 
     player.volume = 100;

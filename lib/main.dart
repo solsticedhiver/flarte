@@ -1,4 +1,3 @@
-//import 'dart:convert';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -727,10 +726,13 @@ class _ShowDetailState extends State<ShowDetail> {
     Future.microtask(() async {
       final programId = widget.video['programId'];
 
-      //debugPrint(programId);
+      debugPrint(programId);
       final resp = await http.get(
           Uri.parse('https://api.arte.tv/api/player/v2/config/fr/$programId'));
       Map<String, dynamic> jr = json.decode(resp.body);
+      if (jr['data'] == null) {
+        return;
+      }
       final streams = jr['data']['attributes']['streams'];
       //debugPrint(json.encode(streams).toString());
       List<Version> cv = [];
@@ -751,8 +753,8 @@ class _ShowDetailState extends State<ShowDetail> {
                   DropdownMenuItem<Version>(value: e, child: Text(e.label)))
               .toList();
         });
+        _getFormats();
       }
-      _getFormats();
     });
   }
 
@@ -831,6 +833,8 @@ class _ShowDetailState extends State<ShowDetail> {
 
   @override
   Widget build(BuildContext context) {
+    //debugPrint(json.encode(widget.video));
+
     final imageUrl = (widget.video['mainImage']['url'])
         .replaceFirst('__SIZE__', '400x225')
         .replaceFirst('?type=TEXT', '');
@@ -876,121 +880,141 @@ class _ShowDetailState extends State<ShowDetail> {
                                   style: Theme.of(context).textTheme.bodyMedium)
                               : const SizedBox.shrink(),
                           const SizedBox(height: 10),
-                          if (widget.video['durationLabel'] != null)
+                          Row(children: [
                             Chip(
                               backgroundColor:
                                   Theme.of(context).primaryColorDark,
-                              label: Text(widget.video['durationLabel']),
+                              label: Text(widget.video['kind']['label']),
                             ),
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.play_arrow),
-                                onPressed: versions.isNotEmpty
-                                    ? () {
-                                        String title = '';
-                                        String? subtitle =
-                                            widget.video['subtitle'];
-                                        if (subtitle != null &&
-                                            subtitle.isNotEmpty) {
-                                          title =
-                                              '${widget.video['title']} / $subtitle';
-                                        } else {
-                                          title = widget.video['title'];
-                                        }
-
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => MyScreen(
-                                                  title: title,
-                                                  url: selectedVersion.url,
-                                                  bitrate: selectedFormat
-                                                      .bandwidth)),
-                                        );
-                                      }
-                                    : null,
-                              ),
-                              const SizedBox(width: 24),
-                              IconButton(
-                                icon: const Icon(Icons.download),
-                                onPressed: versions.isNotEmpty ? _ytdlp : null,
-                              ),
-                              const SizedBox(width: 24),
-                              IconButton(
-                                icon: const Icon(Icons.copy),
-                                onPressed: versions.isNotEmpty
-                                    ? () {
-                                        _copyToClipboard(
-                                            context, selectedVersion.url);
-                                      }
-                                    : null,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          Row(children: [
-                            versionItems.isNotEmpty
-                                ? DropdownButton<Version>(
-                                    underline: const SizedBox.shrink(),
-                                    hint: const Text('Version'),
-                                    selectedItemBuilder:
-                                        (BuildContext context) {
-                                      return versions.map<Widget>((v) {
-                                        return Container(
-                                          padding:
-                                              const EdgeInsets.only(left: 10),
-                                          alignment: Alignment.centerLeft,
-                                          constraints: const BoxConstraints(
-                                              minWidth: 100),
-                                          child: Text(
-                                            v.shortLabel,
-                                            style: const TextStyle(
-                                                color: Colors.deepOrange,
-                                                fontWeight: FontWeight.w600),
-                                          ),
-                                        );
-                                      }).toList();
-                                    },
-                                    value: selectedVersion,
-                                    items: versionItems,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        selectedVersion = value!;
-                                        _getFormats();
-                                      });
-                                    })
-                                : const SizedBox(height: 24),
                             const SizedBox(width: 10),
-                            formatItems.isNotEmpty
-                                ? DropdownButton<Format>(
-                                    underline: const SizedBox.shrink(),
-                                    hint: const Text('Format'),
-                                    value: selectedFormat,
-                                    selectedItemBuilder:
-                                        (BuildContext context) {
-                                      return formats.map<Widget>((f) {
-                                        return Container(
-                                          padding:
-                                              const EdgeInsets.only(left: 10),
-                                          alignment: Alignment.centerLeft,
-                                          constraints: const BoxConstraints(
-                                              minWidth: 100),
-                                          child: Text(
-                                            '${f.resolution.split('x').last}p',
-                                          ),
-                                        );
-                                      }).toList();
-                                    },
-                                    items: formatItems,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        selectedFormat = value!;
-                                      });
-                                    })
-                                : const SizedBox(height: 24),
+                            if (!widget.video['kind']['isCollection'] &&
+                                widget.video['durationLabel'] != null)
+                              Chip(
+                                backgroundColor:
+                                    Theme.of(context).primaryColorDark,
+                                label: Text(widget.video['durationLabel']),
+                              ),
                           ]),
+                          const SizedBox(height: 10),
+                          widget.video['kind']['isCollection']
+                              ? const SizedBox.shrink()
+                              : Row(
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.play_arrow),
+                                      onPressed: versions.isNotEmpty
+                                          ? () {
+                                              String title = '';
+                                              String? subtitle =
+                                                  widget.video['subtitle'];
+                                              if (subtitle != null &&
+                                                  subtitle.isNotEmpty) {
+                                                title =
+                                                    '${widget.video['title']} / $subtitle';
+                                              } else {
+                                                title = widget.video['title'];
+                                              }
+
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        MyScreen(
+                                                            title: title,
+                                                            url: selectedVersion
+                                                                .url,
+                                                            bitrate:
+                                                                selectedFormat
+                                                                    .bandwidth)),
+                                              );
+                                            }
+                                          : null,
+                                    ),
+                                    const SizedBox(width: 24),
+                                    IconButton(
+                                      icon: const Icon(Icons.download),
+                                      onPressed:
+                                          versions.isNotEmpty ? _ytdlp : null,
+                                    ),
+                                    const SizedBox(width: 24),
+                                    IconButton(
+                                      icon: const Icon(Icons.copy),
+                                      onPressed: versions.isNotEmpty
+                                          ? () {
+                                              _copyToClipboard(
+                                                  context, selectedVersion.url);
+                                            }
+                                          : null,
+                                    ),
+                                  ],
+                                ),
+                          const SizedBox(height: 10),
+                          widget.video['kind']['isCollection']
+                              ? const SizedBox.shrink()
+                              : Row(children: [
+                                  versionItems.isNotEmpty
+                                      ? DropdownButton<Version>(
+                                          underline: const SizedBox.shrink(),
+                                          hint: const Text('Version'),
+                                          selectedItemBuilder:
+                                              (BuildContext context) {
+                                            return versions.map<Widget>((v) {
+                                              return Container(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10),
+                                                alignment: Alignment.centerLeft,
+                                                constraints:
+                                                    const BoxConstraints(
+                                                        minWidth: 100),
+                                                child: Text(
+                                                  v.shortLabel,
+                                                  style: const TextStyle(
+                                                      color: Colors.deepOrange,
+                                                      fontWeight:
+                                                          FontWeight.w600),
+                                                ),
+                                              );
+                                            }).toList();
+                                          },
+                                          value: selectedVersion,
+                                          items: versionItems,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              selectedVersion = value!;
+                                              _getFormats();
+                                            });
+                                          })
+                                      : const SizedBox(height: 24),
+                                  const SizedBox(width: 10),
+                                  formatItems.isNotEmpty
+                                      ? DropdownButton<Format>(
+                                          underline: const SizedBox.shrink(),
+                                          hint: const Text('Format'),
+                                          value: selectedFormat,
+                                          selectedItemBuilder:
+                                              (BuildContext context) {
+                                            return formats.map<Widget>((f) {
+                                              return Container(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10),
+                                                alignment: Alignment.centerLeft,
+                                                constraints:
+                                                    const BoxConstraints(
+                                                        minWidth: 100),
+                                                child: Text(
+                                                  '${f.resolution.split('x').last}p',
+                                                ),
+                                              );
+                                            }).toList();
+                                          },
+                                          items: formatItems,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              selectedFormat = value!;
+                                            });
+                                          })
+                                      : const SizedBox(height: 24),
+                                ]),
                           const SizedBox(height: 10),
                           Row(children: [
                             const Expanded(
