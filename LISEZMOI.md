@@ -5,6 +5,7 @@ Une application bureau *flutter* (*Linux* et *Windows*) pour naviguer sur le sit
 <img src="./screenshots/20230324-flarte-640x.png" />
 
 Il copie simplement l'interface sur site, mais ajoute la possibilité de télécharger les vidéos, en utilisant *ffmpeg*.
+**Toutes les vidéos sont la propriété d'arte.tv avec droits de reproduction et diffusion réservés.**
 
 Sur Windows, s'attend à trouver le binaire ffmpeg.exe dans le répertoire flarte. Télécharge dans `%USERPROFILE%\Downloads`
 

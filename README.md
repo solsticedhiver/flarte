@@ -5,6 +5,7 @@ A *flutter* desktop application (*Linux* and *Windows*) to browse https://www.ar
 <img src="./screenshots/20230324-flarte-640x.png" />
 
 It merely copies the website interface, but adds the possibility to download the videos, by using *ffmpeg*.
+**It should be obvious that all the videos are copyrighted by arte.tv, and not free to share as is.**
 
 On Windows, excepts the binary ffmpeg.exe to be in flarte directory. Downloads to `%USERPROFILE%\Downloads` directory.
 
