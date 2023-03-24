@@ -1,0 +1,52 @@
+name: App Windows Release
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  version:
+    name: Create version number
+    runs-on: windows-latest
+    outputs:
+      output1: ${{ steps.version.outputs.version }}
+    steps:
+    - uses: actions/checkout@v3
+    - name: Fetch all history for all tags and branches
+      run: |
+        git fetch --prune --depth=1000
+    - name: Create version
+      id: version
+      #run: |
+      #  'Select-String -Path .\pubspec.yaml -Pattern "^version: (\d+.\d+.\d+)\+\d+"|%{"version=$($_.matches.groups[1].value)"}' >> $env:GITHUB_OUTPUT
+      run: echo "version=v$(grep ^version pubspec.yaml |cut -f 2 -d ' '|cut -f 1 -d '+')" >> $GITHUB_OUTPUT
+      shell: bash
+  build:
+    name: Build and Create release
+    needs: [ version ]
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: subosito/flutter-action@v2
+      with:
+        channel : 'stable'
+        cache: true
+    - run: flutter pub get
+    #- run: flutter test
+    - run: flutter config --enable-windows-desktop
+    - run: flutter build windows --release
+    - name: Archive Release
+      uses: thedoctor0/zip-release@0.7.1
+      with:
+        type: 'zip'
+        directory: 'build/windows/runner/'
+        path: 'Release'
+        filename: 'windows_x64.zip'
+    - name: Create a Release in GitHub
+      uses: ncipollo/release-action@v1
+      with:
+        allowUpdates: true
+        artifacts: "build/windows/runner/windows_x64.zip"
+        token: "${{ secrets.GH_TOKEN }}"
+        tag: "${{ needs.version.outputs.output1 }}"
+        commit: "${{ github.sha }}"
