@@ -12,8 +12,9 @@ Sur Linux, télécharge dans `$XDG_DOWNLOAD_DIR` si définit, et sinon dans `$HO
 
 Ceci sera configurable, une fois la fenêtre des "Paramètres" finie.
 
-## TODO:
+## Bientot ?
 
 - la fenêtre pour les Paramètres
+- utilisable sous android (tablette/mobile) au moins lecture vidéo
 - ajouter france.tv ?
 

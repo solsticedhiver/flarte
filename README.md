@@ -15,4 +15,5 @@ Will be configurable, once settings dialog is done.
 ## TODO:
 
 - settings dialog/route
-- add france.tv and other network ?
+- make it usable on android tablet/phone?
+- add france.tv and other network?
