@@ -1,6 +1,7 @@
 //import 'dart:convert';
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -11,6 +12,7 @@ import 'package:flutter/services.dart';
 import 'package:process/process.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:xdg_directories/xdg_directories.dart';
 
 import 'player.dart';
 
@@ -755,10 +757,12 @@ class _ShowDetailState extends State<ShowDetail> {
   }
 
   void _getFormats() async {
+    // directly parse the .m3u8 to get the bandwidth value to pass to libmpv backend
     final resp = await http.get(Uri.parse(selectedVersion.url),
         headers: {'User-Agent': AppConfig.userAgent});
     final lines = resp.body.split('\n');
     List<Format> tf = [];
+    // #EXT-X-STREAM-INF:BANDWIDTH=xxx,AVERAGE-BANDWIDTH=yyyy,VIDEO-RANGE=SDR,CODECS="avc1.4d401e,mp4a.40.2",RESOLUTION=zzzxzzz,FRAME-RATE=25.000,AUDIO="program_audio_0",SUBTITLES="subs"
     for (var line in lines) {
       if (line.startsWith('#EXT-X-STREAM-INF')) {
         final info = line.split(':').last;
@@ -790,6 +794,39 @@ class _ShowDetailState extends State<ShowDetail> {
             .toList();
       });
     }
+  }
+
+  void _ytdlp() async {
+    ProcessManager mgr = const LocalProcessManager();
+    // look for the format id that matches our resolution
+    String cmd = 'yt-dlp -J ${selectedVersion.url}';
+    String formatId = '';
+    ProcessResult result = await mgr.run(cmd.split(' '));
+    if (result.exitCode != 0) {
+      return;
+    }
+    final jr = json.decode(result.stdout);
+    for (var f in jr['formats']) {
+      if (f['resolution'] == selectedFormat.resolution) {
+        formatId = f['format_id'];
+      }
+    }
+    debugPrint('found format_id: $formatId');
+    // download iwth yt-dlp in $XDG_DOWNLOAD_DIR if defined, else $HOME
+    if (formatId.isNotEmpty) {
+      cmd = 'yt-dlp -f $formatId ${selectedVersion.url}';
+      Directory? downloadDir = getUserDirectory('DOWNLOAD');
+      String workingDirectory = '';
+      if (downloadDir == null) {
+        workingDirectory = const String.fromEnvironment('HOME');
+      } else {
+        workingDirectory = downloadDir.path;
+      }
+      debugPrint('workingDirectory: $workingDirectory');
+      result =
+          await mgr.run(cmd.split(' '), workingDirectory: workingDirectory);
+    }
+    debugPrint('exitCode: ${result.exitCode}');
   }
 
   @override
@@ -878,17 +915,7 @@ class _ShowDetailState extends State<ShowDetail> {
                               const SizedBox(width: 24),
                               IconButton(
                                 icon: const Icon(Icons.download),
-                                onPressed: versions.isNotEmpty
-                                    ? () async {
-                                        ProcessManager mgr =
-                                            const LocalProcessManager();
-                                        final cmd =
-                                            'yt-dlp ${selectedVersion.url}';
-                                        final result =
-                                            await mgr.run(cmd.split(' '));
-                                        debugPrint(result.toString());
-                                      }
-                                    : null,
+                                onPressed: versions.isNotEmpty ? _ytdlp : null,
                               ),
                               const SizedBox(width: 24),
                               IconButton(
@@ -1014,6 +1041,6 @@ class Format {
 
   @override
   String toString() {
-    return 'Format($resolution,$bandwidth)';
+    return 'Format($resolution, $bandwidth)';
   }
 }
