@@ -12,6 +12,7 @@ import 'package:process/process.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:xdg_directories/xdg_directories.dart';
+import 'package:path/path.dart' as path;
 
 import 'player.dart';
 
@@ -801,10 +802,19 @@ class _ShowDetailState extends State<ShowDetail> {
   void _ytdlp() async {
     ProcessManager mgr = const LocalProcessManager();
     // look for the format id that matches our resolution
-    String cmd = 'yt-dlp -J ${selectedVersion.url}';
+    String binary = '';
+    if (Platform.isLinux) {
+      binary = 'yt-dlp';
+    } else if (Platform.isWindows) {
+      binary = 'yt-dlp.exe';
+    } else {
+      return;
+    }
+    String cmd = '$binary -J ${selectedVersion.url}';
     String formatId = '';
     ProcessResult result = await mgr.run(cmd.split(' '));
     if (result.exitCode != 0) {
+      debugPrint(result.stderr);
       return;
     }
     final jr = json.decode(result.stdout);
@@ -814,21 +824,30 @@ class _ShowDetailState extends State<ShowDetail> {
       }
     }
     debugPrint('found format_id: $formatId');
-    // download iwth yt-dlp in $XDG_DOWNLOAD_DIR if defined, else $HOME
-    if (formatId.isNotEmpty) {
-      cmd = 'yt-dlp -f $formatId ${selectedVersion.url}';
+    String workingDirectory = '';
+    if (Platform.isLinux) {
+      // download with yt-dlp in $XDG_DOWNLOAD_DIR if defined, else $HOME
       Directory? downloadDir = getUserDirectory('DOWNLOAD');
-      String workingDirectory = '';
       if (downloadDir == null) {
         workingDirectory = const String.fromEnvironment('HOME');
       } else {
         workingDirectory = downloadDir.path;
       }
+    } else if (Platform.isWindows) {
+      // download to %USERPORFILE%\Downloads
+      workingDirectory =
+          path.join(Platform.environment['USERPORFILE']!, 'Downloads');
+    }
+    if (formatId.isNotEmpty) {
+      cmd = '$binary -f $formatId ${selectedVersion.url}';
       debugPrint('workingDirectory: $workingDirectory');
       result =
           await mgr.run(cmd.split(' '), workingDirectory: workingDirectory);
     }
-    debugPrint('exitCode: ${result.exitCode}');
+    if (result.exitCode != 0) {
+      debugPrint(result.stderr);
+      return;
+    }
   }
 
   @override
