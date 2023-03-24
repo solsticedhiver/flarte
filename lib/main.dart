@@ -123,7 +123,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   ),
                   minLeadingWidth: 30,
                   leading: const Icon(Icons.settings),
-                  title: leftSideWidth != 64 ? const Text('Settings') : null,
+                  title: leftSideWidth != 64 ? const Text('Paramètres') : null,
                   onTap: () {},
                 ),
               ])),

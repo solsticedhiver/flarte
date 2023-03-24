@@ -9,3 +9,8 @@ On Windows, excepts the binary yt-dlp.exe to be in flarte directory. Downloads t
 On Linux, downloads to `$XDG_DOWNLOAD_DIR` if set else to `$HOME`.
 
 Will be configurable, once settings dialog is done.
+
+## TODO:
+
+- settings dialog/route
+- add france.tv and other network ?
