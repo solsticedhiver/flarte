@@ -2,9 +2,10 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
-import 'package:path/path.dart' as path;
+import 'package:window_manager/window_manager.dart';
 
 import 'config.dart';
 
@@ -21,13 +22,20 @@ class MyScreen extends StatefulWidget {
       required this.subtitle});
 
   @override
-  State<MyScreen> createState() => _MyScreenState();
+  State<MyScreen> createState() => MyScreenState();
+
+  static MyScreenState of(BuildContext context) =>
+      context.findAncestorStateOfType<MyScreenState>()!;
 }
 
-class _MyScreenState extends State<MyScreen> {
+class MyScreenState extends State<MyScreen> {
   final Player player =
       Player(configuration: const PlayerConfiguration(title: AppConfig.name));
   VideoController? controller;
+  bool _isFullScreen = false;
+
+  bool get isFullScreen => _isFullScreen;
+  set isFullScreen(bool value) => setState(() => _isFullScreen = value);
 
   @override
   void initState() {
@@ -84,25 +92,46 @@ class _MyScreenState extends State<MyScreen> {
       margin = 10.0;
     }
 
-    return Scaffold(
-        appBar: AppBar(title: Text(widget.title)),
-        body: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Expanded(
-              child: Card(
-                elevation: 8.0,
-                clipBehavior: Clip.antiAlias,
-                margin: EdgeInsets.all(margin),
-                child: Video(
-                  controller: controller,
+    return RawKeyboardListener(
+        autofocus: true,
+        focusNode: FocusNode(),
+        onKey: (event) {
+          if (event is RawKeyDownEvent) {
+            if (event.logicalKey.keyLabel == "Escape" && isFullScreen) {
+              windowManager.setFullScreen(!isFullScreen);
+              _isFullScreen = !isFullScreen;
+            } else if (event.logicalKey.keyLabel == " ") {
+              player.playOrPause();
+            }
+          }
+        },
+        child: Scaffold(
+            appBar: !isFullScreen ? AppBar(title: Text(widget.title)) : null,
+            body: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: InkWell(
+                      hoverColor: Theme.of(context).canvasColor,
+                      onDoubleTap: () {
+                        windowManager.setFullScreen(!isFullScreen);
+                        _isFullScreen = !isFullScreen;
+                      },
+                      child: Card(
+                        elevation: 8.0,
+                        clipBehavior: Clip.antiAlias,
+                        margin: EdgeInsets.all(!isFullScreen ? margin : 0.0),
+                        child: Video(
+                          controller: controller,
+                        ),
+                      )),
                 ),
-              ),
-            ),
-            SeekBar(player: player, buttonSize: buttonSize),
-            SizedBox(height: margin),
-          ],
-        ));
+                if (!isFullScreen) ...[
+                  SeekBar(player: player, buttonSize: buttonSize),
+                  SizedBox(height: margin)
+                ],
+              ],
+            )));
   }
 }
 
@@ -247,12 +276,26 @@ class _SeekBarState extends State<SeekBar> {
               Icons.volume_up,
               color: Theme.of(context).colorScheme.primary,
             )),
+        ElevatedButton(
+            onPressed: () {
+              bool ifs = MyScreen.of(context).isFullScreen;
+              windowManager.setFullScreen(!ifs);
+              MyScreen.of(context).isFullScreen = !ifs;
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.onSecondary,
+              shape: const CircleBorder(),
+              padding: EdgeInsets.all(widget.buttonSize),
+            ),
+            child: Icon(
+              Icons.fullscreen,
+              color: Theme.of(context).colorScheme.primary,
+            )),
         SizedBox(width: widget.buttonSize),
       ],
     );
   }
 }
-
 
 // mpv --ytdl --script-opts=ytdl_hook-try_ytdl_first=yes --ytdl-format='bestvideo[width<=960][height<=540]+bestaudio/best'
 /*
