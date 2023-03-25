@@ -38,7 +38,7 @@ class _SerieScreenState extends State<SerieScreen> {
             jd['props']['pageProps']['props']['page']['value']['zones'];
         //debugPrint(json.encode(zones));
         for (var z in zones) {
-          if (z['code'].startsWith('collection_subcollection_')) {
+          if (z['code'].startsWith('collection_videos')) {
             setState(() {
               teasers.clear();
               teasers.addAll(z['content']['data']);
@@ -48,9 +48,9 @@ class _SerieScreenState extends State<SerieScreen> {
           //debugPrint(json.encode(teasers));
         }
         if (teasers.isEmpty) {
-          // use the collection_videos_ instead
+          // use the collection_subcollection instead
           for (var z in zones) {
-            if (z['code'].startsWith('collection_videos_')) {
+            if (z['code'].startsWith('collection_subcollection_')) {
               setState(() {
                 teasers.clear();
                 teasers.addAll(z['content']['data']);
@@ -120,6 +120,9 @@ class _SerieScreenState extends State<SerieScreen> {
                                         useSubtitle && t['subtitle'] != null
                                             ? t['subtitle']
                                             : t['title'],
+                                        maxLines: 2,
+                                        softWrap: true,
+                                        overflow: TextOverflow.ellipsis,
                                         style: Theme.of(context)
                                             .textTheme
                                             .titleMedium),

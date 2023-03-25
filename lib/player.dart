@@ -53,7 +53,7 @@ class _MyScreenState extends State<MyScreen> {
 
     player.volume = 100;
     player.open(Playlist([Media(widget.url)]));
-    debugPrint('Playing ${widget.url} at ${widget.bitrate}');
+    debugPrint('Playing ${widget.url} at ${widget.bitrate} bps');
 
     return Scaffold(
         appBar: AppBar(title: Text(widget.title)),
