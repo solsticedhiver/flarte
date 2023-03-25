@@ -36,6 +36,7 @@ class _SerieScreenState extends State<SerieScreen> {
         final Map<String, dynamic> jd = json.decode(script.text);
         final zones =
             jd['props']['pageProps']['props']['page']['value']['zones'];
+        //debugPrint(json.encode(zones));
         for (var z in zones) {
           if (z['code'].startsWith('collection_subcollection_')) {
             setState(() {
@@ -45,6 +46,18 @@ class _SerieScreenState extends State<SerieScreen> {
             break;
           }
           //debugPrint(json.encode(teasers));
+        }
+        if (teasers.isEmpty) {
+          // use the collection_videos_ instead
+          for (var z in zones) {
+            if (z['code'].startsWith('collection_videos_')) {
+              setState(() {
+                teasers.clear();
+                teasers.addAll(z['content']['data']);
+              });
+              break;
+            }
+          }
         }
       }
     });
