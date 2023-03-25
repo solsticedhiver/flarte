@@ -71,6 +71,10 @@ class _SerieScreenState extends State<SerieScreen> {
   Widget build(BuildContext context) {
     int count = MediaQuery.of(context).size.width ~/ 285;
     double width = 285.0 * count;
+    final titles = teasers.map((t) => t['title']).toList();
+    // use the subtitle if all titles are the same
+    bool useSubtitle =
+        teasers.length == titles.where((t) => t == titles[0]).length;
     return Scaffold(
         appBar: AppBar(title: Text(widget.title)),
         body: Center(
@@ -99,7 +103,10 @@ class _SerieScreenState extends State<SerieScreen> {
                                       width: 265,
                                     )),
                                     const SizedBox(height: 10),
-                                    Text(t['title'],
+                                    Text(
+                                        useSubtitle && t['subtitle'] != null
+                                            ? t['subtitle']
+                                            : t['title'],
                                         style: Theme.of(context)
                                             .textTheme
                                             .titleMedium),
