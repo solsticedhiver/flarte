@@ -101,3 +101,28 @@ class Cache extends ChangeNotifier {
     notifyListeners();
   }
 }
+
+enum CategoriesListSize { tiny, small, normal }
+
+class Version {
+  String shortLabel;
+  String label;
+  String url;
+  Version({required this.shortLabel, required this.label, required this.url});
+
+  @override
+  String toString() {
+    return 'Version($shortLabel, $label)';
+  }
+}
+
+class Format {
+  String resolution;
+  String bandwidth;
+  Format({required this.resolution, required this.bandwidth});
+
+  @override
+  String toString() {
+    return 'Format($resolution, $bandwidth)';
+  }
+}
