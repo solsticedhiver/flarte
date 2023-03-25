@@ -791,7 +791,18 @@ class _ShowDetailState extends State<ShowDetail> {
       setState(() {
         formats.clear();
         formats.addAll(tf);
-        selectedFormat = formats[2];
+        // try to keep the previously defined resolution, if initiliazed
+        try {
+          final _ = selectedFormat;
+          for (var f in formats) {
+            if (f.resolution == selectedFormat.resolution) {
+              selectedFormat = f;
+              break;
+            }
+          }
+        } catch (e) {
+          selectedFormat = formats[2];
+        }
         formatItems = formats
             .map((e) => DropdownMenuItem<Format>(
                 value: e, child: Text('${e.resolution.split('x').last}p')))
@@ -936,6 +947,8 @@ class _ShowDetailState extends State<ShowDetail> {
     if (result.exitCode != 0) {
       debugPrint(result.stderr);
       return;
+    } else {
+      debugPrint('Done downloading ${selectedVersion.url}');
     }
   }
 
