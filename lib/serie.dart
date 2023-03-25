@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flarte/api.dart';
+import 'package:flarte/main.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as parser;
@@ -22,8 +24,10 @@ class SerieScreen extends StatefulWidget {
 }
 
 class _SerieScreenState extends State<SerieScreen> {
+  Map<String, dynamic> data = {};
   List<dynamic> teasers = [];
 
+  // TODO: this is a mess, reorganize
   @override
   void initState() {
     super.initState();
@@ -34,8 +38,10 @@ class _SerieScreenState extends State<SerieScreen> {
       final script = document.querySelector('script#__NEXT_DATA__');
       if (script != null) {
         final Map<String, dynamic> jd = json.decode(script.text);
-        final zones =
-            jd['props']['pageProps']['props']['page']['value']['zones'];
+        setState(() {
+          data = jd['props']['pageProps']['props']['page'];
+        });
+        final zones = data['value']['zones'];
         //debugPrint(json.encode(zones));
         for (var z in zones) {
           if (z['code'].startsWith('collection_videos')) {
@@ -52,10 +58,8 @@ class _SerieScreenState extends State<SerieScreen> {
           for (var z in zones) {
             if (z['code'].startsWith('collection_subcollection_')) {
               setState(() {
-                teasers.clear();
                 teasers.addAll(z['content']['data']);
               });
-              break;
             }
           }
         }
@@ -88,9 +92,21 @@ class _SerieScreenState extends State<SerieScreen> {
     // use the subtitle if all titles are the same
     bool useSubtitle =
         teasers.length == titles.where((t) => t == titles[0]).length;
-    return Scaffold(
-        appBar: AppBar(title: Text(widget.title)),
-        body: Center(
+    Widget body;
+    if (data.isNotEmpty) {
+      int zoneCount = 0;
+      for (var z in data['value']['zones']) {
+        if (z['content']['data'].length > 1) {
+          zoneCount++;
+        }
+      }
+      if (zoneCount > 1) {
+        body = CarouselList(
+          data: data,
+          size: CategoriesListSize.normal,
+        );
+      } else {
+        body = Center(
             child: Container(
                 width: width,
                 child: GridView.count(
@@ -144,6 +160,12 @@ class _SerieScreenState extends State<SerieScreen> {
                                   ],
                                 ))));
                   }).toList(),
-                ))));
+                )));
+      }
+    } else {
+      body = const SizedBox.shrink();
+    }
+
+    return Scaffold(appBar: AppBar(title: Text(widget.title)), body: body);
   }
 }
