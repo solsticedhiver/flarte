@@ -11,8 +11,8 @@ import 'package:path/path.dart' as path;
 
 import 'api.dart';
 import 'config.dart';
-import 'player.dart';
 import 'serie.dart';
+import 'player.dart';
 
 class ShowDetail extends StatefulWidget {
   final Map<String, dynamic> video;
@@ -258,6 +258,53 @@ class _ShowDetailState extends State<ShowDetail> {
     }
   }
 
+  void _cvlc() async {
+    ProcessManager mgr = const LocalProcessManager();
+    // look for the format id that matches our resolution
+    String binary_vlc = '';
+    if (Platform.isLinux) {
+      binary_vlc = 'cvlc';
+    } else if (Platform.isWindows) {
+      binary_vlc = 'cvlc.exe';
+    } else {
+      return;
+    }
+    List<String> cmd = [
+      binary_vlc,
+      '--play-and-exit',
+      '--http-user-agent',
+      'User-Agent: ${AppConfig.userAgent}',
+      '--quiet',
+      '--adaptive-maxheight',
+      selectedFormat.resolution.split('x').last,
+      selectedVersion.url
+    ];
+    ProcessResult result = await mgr.run(cmd);
+    if (result.exitCode != 0) {
+      debugPrint(result.stderr);
+      return;
+    }
+  }
+
+  void _libmpv() {
+    String title = '';
+    String? subtitle = widget.video['subtitle'];
+    if (subtitle != null && subtitle.isNotEmpty) {
+      title = '${widget.video['title']} / $subtitle';
+    } else {
+      title = widget.video['title'];
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => MyScreen(
+              title: title,
+              url: selectedVersion.url,
+              bitrate: selectedFormat.bandwidth)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     //debugPrint(json.encode(widget.video));
@@ -329,33 +376,8 @@ class _ShowDetailState extends State<ShowDetail> {
                                   children: [
                                     IconButton(
                                       icon: const Icon(Icons.play_arrow),
-                                      onPressed: versions.isNotEmpty
-                                          ? () {
-                                              String title = '';
-                                              String? subtitle =
-                                                  widget.video['subtitle'];
-                                              if (subtitle != null &&
-                                                  subtitle.isNotEmpty) {
-                                                title =
-                                                    '${widget.video['title']} / $subtitle';
-                                              } else {
-                                                title = widget.video['title'];
-                                              }
-
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        MyScreen(
-                                                            title: title,
-                                                            url: selectedVersion
-                                                                .url,
-                                                            bitrate:
-                                                                selectedFormat
-                                                                    .bandwidth)),
-                                              );
-                                            }
-                                          : null,
+                                      onPressed:
+                                          versions.isNotEmpty ? _libmpv : null,
                                     ),
                                     const SizedBox(width: 24),
                                     IconButton(
