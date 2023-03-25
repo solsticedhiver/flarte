@@ -15,6 +15,7 @@ import 'package:xdg_directories/xdg_directories.dart';
 import 'package:path/path.dart' as path;
 
 import 'player.dart';
+import 'serie.dart';
 
 void main() {
   runApp(ChangeNotifierProvider<Cache>(
@@ -1122,6 +1123,19 @@ class _ShowDetailState extends State<ShowDetail> {
                                           })
                                       : const SizedBox(height: 24),
                                 ]),
+                          widget.video['kind']['isCollection']
+                              ? TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => SerieScreen(
+                                                title: widget.video['title'],
+                                                url: widget.video['url'])));
+                                  },
+                                  child: const Text('Épisodes'),
+                                )
+                              : const SizedBox.shrink(),
                           const SizedBox(height: 10),
                           Row(children: [
                             const Expanded(
