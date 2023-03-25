@@ -198,19 +198,16 @@ class _ShowDetailState extends State<ShowDetail> {
   void _ffmpeg() async {
     ProcessManager mgr = const LocalProcessManager();
     // look for the format id that matches our resolution
-    String binary_ffmpeg = '';
-    String binary_ffprobe = '';
-    if (Platform.isLinux) {
-      binary_ffmpeg = 'ffmpeg';
-      binary_ffprobe = 'ffprobe';
-    } else if (Platform.isWindows) {
-      binary_ffmpeg = 'ffmpeg.exe';
-      binary_ffprobe = 'ffprobe.exe';
-    } else {
+    String ffmpeg = 'ffmpeg';
+    String ffprobe = 'ffprobe';
+    if (Platform.isWindows) {
+      ffmpeg = 'ffmpeg.exe';
+      ffprobe = 'ffprobe.exe';
+    } else if (!Platform.isLinux) {
       return;
     }
     List<String> cmd = [
-      binary_ffprobe,
+      ffprobe,
       '-headers',
       'User-Agent: ${AppConfig.userAgent}',
       '-v',
@@ -241,7 +238,7 @@ class _ShowDetailState extends State<ShowDetail> {
       return;
     }
     cmd = [
-      binary_ffmpeg,
+      ffmpeg,
       '-headers',
       'User-Agent: ${AppConfig.userAgent}',
       '-i',
