@@ -230,7 +230,7 @@ class _ShowDetailState extends State<ShowDetail> {
     int program = -1;
     for (var p in jr['programs']) {
       if (p['streams'][0]['height'] == height) {
-        program = p['streams'][0]['index'];
+        program = p['program_id'];
         break;
       }
     }
