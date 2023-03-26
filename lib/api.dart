@@ -118,7 +118,7 @@ class Version {
 
 class Format {
   String resolution;
-  String bandwidth;
+  String bandwidth; // used with media_kit/libmpv player
   Format({required this.resolution, required this.bandwidth});
 
   @override

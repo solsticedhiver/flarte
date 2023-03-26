@@ -191,6 +191,13 @@ class _ShowDetailState extends State<ShowDetail> {
     }
     if (result.exitCode != 0) {
       debugPrint(result.stderr);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(
+            'Erreur de téléchargement de ${widget.video['programId']} avec yt-dlp',
+            style: const TextStyle(color: Colors.white)),
+        backgroundColor: Colors.black87,
+        behavior: SnackBarBehavior.floating,
+      ));
       return;
     }
   }
@@ -221,6 +228,13 @@ class _ShowDetailState extends State<ShowDetail> {
     ProcessResult result = await mgr.run(cmd);
     if (result.exitCode != 0) {
       debugPrint(result.stderr);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        duration: const Duration(seconds: 10),
+        content: Text('Erreur pour ${widget.video['programId']} avec ffprobe',
+            style: const TextStyle(color: Colors.white)),
+        backgroundColor: Colors.black87,
+        behavior: SnackBarBehavior.floating,
+      ));
       return;
     }
     Map<String, dynamic> jr = json.decode(result.stdout);
@@ -250,8 +264,39 @@ class _ShowDetailState extends State<ShowDetail> {
       _outputFilename()
     ];
     result = await mgr.run(cmd, workingDirectory: _dlDirectory());
+    if ((result.exitCode != 0) &&
+        (result.stderr
+            .contains('Could not find tag for codec timed_id3 in stream'))) {
+      // retry without id3 stream
+      cmd = [
+        ffmpeg,
+        '-headers',
+        'User-Agent: ${AppConfig.userAgent}',
+        '-i',
+        selectedVersion.url,
+        '-map',
+        '0:p:$program:0',
+        '-map',
+        '0:p:$program:1',
+        // we expect the id3 stream to be at index 2
+        '-c',
+        'copy',
+        '-y',
+        _outputFilename()
+      ];
+      result = await mgr.run(cmd, workingDirectory: _dlDirectory());
+    }
+
     if (result.exitCode != 0) {
       debugPrint(result.stderr);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        duration: const Duration(seconds: 10),
+        content: Text(
+            'Erreur de téléchargement de ${widget.video['programId']} avec ffmpeg',
+            style: const TextStyle(color: Colors.white)),
+        backgroundColor: Colors.black87,
+        behavior: SnackBarBehavior.floating,
+      ));
       return;
     } else {
       debugPrint('Done downloading ${selectedVersion.url}');
