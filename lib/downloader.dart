@@ -8,7 +8,14 @@ class Stream {
   Uri? video;
   Uri? audio;
   Uri? subtitle;
-  Stream({required this.video, required this.audio, required this.subtitle});
+  int videoSize = 0;
+  int audioSize = 0;
+  Stream(
+      {required this.video,
+      required this.audio,
+      required this.subtitle,
+      this.videoSize = 0,
+      this.audioSize = 0});
 
   static Future<Stream> getMediaPlaylist(String url, String resolution) async {
     // get m3u8 playlist for each video, audio and subtitle stream
@@ -30,11 +37,15 @@ class Stream {
         }
         if (playlist.audios.isNotEmpty) {
           audio = playlist.audios[0].url;
+          debugPrint(playlist.audios[0].format.language);
+          debugPrint(playlist.audios[0].format.label);
         } else {
           audio = null;
         }
         if (playlist.subtitles.isNotEmpty) {
           subtitle = playlist.subtitles[0].url;
+          debugPrint(playlist.subtitles[0].format.language);
+          debugPrint(playlist.subtitles[0].format.label);
         } else {
           subtitle = null;
         }
@@ -53,6 +64,7 @@ class Stream {
     Stream playlists = await Stream.getMediaPlaylist(url, resolution);
 
     Uri? video, audio, subtitle;
+    int videoSize = 0;
     if (playlists.video != null) {
       final resp = await http.get(playlists.video!);
       String contentString = resp.body;
@@ -71,6 +83,11 @@ class Stream {
           if (count != playlist.segments.length) {
             debugPrint('Warning: different urls for video stream segments');
           }
+          for (var s in playlist.segments) {
+            if (s.byterangeLength != null) {
+              videoSize = videoSize + s.byterangeLength!;
+            }
+          }
         }
       } on ParserException catch (e) {
         return Future.error(e);
@@ -78,6 +95,7 @@ class Stream {
     } else {
       return Future.error(Exception('Stream video Uri is null'));
     }
+    int audioSize = 0;
     if (playlists.audio != null) {
       final resp = await http.get(playlists.audio!);
       String contentString = resp.body;
@@ -95,6 +113,11 @@ class Stream {
               .length;
           if (count != playlist.segments.length) {
             debugPrint('Warning: different urls for audio stream segments');
+          }
+          for (var s in playlist.segments) {
+            if (s.byterangeLength != null) {
+              audioSize = audioSize + s.byterangeLength!;
+            }
           }
         }
       } on ParserException catch (e) {
@@ -120,7 +143,12 @@ class Stream {
         return Future.error(e);
       }
     }
-    return Stream(video: video, audio: audio, subtitle: subtitle);
+    return Stream(
+        video: video,
+        audio: audio,
+        subtitle: subtitle,
+        videoSize: videoSize!,
+        audioSize: audioSize!);
   }
 
   @override

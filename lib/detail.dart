@@ -279,10 +279,17 @@ class _ShowDetailState extends State<ShowDetail> {
           await mgr.run(cmd.split(' '), workingDirectory: workingDirectory);
       if (result.exitCode != 0) {
         debugPrint(
-            'failed to combine video/audio/subtitle for ${widget.video['programId']}\n${result.stderr}');
+            'Failed to combine video/audio/subtitle for ${widget.video['programId']}\n${result.stderr}');
       } else {
         debugPrint(
             'Finished combining video/audio/subtitle for ${widget.video['programId']}');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+              'Téléchargement de ${widget.video['programId']} terminé',
+              style: const TextStyle(color: Colors.white)),
+          backgroundColor: Colors.black87,
+          behavior: SnackBarBehavior.floating,
+        ));
       }
     } catch (e) {
       debugPrint(e.toString());
