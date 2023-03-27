@@ -13,6 +13,7 @@ import 'api.dart';
 import 'config.dart';
 import 'serie.dart';
 import 'player.dart';
+import 'downloader.dart';
 
 class ShowDetail extends StatefulWidget {
   final Map<String, dynamic> video;
@@ -203,92 +204,88 @@ class _ShowDetailState extends State<ShowDetail> {
   }
 
   void _ffmpeg() async {
+    // because ffmpeg can't handle vtt subtitle or choke on some time_id3 stream or sidx unimplemented feature
+    // we download video, audio and subtitle separatly to reconstruct the file from that
+    Stream stream = await Stream.getMediaStream(
+        selectedVersion.url, selectedFormat.resolution);
+    debugPrint(stream.toString());
     ProcessManager mgr = const LocalProcessManager();
-    // look for the format id that matches our resolution
     String ffmpeg = 'ffmpeg';
-    String ffprobe = 'ffprobe';
     if (Platform.isWindows) {
       ffmpeg = 'ffmpeg.exe';
-      ffprobe = 'ffprobe.exe';
     } else if (!Platform.isLinux) {
       return;
     }
-    List<String> cmd = [
-      ffprobe,
-      '-headers',
-      'User-Agent: ${AppConfig.userAgent}',
-      '-v',
-      'quiet',
-      '-print_format',
-      'json',
-      '-show_programs',
-      '-i',
-      selectedVersion.url
-    ];
-    ProcessResult result = await mgr.run(cmd);
-    if (result.exitCode != 0) {
-      debugPrint(result.stderr);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        duration: const Duration(seconds: 10),
-        content: Text('Erreur pour ${widget.video['programId']} avec ffprobe',
-            style: const TextStyle(color: Colors.white)),
-        backgroundColor: Colors.black87,
-        behavior: SnackBarBehavior.floating,
-      ));
-      return;
-    }
-    Map<String, dynamic> jr = json.decode(result.stdout);
-    final res = selectedFormat.resolution.split('x');
-    final width = int.parse(res[0]);
-    final height = int.parse(res[1]);
-    int program = -1;
-    for (var p in jr['programs']) {
-      if (p['streams'][0]['height'] == height) {
-        program = p['program_id'];
-        break;
-      }
-    }
-    if (program == -1) {
-      return;
-    }
-    cmd = [
+    final workingDirectory = _dlDirectory();
+    final videoFilename = stream.video.toString().split('/').last;
+    final audioFilename = stream.audio.toString().split('/').last;
+    debugPrint(videoFilename);
+    debugPrint(audioFilename);
+    final dlVideo = mgr.run([
       ffmpeg,
       '-headers',
       'User-Agent: ${AppConfig.userAgent}',
       '-i',
-      selectedVersion.url,
-      '-map',
-      '0:p:$program',
+      stream.video.toString(),
       '-c',
       'copy',
-      _outputFilename()
-    ];
-    result = await mgr.run(cmd, workingDirectory: _dlDirectory());
-    if ((result.exitCode != 0) &&
-        (result.stderr
-            .contains('Could not find tag for codec timed_id3 in stream'))) {
-      // retry without id3 stream
-      cmd = [
-        ffmpeg,
-        '-headers',
-        'User-Agent: ${AppConfig.userAgent}',
-        '-i',
-        selectedVersion.url,
-        '-map',
-        '0:p:$program:0',
-        '-map',
-        '0:p:$program:1',
-        // we expect the id3 stream to be at index 2
-        '-c',
-        'copy',
-        '-y',
-        _outputFilename()
-      ];
-      result = await mgr.run(cmd, workingDirectory: _dlDirectory());
+      videoFilename
+    ], workingDirectory: workingDirectory);
+    final dlAudio = mgr.run([
+      ffmpeg,
+      '-headers',
+      'User-Agent: ${AppConfig.userAgent}',
+      '-i',
+      stream.audio.toString(),
+      '-c',
+      'copy',
+      audioFilename
+    ], workingDirectory: workingDirectory);
+    List<Future> tasks;
+    if (stream.subtitle != null) {
+      final dlSub = http.get(stream.subtitle!);
+      tasks = [dlVideo, dlAudio, dlSub];
+    } else {
+      tasks = [dlVideo, dlAudio];
     }
-
-    if (result.exitCode != 0) {
-      debugPrint(result.stderr);
+    try {
+      List responses = await Future.wait(tasks, eagerError: true);
+      if (responses[0].exitCode != 0) {
+        debugPrint(responses[0].stderr);
+        throw (Exception('Erreur lors du téléchargement du flux video'));
+      }
+      if (responses[1].exitCode != 0) {
+        debugPrint(responses[0].stderr);
+        throw (Exception('Erreur lors du téléchargement du flux audio'));
+      }
+      // combine video/audio/subtitle together
+      final outputFilename =
+          selectedVersion.url.split('/').last.replaceFirst('m3u8', 'mp4');
+      final String cmd;
+      if (stream.subtitle == null) {
+        cmd =
+            '$ffmpeg -i $videoFilename -i $audioFilename -map 0:v -map 1:a -c copy $outputFilename';
+      } else {
+        final subFilename = stream.subtitle.toString().split('/').last;
+        debugPrint(subFilename);
+        final _ = path.join(workingDirectory, subFilename);
+        await File(_)
+            .writeAsString(utf8.decode(responses[2].bodyBytes), flush: true);
+        cmd =
+            '$ffmpeg -i $videoFilename -i $audioFilename -i $subFilename -map 0:v -map 1:a -map 2:s -c:v copy -c:a copy -c:s mov_text $outputFilename';
+        // TODO: does not work yet, we need to convert it to .ass
+      }
+      final result =
+          await mgr.run(cmd.split(' '), workingDirectory: workingDirectory);
+      if (result.exitCode != 0) {
+        debugPrint(
+            'failed to combine video/audio/subtitle for ${widget.video['programId']}\n${result.stderr}');
+      } else {
+        debugPrint(
+            'Finished combining video/audio/subtitle for ${widget.video['programId']}');
+      }
+    } catch (e) {
+      debugPrint(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         duration: const Duration(seconds: 10),
         content: Text(
@@ -297,9 +294,6 @@ class _ShowDetailState extends State<ShowDetail> {
         backgroundColor: Colors.black87,
         behavior: SnackBarBehavior.floating,
       ));
-      return;
-    } else {
-      debugPrint('Done downloading ${selectedVersion.url}');
     }
   }
 
