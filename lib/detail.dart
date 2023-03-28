@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:xdg_directories/xdg_directories.dart';
 import 'package:path/path.dart' as path;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'api.dart';
 import 'config.dart';
@@ -68,6 +69,7 @@ class _ShowDetailState extends State<ShowDetail> {
           versions.clear();
           versions.addAll(cv);
           selectedVersion = versions.first;
+          debugPrint(selectedVersion.url);
           versionItems = versions
               .map((e) =>
                   DropdownMenuItem<Version>(value: e, child: Text(e.label)))
@@ -218,9 +220,29 @@ class _ShowDetailState extends State<ShowDetail> {
     }
   }
 
+  Future<void> _webvtt(Uri url, String subFilename) async {
+    final req = await http.get(url);
+    String resp = utf8.decode(req.bodyBytes);
+    StringBuffer webvtt = StringBuffer('');
+    bool addLine = true;
+    for (var line in resp.split('\n')) {
+      if (line.startsWith('STYLE')) {
+        addLine = false;
+      } else if (line.trim() == '' && !addLine) {
+        addLine = true;
+      }
+      if (addLine) {
+        webvtt.writeln(line.trim());
+      }
+    }
+    await File(subFilename).writeAsString(webvtt.toString(), flush: true);
+  }
+
   void _ffmpeg() async {
-    // because ffmpeg can't handle vtt subtitle or choke on some time_id3 stream or sidx unimplemented feature
-    // we download video, audio and subtitle separatly to reconstruct the file from that
+    // work-around ffmpeg bug #10149 and #10169
+    // because ffmpeg can't handle vtt subtitle correctly or choke on some time_id3/sidx stream
+    // we download subtitle to modify it and then stream video, audio and subtitle separatly
+    debugPrint('looking at ${selectedVersion.url}');
     MediaStream stream;
     try {
       stream = await MediaStream.getMediaStream(
@@ -270,10 +292,6 @@ class _ShowDetailState extends State<ShowDetail> {
       ], workingDirectory: workingDirectory);
       tasks.add(dlAudio);
     }
-    if (stream.subtitle != null) {
-      final dlSub = http.get(stream.subtitle!);
-      tasks.add(dlSub);
-    }
     String message;
     try {
       List responses = await Future.wait(tasks, eagerError: true);
@@ -300,24 +318,11 @@ class _ShowDetailState extends State<ShowDetail> {
         cmd =
             '$ffmpeg -i $videoFilename -i $audioFilename -map 0:v -map 1:a -c copy $outputFilename';
       } else {
-        subFilename = stream.subtitle.toString().split('/').last;
-        debugPrint(subFilename);
         // WORKAROUND: because of ffmpeg bug #10169, remove all STYLE blocks in webvtt
-        String resp = utf8.decode(responses.last.bodyBytes);
-        StringBuffer webvtt = StringBuffer('');
-        bool addLine = true;
-        for (var line in resp.split('\n')) {
-          if (line.startsWith('STYLE')) {
-            addLine = false;
-          } else if (line.trim() == '' && !addLine) {
-            addLine = true;
-          }
-          if (addLine) {
-            webvtt.writeln(line.trim());
-          }
-        }
-        final _ = path.join(workingDirectory, subFilename);
-        await File(_).writeAsString(webvtt.toString(), flush: true);
+        subFilename = path.join(
+            workingDirectory, stream.subtitle.toString().split('/').last);
+        await _webvtt(stream.subtitle!, subFilename);
+        debugPrint(subFilename);
         cmd =
             '$ffmpeg -i $videoFilename -i $audioFilename -i $subFilename -map 0:v -map 1:a -map 2:s -c:v copy -c:a copy -c:s mov_text $outputFilename';
       }
@@ -339,8 +344,8 @@ class _ShowDetailState extends State<ShowDetail> {
         await File(path.join(workingDirectory, audioFilename)).delete();
         await File(path.join(workingDirectory, videoFilename)).delete();
       }
-      if (stream.subtitle != null && subFilename.isNotEmpty) {
-        await File(path.join(workingDirectory, subFilename)).delete();
+      if (stream.subtitle != null) {
+        await File(subFilename).delete();
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -427,7 +432,7 @@ class _ShowDetailState extends State<ShowDetail> {
     }
   }
 
-  void _libmpv() {
+  void _libmpv() async {
     String title = '';
     String? subtitle = widget.video['subtitle'];
     if (subtitle != null && subtitle.isNotEmpty) {
@@ -436,12 +441,31 @@ class _ShowDetailState extends State<ShowDetail> {
       title = widget.video['title'];
     }
 
+    MediaStream stream;
+    try {
+      stream = await MediaStream.getMediaStream(
+          selectedVersion.url, selectedFormat.resolution);
+    } catch (e) {
+      // this is a TS stream with no separate audio stream, causing the timed_id3 error
+      stream = await MediaStream.getMediaPlaylist(
+          selectedVersion.url, selectedFormat.resolution);
+    }
+    String subFilename = '';
+    if (stream.subtitle != null) {
+      Directory tmpDir = await getTemporaryDirectory();
+      debugPrint(tmpDir.toString());
+      subFilename =
+          path.join(tmpDir.path, stream.subtitle.toString().split('/').last);
+      await _webvtt(stream.subtitle!, subFilename);
+    }
+    debugPrint(stream.toString());
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       if (Platform.isLinux || Platform.isWindows) {
         return MyScreen(
             title: title,
-            url: selectedVersion.url,
-            bitrate: selectedFormat.bandwidth);
+            video: stream.video!.toString(),
+            audio: stream.audio != null ? stream.audio.toString() : '',
+            subtitle: subFilename);
       } else {
         return MyMobileScreen(
             title: title,

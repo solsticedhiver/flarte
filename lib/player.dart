@@ -1,20 +1,24 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:path/path.dart' as path;
 
 import 'config.dart';
 
 class MyScreen extends StatefulWidget {
-  final String url;
   final String title;
-  final String bitrate;
+  final String video;
+  final String audio;
+  final String subtitle;
   const MyScreen(
       {super.key,
-      required this.url,
       required this.title,
-      required this.bitrate});
+      required this.video,
+      required this.audio,
+      required this.subtitle});
 
   @override
   State<MyScreen> createState() => _MyScreenState();
@@ -49,13 +53,28 @@ class _MyScreenState extends State<MyScreen> {
   Widget build(BuildContext context) {
     final pp = player.platform as libmpvPlayer;
     pp.setProperty('user-agent', AppConfig.userAgent);
-    // use --hls-bitrate to select channel for a resolution by bitrate
-    pp.setProperty('hls-bitrate', widget.bitrate);
-
+    // work-around ffmpeg bug #10149 and #10169
+    // mpv is plagged with the same problem/bug than ffmpeg, because it uses it somehow as back-end
+    // we use the same work-around by specifying video, audio and subtitle stream separately too
     if (player.state.playlist.medias.isEmpty) {
+      if (widget.subtitle.isNotEmpty) {
+        debugPrint('Playing with subtitle from ${widget.subtitle}');
+        pp.setProperty('sub-files', widget.subtitle);
+      }
+      if (widget.audio.isNotEmpty) {
+        debugPrint('Playing audio from ${widget.audio}');
+        // escape character usedd as list seprator by mpv
+        String audio = widget.audio;
+        if (Platform.isLinux) {
+          audio = audio.replaceAll(':', '\\:');
+        } else if (Platform.isWindows) {
+          audio = audio.replaceAll(';', '\\;');
+        }
+        pp.setProperty('audio-files', audio);
+      }
       player.setVolume(100);
-      player.open(Playlist([Media(widget.url)]));
-      debugPrint('Playing ${widget.url} at ${widget.bitrate} bps');
+      player.open(Playlist([Media(widget.video)]));
+      debugPrint('Playing ${widget.video}');
     }
 
     double buttonSize = 24.0;
