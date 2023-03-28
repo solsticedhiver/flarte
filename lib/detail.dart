@@ -206,12 +206,13 @@ class _ShowDetailState extends State<ShowDetail> {
   void _ffmpeg() async {
     // because ffmpeg can't handle vtt subtitle or choke on some time_id3 stream or sidx unimplemented feature
     // we download video, audio and subtitle separatly to reconstruct the file from that
-    Stream stream;
+    MediaStream stream;
     try {
-      stream = await Stream.getMediaStream(
+      stream = await MediaStream.getMediaStream(
           selectedVersion.url, selectedFormat.resolution);
     } catch (e) {
-      stream = await Stream.getMediaPlaylist(
+      // this is a TS stream with no separate audio stream, causing the timed_id3 error
+      stream = await MediaStream.getMediaPlaylist(
           selectedVersion.url, selectedFormat.resolution);
     }
     debugPrint(stream.toString());
