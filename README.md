@@ -24,7 +24,6 @@ There are currently 2 archives with precompiled binaries:
 
 Embedded player is sub-optimal (based on mpv/libmpv):
 - no sound on some videos (ffmpeg bug)
-- no subtitles
 - seeking (forward/backward) does not always work
 - bug: download is aborted if dialog is closed
 

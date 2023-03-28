@@ -287,12 +287,24 @@ class _ShowDetailState extends State<ShowDetail> {
       } else {
         subFilename = stream.subtitle.toString().split('/').last;
         debugPrint(subFilename);
+        // WORKAROUND: because of ffmpeg bug #10169, remove all STYLE blocks in webvtt
+        String resp = utf8.decode(responses.last.bodyBytes);
+        StringBuffer webvtt = StringBuffer('');
+        bool addLine = true;
+        for (var line in resp.split('\n')) {
+          if (line.startsWith('STYLE')) {
+            addLine = false;
+          } else if (line.trim() == '' && !addLine) {
+            addLine = true;
+          }
+          if (addLine) {
+            webvtt.writeln(line.trim());
+          }
+        }
         final _ = path.join(workingDirectory, subFilename);
-        await File(_)
-            .writeAsString(utf8.decode(responses.last.bodyBytes), flush: true);
+        await File(_).writeAsString(webvtt.toString(), flush: true);
         cmd =
             '$ffmpeg -i $videoFilename -i $audioFilename -i $subFilename -map 0:v -map 1:a -map 2:s -c:v copy -c:a copy -c:s mov_text $outputFilename';
-        // TODO: does not work yet, we need to convert it to .ass
       }
       message = 'Téléchargement de ${widget.video['programId']} terminé';
       if (cmd.isNotEmpty) {
