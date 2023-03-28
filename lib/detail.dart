@@ -226,6 +226,7 @@ class _ShowDetailState extends State<ShowDetail> {
     final videoFilename =
         stream.video.toString().split('/').last.replaceFirst('m3u8', 'mp4');
     String audioFilename = '';
+    String subFilename = '';
     debugPrint(videoFilename);
     final dlVideo = mgr.run([
       ffmpeg,
@@ -283,7 +284,7 @@ class _ShowDetailState extends State<ShowDetail> {
         cmd =
             '$ffmpeg -i $videoFilename -i $audioFilename -map 0:v -map 1:a -c copy $outputFilename';
       } else {
-        final subFilename = stream.subtitle.toString().split('/').last;
+        subFilename = stream.subtitle.toString().split('/').last;
         debugPrint(subFilename);
         final _ = path.join(workingDirectory, subFilename);
         await File(_)
@@ -305,6 +306,13 @@ class _ShowDetailState extends State<ShowDetail> {
               'Finished combining video/audio/subtitle for ${widget.video['programId']}');
           message = 'Téléchargement de ${widget.video['programId']} terminé';
         }
+      }
+      if (stream.audio != null && audioFilename.isNotEmpty) {
+        await File(path.join(workingDirectory, audioFilename)).delete();
+        await File(path.join(workingDirectory, videoFilename)).delete();
+      }
+      if (stream.subtitle != null && subFilename.isNotEmpty) {
+        await File(path.join(workingDirectory, subFilename)).delete();
       }
     } catch (e) {
       debugPrint(e.toString());
