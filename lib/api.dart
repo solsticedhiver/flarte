@@ -78,7 +78,7 @@ class Cache extends ChangeNotifier {
     debugPrint(
         '${DateTime.now().toIso8601String().substring(11, 19)}: in Cache.fetch($key)');
     final String url =
-        "https://www.arte.tv/api/rproxy/emac/v4/fr/web/pages/$key/";
+        "https://www.arte.tv/api/rproxy/emac/v4/${AppConfig.lang}/web/pages/$key/";
     final http.Response resp = await http
         .get(Uri.parse(url), headers: {'User-Agent': AppConfig.userAgent});
     if (resp.statusCode == 200) {

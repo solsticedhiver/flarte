@@ -39,8 +39,8 @@ class _ShowDetailState extends State<ShowDetail> {
       final programId = widget.video['programId'];
 
       debugPrint(programId);
-      final resp = await http.get(
-          Uri.parse('https://api.arte.tv/api/player/v2/config/fr/$programId'));
+      final resp = await http.get(Uri.parse(
+          'https://api.arte.tv/api/player/v2/config/${AppConfig.lang}/$programId'));
       Map<String, dynamic> jr = json.decode(resp.body);
       if (jr['data'] == null) {
         return;
@@ -320,11 +320,13 @@ class _ShowDetailState extends State<ShowDetail> {
       message =
           'Erreur de téléchargement de ${widget.video['programId']} avec ffmpeg';
     }
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(message, style: const TextStyle(color: Colors.white)),
-      backgroundColor: Colors.black87,
-      behavior: SnackBarBehavior.floating,
-    ));
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(message, style: const TextStyle(color: Colors.white)),
+        backgroundColor: Colors.black87,
+        behavior: SnackBarBehavior.floating,
+      ));
+    }
   }
 
   void _cvlc() async {

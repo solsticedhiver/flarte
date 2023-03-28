@@ -324,7 +324,7 @@ class CarouselList extends StatelessWidget {
 
   Future<Map<String, dynamic>> _getProgramDetail(String programId) async {
     final url =
-        'https://www.arte.tv/api/rproxy/emac/v4/fr/web/programs/$programId';
+        'https://www.arte.tv/api/rproxy/emac/v4/${AppConfig.lang}/web/programs/$programId';
     final resp = await http
         .get(Uri.parse(url), headers: {'User-Agent': AppConfig.userAgent});
     final Map<String, dynamic> jr = json.decode(resp.body);
