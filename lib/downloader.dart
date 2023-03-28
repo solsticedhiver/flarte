@@ -37,15 +37,11 @@ class Stream {
         }
         if (playlist.audios.isNotEmpty) {
           audio = playlist.audios[0].url;
-          debugPrint(playlist.audios[0].format.language);
-          debugPrint(playlist.audios[0].format.label);
         } else {
           audio = null;
         }
         if (playlist.subtitles.isNotEmpty) {
           subtitle = playlist.subtitles[0].url;
-          debugPrint(playlist.subtitles[0].format.language);
-          debugPrint(playlist.subtitles[0].format.label);
         } else {
           subtitle = null;
         }
@@ -147,8 +143,8 @@ class Stream {
         video: video,
         audio: audio,
         subtitle: subtitle,
-        videoSize: videoSize!,
-        audioSize: audioSize!);
+        videoSize: videoSize,
+        audioSize: audioSize);
   }
 
   @override

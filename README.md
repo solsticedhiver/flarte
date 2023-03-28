@@ -26,6 +26,7 @@ Embedded player is sub-optimal (based on mpv/libmpv):
 - no sound on some videos (ffmpeg bug)
 - no subtitles
 - seeking (forward/backward) does not always work
+- bug: download is aborted if dialog is closed
 
 Using an external [c]vlc instance will be an option, once settings will be done. This will fix only the first issue, though :-(
 
