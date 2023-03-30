@@ -13,6 +13,7 @@ import 'api.dart';
 import 'config.dart';
 import 'serie.dart';
 import 'player.dart';
+import 'mobile_player.dart';
 import 'downloader.dart';
 
 class ShowDetail extends StatefulWidget {
@@ -378,14 +379,19 @@ class _ShowDetailState extends State<ShowDetail> {
       title = widget.video['title'];
     }
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => MyScreen(
-              title: title,
-              url: selectedVersion.url,
-              bitrate: selectedFormat.bandwidth)),
-    );
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      if (Platform.isLinux || Platform.isWindows) {
+        return MyScreen(
+            title: title,
+            url: selectedVersion.url,
+            bitrate: selectedFormat.bandwidth);
+      } else {
+        return MyMobileScreen(
+            title: title,
+            url: selectedVersion.url,
+            bitrate: selectedFormat.bandwidth);
+      }
+    }));
   }
 
   @override
@@ -459,14 +465,18 @@ class _ShowDetailState extends State<ShowDetail> {
                                   children: [
                                     IconButton(
                                       icon: const Icon(Icons.play_arrow),
-                                      onPressed:
-                                          versions.isNotEmpty ? _libmpv : null,
+                                      onPressed: versions.isNotEmpty &&
+                                              formats.isNotEmpty
+                                          ? _libmpv
+                                          : null,
                                     ),
                                     const SizedBox(width: 24),
                                     IconButton(
                                       icon: const Icon(Icons.download),
-                                      onPressed:
-                                          versions.isNotEmpty ? _ffmpeg : null,
+                                      onPressed: versions.isNotEmpty &&
+                                              formats.isNotEmpty
+                                          ? _ffmpeg
+                                          : null,
                                     ),
                                     const SizedBox(width: 24),
                                     IconButton(

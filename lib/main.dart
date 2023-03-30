@@ -175,7 +175,7 @@ class Carousel extends StatefulWidget {
     switch (size) {
       case CategoriesListSize.normal:
         _width = 285;
-        _height = 262;
+        _height = 265;
         break;
       case CategoriesListSize.small:
         _width = 220;
