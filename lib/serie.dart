@@ -103,7 +103,7 @@ class _SerieScreenState extends State<SerieScreen> {
       if (zoneCount > 1) {
         body = CarouselList(
           data: data,
-          size: CategoriesListSize.normal,
+          size: CarouselListSize.normal,
         );
       } else {
         body = Center(

@@ -104,6 +104,8 @@ class Cache extends ChangeNotifier {
 
 enum CategoriesListSize { tiny, small, normal }
 
+enum CarouselListSize { tiny, small, normal }
+
 class Version {
   String shortLabel;
   String label;

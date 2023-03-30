@@ -84,14 +84,16 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     double leftSideWidth;
-    CategoriesListSize size = CategoriesListSize.normal;
+    CarouselListSize carSize = CarouselListSize.normal;
+    CategoriesListSize catSize = CategoriesListSize.normal;
     leftSideWidth = 300;
     if (MediaQuery.of(context).size.width < 1600) {
-      size = CategoriesListSize.small;
+      catSize = CategoriesListSize.small;
       leftSideWidth = 200;
     }
     if (MediaQuery.of(context).size.width < 1280) {
-      size = CategoriesListSize.tiny;
+      carSize = CarouselListSize.small;
+      catSize = CategoriesListSize.tiny;
       leftSideWidth = 64;
     }
     double padding = 10;
@@ -107,8 +109,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   Column(mainAxisAlignment: MainAxisAlignment.start, children: [
                 Expanded(
                     flex: 1,
-                    child:
-                        CategoriesList(size: size, controller: _tabController)),
+                    child: CategoriesList(
+                        size: catSize, controller: _tabController)),
                 ListTile(
                   selectedTileColor: Theme.of(context).highlightColor,
                   contentPadding: EdgeInsets.only(
@@ -126,34 +128,34 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             flex: 1,
             child: TabBarView(controller: _tabController, children: [
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['HOME'], size: size);
+                return CarouselList(data: cache.data['HOME'], size: carSize);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['DOR'], size: size);
+                return CarouselList(data: cache.data['DOR'], size: carSize);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['SER'], size: size);
+                return CarouselList(data: cache.data['SER'], size: carSize);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['CIN'], size: size);
+                return CarouselList(data: cache.data['CIN'], size: carSize);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['EMI'], size: size);
+                return CarouselList(data: cache.data['EMI'], size: carSize);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['HIS'], size: size);
+                return CarouselList(data: cache.data['HIS'], size: carSize);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['DEC'], size: size);
+                return CarouselList(data: cache.data['DEC'], size: carSize);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['SCI'], size: size);
+                return CarouselList(data: cache.data['SCI'], size: carSize);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['ACT'], size: size);
+                return CarouselList(data: cache.data['ACT'], size: carSize);
               }),
               Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['CPO'], size: size);
+                return CarouselList(data: cache.data['CPO'], size: carSize);
               }),
             ]),
           ),
@@ -163,7 +165,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
 class Carousel extends StatefulWidget {
   final List<Widget> children;
-  final CategoriesListSize size;
+  final CarouselListSize size;
   late final double _width, _height;
   @override
   State<Carousel> createState() => _CarouselState();
@@ -171,17 +173,17 @@ class Carousel extends StatefulWidget {
   Carousel(
       {super.key,
       required this.children,
-      this.size = CategoriesListSize.normal}) {
+      this.size = CarouselListSize.normal}) {
     switch (size) {
-      case CategoriesListSize.normal:
+      case CarouselListSize.normal:
         _width = 285;
         _height = 265;
         break;
-      case CategoriesListSize.small:
+      case CarouselListSize.small:
         _width = 220;
         _height = 112 + 100;
         break;
-      case CategoriesListSize.tiny:
+      case CarouselListSize.tiny:
         _width = 180;
         _height = 90 + 100;
         break;
@@ -286,23 +288,23 @@ class _CarouselState extends State<Carousel> {
 
 class CarouselList extends StatelessWidget {
   final Map<dynamic, dynamic> data;
-  final CategoriesListSize size;
+  final CarouselListSize size;
   late final double _imageHeight, _imageWidth;
 
   CarouselList(
-      {super.key, required this.data, this.size = CategoriesListSize.normal}) {
+      {super.key, required this.data, this.size = CarouselListSize.normal}) {
     switch (size) {
-      case CategoriesListSize.normal:
+      case CarouselListSize.normal:
         // image size divided by 1.5
         _imageHeight = 148;
         _imageWidth = 265;
         break;
-      case CategoriesListSize.small:
+      case CarouselListSize.small:
         // image size divided by 2
         _imageHeight = 112;
         _imageWidth = 200;
         break;
-      case CategoriesListSize.tiny:
+      case CarouselListSize.tiny:
         // image size divided by 2.5
         _imageHeight = 90;
         _imageWidth = 160;
@@ -458,15 +460,14 @@ class CarouselList extends StatelessWidget {
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 2,
                                   ),
-                                  subtitle: (size == CategoriesListSize.normal)
+                                  subtitle: (size == CarouselListSize.normal)
                                       ? Text(
                                           v['subtitle'] ?? '',
                                           overflow: TextOverflow.ellipsis,
                                           maxLines: 2,
                                         )
                                       : null,
-                                  isThreeLine:
-                                      size == CategoriesListSize.normal,
+                                  isThreeLine: size == CarouselListSize.normal,
                                 ),
                               ]))));
             }).toList())
