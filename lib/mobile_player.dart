@@ -27,14 +27,7 @@ class _MyMobileScreenState extends State<MyMobileScreen> {
   @override
   void initState() {
     super.initState();
-    controller = VideoPlayerController.network(widget.url)
-      ..initialize().then((_) {
-        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
-        setState(() {
-          controller.play();
-        });
-      });
-    controller.setClosedCaptionFile(Future.microtask(() async {
+    Future<ClosedCaptionFile> closedCaptionFile = Future.microtask(() async {
       String resolution =
           '768x432'; // hard-coded for now as this is not used at all
       MediaStream stream;
@@ -52,7 +45,15 @@ class _MyMobileScreenState extends State<MyMobileScreen> {
       }
       ClosedCaptionFile closedCaptionFile = WebVTTCaptionFile(fileContents);
       return closedCaptionFile;
-    }));
+    });
+    controller = VideoPlayerController.network(widget.url,
+        closedCaptionFile: closedCaptionFile)
+      ..initialize().then((_) {
+        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+        setState(() {
+          controller.play();
+        });
+      });
     controller.addListener(() {
       setState(() {});
     });
@@ -68,6 +69,12 @@ class _MyMobileScreenState extends State<MyMobileScreen> {
   Widget build(BuildContext context) {
     debugPrint('Playing ${widget.url} at ${widget.bitrate} bps');
 
+    double buttonSize = 24.0;
+    double margin = 16.0;
+    if (MediaQuery.of(context).size.height <= 720) {
+      buttonSize = 16.0;
+      margin = 10.0;
+    }
     return Scaffold(
         appBar: AppBar(title: Text(widget.title)),
         body: Column(
@@ -77,7 +84,7 @@ class _MyMobileScreenState extends State<MyMobileScreen> {
               child: Card(
                 elevation: 8.0,
                 clipBehavior: Clip.antiAlias,
-                margin: const EdgeInsets.all(16.0),
+                margin: EdgeInsets.all(margin),
                 child: AspectRatio(
                     aspectRatio: controller.value.aspectRatio,
                     child: controller.value.isInitialized
@@ -91,7 +98,7 @@ class _MyMobileScreenState extends State<MyMobileScreen> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(width: 24.0),
+                SizedBox(width: buttonSize),
                 ElevatedButton(
                   onPressed: () {
                     debugPrint(controller.value.caption.toString());
@@ -104,7 +111,7 @@ class _MyMobileScreenState extends State<MyMobileScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.onSecondary,
                     shape: const CircleBorder(),
-                    padding: const EdgeInsets.all(24),
+                    padding: EdgeInsets.all(buttonSize),
                   ),
                   child: Icon(
                     controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
@@ -147,7 +154,7 @@ class _MyMobileScreenState extends State<MyMobileScreen> {
                       backgroundColor:
                           Theme.of(context).colorScheme.onSecondary,
                       shape: const CircleBorder(),
-                      padding: const EdgeInsets.all(24),
+                      padding: EdgeInsets.all(buttonSize),
                     ),
                     child: Icon(
                       Icons.volume_down,
@@ -164,16 +171,16 @@ class _MyMobileScreenState extends State<MyMobileScreen> {
                       backgroundColor:
                           Theme.of(context).colorScheme.onSecondary,
                       shape: const CircleBorder(),
-                      padding: const EdgeInsets.all(24),
+                      padding: EdgeInsets.all(buttonSize),
                     ),
                     child: Icon(
                       Icons.volume_up,
                       color: Theme.of(context).colorScheme.primary,
                     )),
-                const SizedBox(width: 24.0),
+                SizedBox(width: buttonSize),
               ],
             ),
-            const SizedBox(height: 16.0),
+            SizedBox(height: margin),
           ],
         ));
   }

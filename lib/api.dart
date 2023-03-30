@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 const List<Map<String, dynamic>> categories = [
   {
-    'text': 'Home',
+    'text': 'Accueil',
     'color': [124, 124, 124],
     'code': 'HOME'
   },

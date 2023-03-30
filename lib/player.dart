@@ -55,6 +55,13 @@ class _MyScreenState extends State<MyScreen> {
     player.open(Playlist([Media(widget.url)]));
     debugPrint('Playing ${widget.url} at ${widget.bitrate} bps');
 
+    double buttonSize = 24.0;
+    double margin = 16.0;
+    if (MediaQuery.of(context).size.height <= 720) {
+      buttonSize = 16.0;
+      margin = 10.0;
+    }
+
     return Scaffold(
         appBar: AppBar(title: Text(widget.title)),
         body: Column(
@@ -64,14 +71,14 @@ class _MyScreenState extends State<MyScreen> {
               child: Card(
                 elevation: 8.0,
                 clipBehavior: Clip.antiAlias,
-                margin: const EdgeInsets.all(16.0),
+                margin: EdgeInsets.all(margin),
                 child: Video(
                   controller: controller,
                 ),
               ),
             ),
-            SeekBar(player: player),
-            const SizedBox(height: 16.0),
+            SeekBar(player: player, buttonSize: buttonSize),
+            SizedBox(height: margin),
           ],
         ));
   }
@@ -79,9 +86,11 @@ class _MyScreenState extends State<MyScreen> {
 
 class SeekBar extends StatefulWidget {
   final Player player;
+  final double buttonSize;
   const SeekBar({
     super.key,
     required this.player,
+    required this.buttonSize,
   });
 
   @override
@@ -141,13 +150,13 @@ class _SeekBarState extends State<SeekBar> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const SizedBox(width: 24.0),
+        SizedBox(width: widget.buttonSize),
         ElevatedButton(
           onPressed: widget.player.playOrPause,
           style: ElevatedButton.styleFrom(
             backgroundColor: Theme.of(context).colorScheme.onSecondary,
             shape: const CircleBorder(),
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(widget.buttonSize),
           ),
           child: Icon(
             isPlaying ? Icons.pause : Icons.play_arrow,
@@ -185,7 +194,7 @@ class _SeekBarState extends State<SeekBar> {
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.onSecondary,
               shape: const CircleBorder(),
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(widget.buttonSize),
             ),
             child: Icon(
               Icons.volume_down,
@@ -200,13 +209,13 @@ class _SeekBarState extends State<SeekBar> {
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.onSecondary,
               shape: const CircleBorder(),
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(widget.buttonSize),
             ),
             child: Icon(
               Icons.volume_up,
               color: Theme.of(context).colorScheme.primary,
             )),
-        const SizedBox(width: 24.0),
+        SizedBox(width: widget.buttonSize),
       ],
     );
   }
