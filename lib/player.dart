@@ -51,7 +51,7 @@ class _MyScreenState extends State<MyScreen> {
     // use --hls-bitrate to select channel for a resolution by bitrate
     pp.setProperty('hls-bitrate', widget.bitrate);
 
-    player.volume = 100;
+    player.setVolume(100);
     player.open(Playlist([Media(widget.url)]));
     debugPrint('Playing ${widget.url} at ${widget.bitrate} bps');
 
@@ -107,12 +107,12 @@ class _SeekBarState extends State<SeekBar> {
   @override
   void initState() {
     super.initState();
-    isPlaying = widget.player.state.isPlaying;
+    isPlaying = widget.player.state.playing;
     position = widget.player.state.position;
     duration = widget.player.state.duration;
     subscriptions.addAll(
       [
-        widget.player.streams.isPlaying.listen((event) {
+        widget.player.streams.playing.listen((event) {
           setState(() {
             if (mounted) {
               isPlaying = event;
@@ -189,7 +189,7 @@ class _SeekBarState extends State<SeekBar> {
         const SizedBox(width: 10.0),
         ElevatedButton(
             onPressed: () {
-              widget.player.volume = widget.player.state.volume - 5;
+              widget.player.setVolume(widget.player.state.volume - 5);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.onSecondary,
@@ -202,9 +202,9 @@ class _SeekBarState extends State<SeekBar> {
             )),
         ElevatedButton(
             onPressed: () {
-              widget.player.volume = widget.player.state.volume + 5 <= 100
+              widget.player.setVolume(widget.player.state.volume + 5 <= 100
                   ? widget.player.state.volume + 5
-                  : widget.player.state.volume;
+                  : widget.player.state.volume);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.onSecondary,
