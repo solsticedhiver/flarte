@@ -105,25 +105,31 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         body: Row(children: [
           SizedBox(
               width: leftSideWidth,
-              child:
-                  Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-                Expanded(
-                    flex: 1,
-                    child: CategoriesList(
-                        size: catSize, controller: _tabController)),
-                ListTile(
-                  selectedTileColor: Theme.of(context).highlightColor,
-                  contentPadding: EdgeInsets.only(
-                    left: 25,
-                    top: padding,
-                    bottom: padding,
-                  ),
-                  minLeadingWidth: 30,
-                  leading: const Icon(Icons.settings),
-                  title: leftSideWidth != 64 ? const Text('Paramètres') : null,
-                  onTap: () {},
-                ),
-              ])),
+              child: Container(
+                  color: Theme.of(context)
+                      .canvasColor, // added a Container to fix the visual bug of hover highlight on first InkWell in Carousel
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Expanded(
+                            flex: 1,
+                            child: CategoriesList(
+                                size: catSize, controller: _tabController)),
+                        ListTile(
+                          selectedTileColor: Theme.of(context).highlightColor,
+                          contentPadding: EdgeInsets.only(
+                            left: 25,
+                            top: padding,
+                            bottom: padding,
+                          ),
+                          minLeadingWidth: 30,
+                          leading: const Icon(Icons.settings),
+                          title: leftSideWidth != 64
+                              ? const Text('Paramètres')
+                              : null,
+                          onTap: () {},
+                        ),
+                      ]))),
           Expanded(
             flex: 1,
             child: TabBarView(controller: _tabController, children: [
