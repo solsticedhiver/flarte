@@ -7,6 +7,7 @@ import 'package:flarte/main.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as parser;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'detail.dart';
 
@@ -73,6 +74,12 @@ class _SerieScreenState extends State<SerieScreen> {
   }
 
   void _showDialogProgram(BuildContext context, Map<String, dynamic> v) {
+    Locale myLocale = Localizations.localeOf(context);
+    String lang = myLocale.toLanguageTag();
+    if (!AppLocalizations.supportedLocales.contains(Locale(lang))) {
+      lang = 'en';
+    }
+
     showDialog(
         context: context,
         builder: (context) {
@@ -80,7 +87,10 @@ class _SerieScreenState extends State<SerieScreen> {
               elevation: 8.0,
               child: SizedBox(
                   width: min(MediaQuery.of(context).size.width - 100, 600),
-                  child: ShowDetail(video: v)));
+                  child: ShowDetail(
+                    video: v,
+                    lang: lang,
+                  )));
         });
   }
 

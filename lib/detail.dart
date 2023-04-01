@@ -18,11 +18,12 @@ import 'downloader.dart';
 
 class ShowDetail extends StatefulWidget {
   final Map<String, dynamic> video;
+  final String lang;
 
   @override
   State<ShowDetail> createState() => _ShowDetailState();
 
-  const ShowDetail({super.key, required this.video});
+  const ShowDetail({super.key, required this.video, required this.lang});
 }
 
 class _ShowDetailState extends State<ShowDetail> {
@@ -41,7 +42,7 @@ class _ShowDetailState extends State<ShowDetail> {
 
       debugPrint(programId);
       final resp = await http.get(Uri.parse(
-          'https://api.arte.tv/api/player/v2/config/${AppConfig.lang}/$programId'));
+          'https://api.arte.tv/api/player/v2/config/${widget.lang}/$programId'));
       Map<String, dynamic> jr = json.decode(resp.body);
       if (jr['data'] == null) {
         return;

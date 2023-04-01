@@ -8,6 +8,7 @@ import 'package:flarte/config.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'detail.dart';
 
@@ -32,8 +33,11 @@ class MyApp extends StatelessWidget {
         TargetPlatform.windows: OpenUpwardsPageTransitionsBuilder(),
       },
     );
+
     return MaterialApp(
       title: 'Flarte',
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       //theme: ThemeData(
       //  primarySwatch: Colors.deepOrange,
       //),
@@ -70,15 +74,12 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   late TabController _tabController;
+  late String lang;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(initialIndex: 0, length: 10, vsync: this);
-    final cache = Provider.of<Cache>(context, listen: false);
-    Future.delayed(Duration.zero, () async {
-      await cache.fetch('HOME');
-    });
   }
 
   @override
@@ -100,6 +101,18 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     if (MediaQuery.of(context).size.height < 720) {
       padding = 5;
     }
+
+    Locale myLocale = Localizations.localeOf(context);
+    lang = myLocale.toLanguageTag();
+    if (!AppLocalizations.supportedLocales.contains(Locale(lang))) {
+      lang = 'en';
+    }
+
+    final cache = Provider.of<Cache>(context, listen: false);
+    Future.delayed(Duration.zero, () async {
+      await cache.fetch('HOME', lang);
+    });
+
     return Scaffold(
         drawer: const Drawer(),
         body: Row(children: [
@@ -125,7 +138,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                           minLeadingWidth: 30,
                           leading: const Icon(Icons.settings),
                           title: leftSideWidth != 64
-                              ? const Text('Paramètres')
+                              ? Text(AppLocalizations.of(context)!.strSettings)
                               : null,
                           onTap: () {},
                         ),
@@ -319,6 +332,7 @@ class CarouselList extends StatelessWidget {
   }
 
   void _showDialogProgram(BuildContext context, Map<String, dynamic> v) {
+    String lang = context.findAncestorStateOfType<_MyHomePageState>()!.lang;
     showDialog(
         context: context,
         builder: (context) {
@@ -326,13 +340,15 @@ class CarouselList extends StatelessWidget {
               elevation: 8.0,
               child: SizedBox(
                   width: min(MediaQuery.of(context).size.width - 100, 600),
-                  child: ShowDetail(video: v)));
+                  child: ShowDetail(video: v, lang: lang)));
         });
   }
 
-  Future<Map<String, dynamic>> _getProgramDetail(String programId) async {
+  Future<Map<String, dynamic>> _getProgramDetail(
+      String programId, BuildContext context) async {
+    String lang = context.findAncestorStateOfType<_MyHomePageState>()!.lang;
     final url =
-        'https://www.arte.tv/api/rproxy/emac/v4/${AppConfig.lang}/web/programs/$programId';
+        'https://www.arte.tv/api/rproxy/emac/v4/$lang/web/programs/$programId';
     final resp = await http
         .get(Uri.parse(url), headers: {'User-Agent': AppConfig.userAgent});
     final Map<String, dynamic> jr = json.decode(resp.body);
@@ -349,7 +365,7 @@ class CarouselList extends StatelessWidget {
               child: SizedBox(
             width: min(MediaQuery.of(context).size.width - 50, 900),
             child: FutureBuilder(
-              future: _getProgramDetail(programId),
+              future: _getProgramDetail(programId, context),
               builder: (context, snapshot) {
                 Widget trailer = const Text('');
                 if (snapshot.hasData) {
@@ -492,7 +508,8 @@ class CarouselList extends StatelessWidget {
                       return thumbnails[index];
                     },
                   )
-                : const Center(child: Text('Fetching data ...'))));
+                : Center(
+                    child: Text(AppLocalizations.of(context)!.strFetching))));
   }
 }
 
@@ -519,6 +536,60 @@ class _CategoriesListState extends State<CategoriesList> {
         padding = 0;
       }
     }
+
+    List<Map<String, dynamic>> categories = [
+      {
+        'text': AppLocalizations.of(context)!.strHOME,
+        'color': [124, 124, 124],
+        'code': 'HOME'
+      },
+      {
+        'text': AppLocalizations.of(context)!.strDOR,
+        'color': [225, 143, 71],
+        'code': 'DOR'
+      },
+      {
+        'text': AppLocalizations.of(context)!.strSER,
+        'color': [0, 230, 227],
+        'code': 'SER',
+      },
+      {
+        'text': AppLocalizations.of(context)!.strCIN,
+        'color': [254, 0, 0],
+        'code': 'CIN',
+      },
+      {
+        'text': AppLocalizations.of(context)!.strEMI,
+        'color': [109, 255, 115],
+        'code': 'EMI',
+      },
+      {
+        'text': AppLocalizations.of(context)!.strHIS,
+        'color': [254, 184, 0],
+        'code': 'HIS',
+      },
+      {
+        'text': AppLocalizations.of(context)!.strDEC,
+        'color': [0, 199, 122],
+        'code': 'DEC',
+      },
+      {
+        'text': AppLocalizations.of(context)!.strSCI,
+        'color': [239, 1, 89],
+        'code': 'SCI',
+      },
+      {
+        'text': AppLocalizations.of(context)!.strACT,
+        'color': [1, 121, 218],
+        'code': 'ACT',
+      },
+      {
+        'text': AppLocalizations.of(context)!.strCPO,
+        'color': [208, 73, 244],
+        'code': 'CPO',
+      }
+    ];
+
     return ListView.builder(
       //padding: const EdgeInsets.symmetric(vertical: 10),
       shrinkWrap: true,
@@ -556,7 +627,9 @@ class _CategoriesListState extends State<CategoriesList> {
               widget.controller.animateTo(index);
             });
             final cache = Provider.of<Cache>(context, listen: false);
-            cache.fetch(c['code']);
+            String lang =
+                context.findAncestorStateOfType<_MyHomePageState>()!.lang;
+            cache.fetch(c['code'], lang);
           },
           contentPadding:
               EdgeInsets.only(left: 15, top: padding, bottom: padding),
@@ -678,6 +751,8 @@ class _ShowListState extends State<ShowList> {
 
   @override
   Widget build(BuildContext context) {
+    String lang = context.findAncestorStateOfType<_MyHomePageState>()!.lang;
+
     return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
       SizedBox(
           width: 450,
@@ -700,7 +775,7 @@ class _ShowListState extends State<ShowList> {
               })),
       Expanded(
           child: selectedShowIndex != -1
-              ? ShowDetail(video: widget.videos[selectedShowIndex])
+              ? ShowDetail(video: widget.videos[selectedShowIndex], lang: lang)
               : const SizedBox.shrink())
     ]);
   }

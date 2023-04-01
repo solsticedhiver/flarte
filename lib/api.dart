@@ -2,59 +2,7 @@ import 'dart:convert';
 import 'package:flarte/config.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
-const List<Map<String, dynamic>> categories = [
-  {
-    'text': 'Accueil',
-    'color': [124, 124, 124],
-    'code': 'HOME'
-  },
-  {
-    'text': 'Documentaires et reportages',
-    'color': [225, 143, 71],
-    'code': 'DOR'
-  },
-  {
-    'text': 'Séries et fictions',
-    'color': [0, 230, 227],
-    'code': 'SER',
-  },
-  {
-    'text': 'Cinéma',
-    'color': [254, 0, 0],
-    'code': 'CIN',
-  },
-  {
-    'text': 'Magazines et émissions',
-    'color': [109, 255, 115],
-    'code': 'EMI',
-  },
-  {
-    'text': 'Histoire',
-    'color': [254, 184, 0],
-    'code': 'HIS',
-  },
-  {
-    'text': 'Voyages et découvertes',
-    'color': [0, 199, 122],
-    'code': 'DEC',
-  },
-  {
-    'text': 'Sciences',
-    'color': [239, 1, 89],
-    'code': 'SCI',
-  },
-  {
-    'text': 'Info et société',
-    'color': [1, 121, 218],
-    'code': 'ACT',
-  },
-  {
-    'text': 'Culture et pop',
-    'color': [208, 73, 244],
-    'code': 'CPO',
-  }
-];
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Cache extends ChangeNotifier {
   final Map<String, dynamic> data = {
@@ -71,14 +19,15 @@ class Cache extends ChangeNotifier {
   };
   //int index = 0;
 
-  Future<void> fetch(String key) async {
+  Future<void> fetch(String key, String lang) async {
     if (data[key].isNotEmpty) {
       return;
     }
     debugPrint(
         '${DateTime.now().toIso8601String().substring(11, 19)}: in Cache.fetch($key)');
+
     final String url =
-        "https://www.arte.tv/api/rproxy/emac/v4/${AppConfig.lang}/web/pages/$key/";
+        "https://www.arte.tv/api/rproxy/emac/v4/$lang/web/pages/$key/";
     final http.Response resp = await http
         .get(Uri.parse(url), headers: {'User-Agent': AppConfig.userAgent});
     if (resp.statusCode == 200) {
@@ -88,9 +37,9 @@ class Cache extends ChangeNotifier {
     }
   }
 
-  dynamic get(String key) async {
+  dynamic get(String key, String lang) async {
     if (data[key].isEmpty) {
-      await fetch(key);
+      await fetch(key, lang);
     }
     return data[key];
   }

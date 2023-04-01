@@ -1,0 +1,14 @@
+{
+    "strHOME": "Home",
+    "strDOR": "Documentaries",
+    "strSER": "Series",
+    "strCIN": "Cinema",
+    "strEMI": "Magazines and Shows",
+    "strHIS": "History",
+    "strDEC": "Discovery",
+    "strSCI": "Sciences",
+    "strACT": "Politics and Society",
+    "strCPO": "Culture",
+    "strSettings": "Settings",
+    "strFetching": "Fetching data ..."
+}
