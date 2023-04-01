@@ -10,5 +10,6 @@
     "strACT": "Politics and Society",
     "strCPO": "Culture",
     "strSettings": "Settings",
-    "strFetching": "Fetching data ..."
+    "strFetching": "Fetching data ...",
+    "strEpisodes": "Episodes"
 }

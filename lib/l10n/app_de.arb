@@ -1,5 +1,5 @@
 {
-    "strHOME": "Heim",
+    "strHOME": "Startseite",
     "strDOR": "Doku und Reportagen",
     "strSER": "Fernsehfilme und Serien",
     "strCIN": "Kino",
@@ -10,5 +10,6 @@
     "strACT": "Aktuelles und Gesellschaft",
     "strCPO": "Kultur und Pop",
     "strSettings": "Einstellungen",
-    "strFetching": "Daten abrufen ..."
+    "strFetching": "Daten abrufen ...",
+    "strEpisodes": "Episoden"
 }

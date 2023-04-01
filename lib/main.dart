@@ -14,8 +14,15 @@ import 'detail.dart';
 import 'settings.dart';
 
 void main() {
-  runApp(ChangeNotifierProvider<Cache>(
-      create: (_) => Cache(), child: const MyApp()));
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider<Cache>(create: (_) => Cache()),
+      ChangeNotifierProvider<LocaleModel>(create: (_) => LocaleModel()),
+    ],
+    builder: (context, child) {
+      return const MyApp();
+    },
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -104,10 +111,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     }
 
     Locale myLocale = Localizations.localeOf(context);
-    lang = myLocale.toLanguageTag();
-    if (!AppLocalizations.supportedLocales.contains(Locale(lang))) {
-      lang = 'en';
-    }
+    Provider.of<LocaleModel>(context, listen: false).changeLocale(myLocale);
+    lang =
+        Provider.of<LocaleModel>(context, listen: false).locale.toLanguageTag();
 
     final cache = Provider.of<Cache>(context, listen: false);
     Future.delayed(Duration.zero, () async {
@@ -338,7 +344,8 @@ class CarouselList extends StatelessWidget {
   }
 
   void _showDialogProgram(BuildContext context, Map<String, dynamic> v) {
-    String lang = context.findAncestorStateOfType<_MyHomePageState>()!.lang;
+    final lang =
+        Provider.of<LocaleModel>(context, listen: false).locale.toLanguageTag();
     showDialog(
         context: context,
         builder: (context) {
@@ -352,7 +359,8 @@ class CarouselList extends StatelessWidget {
 
   Future<Map<String, dynamic>> _getProgramDetail(
       String programId, BuildContext context) async {
-    String lang = context.findAncestorStateOfType<_MyHomePageState>()!.lang;
+    final lang =
+        Provider.of<LocaleModel>(context, listen: false).locale.toLanguageTag();
     final url =
         'https://www.arte.tv/api/rproxy/emac/v4/$lang/web/programs/$programId';
     final resp = await http
@@ -633,8 +641,9 @@ class _CategoriesListState extends State<CategoriesList> {
               widget.controller.animateTo(index);
             });
             final cache = Provider.of<Cache>(context, listen: false);
-            String lang =
-                context.findAncestorStateOfType<_MyHomePageState>()!.lang;
+            final lang = Provider.of<LocaleModel>(context, listen: false)
+                .locale
+                .toLanguageTag();
             cache.fetch(c['code'], lang);
           },
           contentPadding:
@@ -757,7 +766,8 @@ class _ShowListState extends State<ShowList> {
 
   @override
   Widget build(BuildContext context) {
-    String lang = context.findAncestorStateOfType<_MyHomePageState>()!.lang;
+    final lang =
+        Provider.of<LocaleModel>(context, listen: false).locale.toLanguageTag();
 
     return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
       SizedBox(

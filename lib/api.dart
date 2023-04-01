@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flarte/config.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Cache extends ChangeNotifier {
   final Map<String, dynamic> data = {
@@ -74,5 +75,17 @@ class Format {
   @override
   String toString() {
     return 'Format($resolution, $bandwidth)';
+  }
+}
+
+class LocaleModel with ChangeNotifier {
+  Locale locale = const Locale('en');
+  Locale get getLocale => locale;
+
+  void changeLocale(Locale l) {
+    if (AppLocalizations.supportedLocales.contains(l)) {
+      locale = l;
+      notifyListeners();
+    }
   }
 }

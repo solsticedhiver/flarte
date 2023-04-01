@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:process/process.dart';
 import 'package:xdg_directories/xdg_directories.dart';
 import 'package:path/path.dart' as path;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'api.dart';
 import 'config.dart';
@@ -568,7 +569,8 @@ class _ShowDetailState extends State<ShowDetail> {
                                                 title: widget.video['title'],
                                                 url: widget.video['url'])));
                                   },
-                                  child: const Text('Épisodes'),
+                                  child: Text(AppLocalizations.of(context)!
+                                      .strEpisodes),
                                 )
                               : const SizedBox.shrink(),
                           const SizedBox(height: 10),

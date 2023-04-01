@@ -10,5 +10,6 @@
     "strACT": "Info et société",
     "strCPO": "Culture et pop",
     "strSettings": "Paramètres",
-    "strFetching": "Téléchargement des données ..."
+    "strFetching": "Téléchargement des données ...",
+    "strEpisodes": "Épisodes"
 }
