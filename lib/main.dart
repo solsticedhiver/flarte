@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'detail.dart';
+import 'settings.dart';
 
 void main() {
   runApp(ChangeNotifierProvider<Cache>(
@@ -140,7 +141,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                           title: leftSideWidth != 64
                               ? Text(AppLocalizations.of(context)!.strSettings)
                               : null,
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) {
+                              return FlarteSettings();
+                            }));
+                          },
                         ),
                       ]))),
           Expanded(
