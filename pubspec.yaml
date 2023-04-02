@@ -52,6 +52,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any
+  settings_ui: ^2.0.2
 
 dev_dependencies:
   flutter_test:

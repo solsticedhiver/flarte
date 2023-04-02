@@ -5,22 +5,12 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Cache extends ChangeNotifier {
-  final Map<String, dynamic> data = {
-    'HOME': {},
-    'DOR': {},
-    'SER': {},
-    'CIN': {},
-    'EMI': {},
-    'HIS': {},
-    'DEC': {},
-    'SCI': {},
-    'ACT': {},
-    'CPO': {}
-  };
+  final Map<String, dynamic> data = {};
   //int index = 0;
 
   Future<void> fetch(String key, String lang) async {
-    if (data[key].isNotEmpty) {
+    final cacheKey = '$key-$lang';
+    if (data.keys.contains(cacheKey) && data[cacheKey].isNotEmpty) {
       return;
     }
     debugPrint(
@@ -32,20 +22,23 @@ class Cache extends ChangeNotifier {
         .get(Uri.parse(url), headers: {'User-Agent': AppConfig.userAgent});
     if (resp.statusCode == 200) {
       final jr = json.decode(resp.body);
-      data[key] = jr;
+      data[cacheKey] = jr;
       notifyListeners();
     }
   }
 
-  dynamic get(String key, String lang) async {
-    if (data[key].isEmpty) {
+  Future<Map<String, dynamic>> get(String key, String lang) async {
+    final cacheKey = '$key-$lang';
+    debugPrint(cacheKey);
+    if (!data.keys.contains(cacheKey) || !data[cacheKey].isEmpty) {
       await fetch(key, lang);
     }
-    return data[key];
+    return data[cacheKey];
   }
 
-  void set(String key, Map<dynamic, dynamic> dict) {
-    data[key] = dict;
+  void set(String key, String lang, Map<dynamic, dynamic> dict) {
+    final cacheKey = '$key-$lang';
+    data[cacheKey] = dict;
     //index = data.keys.toList().indexOf(key);
     notifyListeners();
   }
@@ -79,8 +72,8 @@ class Format {
 }
 
 class LocaleModel with ChangeNotifier {
-  Locale locale = const Locale('en');
-  Locale get getLocale => locale;
+  Locale? locale;
+  Locale? get getLocale => locale;
 
   void changeLocale(Locale l) {
     if (AppLocalizations.supportedLocales.contains(l)) {

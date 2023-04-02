@@ -42,32 +42,35 @@ class MyApp extends StatelessWidget {
       },
     );
 
-    return MaterialApp(
-      title: 'Flarte',
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      //theme: ThemeData(
-      //  primarySwatch: Colors.deepOrange,
-      //),
-      theme: ThemeData(
-        primarySwatch: Colors.deepOrange,
-        brightness: Brightness.light,
-        pageTransitionsTheme: pageTransitionsTheme,
-        /* light theme settings */
-      ),
-      darkTheme: ThemeData(
-        primarySwatch: Colors.deepOrange,
-        brightness: Brightness.dark,
-        pageTransitionsTheme: pageTransitionsTheme,
-        /* dark theme settings */
-      ),
-      themeMode: ThemeMode.dark,
-      /* ThemeMode.system to follow system theme,
+    return Consumer<LocaleModel>(builder: (context, localeModel, child) {
+      return MaterialApp(
+        title: 'Flarte',
+        locale: localeModel.locale,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        //theme: ThemeData(
+        //  primarySwatch: Colors.deepOrange,
+        //),
+        theme: ThemeData(
+          primarySwatch: Colors.deepOrange,
+          brightness: Brightness.light,
+          pageTransitionsTheme: pageTransitionsTheme,
+          /* light theme settings */
+        ),
+        darkTheme: ThemeData(
+          primarySwatch: Colors.deepOrange,
+          brightness: Brightness.dark,
+          pageTransitionsTheme: pageTransitionsTheme,
+          /* dark theme settings */
+        ),
+        themeMode: ThemeMode.dark,
+        /* ThemeMode.system to follow system theme,
          ThemeMode.light for light theme,
          ThemeMode.dark for dark theme
       */
-      home: const MyHomePage(title: 'arte.tv'),
-    );
+        home: const MyHomePage(title: 'arte.tv'),
+      );
+    });
   }
 }
 
@@ -82,7 +85,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   late TabController _tabController;
-  late String lang;
 
   @override
   void initState() {
@@ -110,15 +112,20 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       padding = 5;
     }
 
-    Locale myLocale = Localizations.localeOf(context);
-    Provider.of<LocaleModel>(context, listen: false).changeLocale(myLocale);
-    lang =
-        Provider.of<LocaleModel>(context, listen: false).locale.toLanguageTag();
-
-    final cache = Provider.of<Cache>(context, listen: false);
-    Future.delayed(Duration.zero, () async {
-      await cache.fetch('HOME', lang);
-    });
+    // WARNING: this should match the order of categories in _CategoriesListState
+    // TODO: find a more elegant way to declare that
+    List<String> codes = [
+      'HOME',
+      'DOR',
+      'SER',
+      'CIN',
+      'EMI',
+      'HIS',
+      'DEC',
+      'SCI',
+      'ACT',
+      'CPO'
+    ];
 
     return Scaffold(
         drawer: const Drawer(),
@@ -133,8 +140,21 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                       children: [
                         Expanded(
                             flex: 1,
-                            child: CategoriesList(
-                                size: catSize, controller: _tabController)),
+                            child: Consumer<LocaleModel>(
+                                builder: (context, localeModel, child) {
+                              String lang;
+                              Locale? l = localeModel.locale;
+                              if (l != null) {
+                                lang = l.languageCode;
+                              } else {
+                                lang = Localizations.localeOf(context)
+                                    .languageCode;
+                              }
+                              return CategoriesList(
+                                  size: catSize,
+                                  controller: _tabController,
+                                  lang: lang);
+                            })),
                         ListTile(
                           selectedTileColor: Theme.of(context).highlightColor,
                           contentPadding: EdgeInsets.only(
@@ -157,38 +177,33 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                       ]))),
           Expanded(
             flex: 1,
-            child: TabBarView(controller: _tabController, children: [
-              Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['HOME'], size: carSize);
-              }),
-              Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['DOR'], size: carSize);
-              }),
-              Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['SER'], size: carSize);
-              }),
-              Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['CIN'], size: carSize);
-              }),
-              Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['EMI'], size: carSize);
-              }),
-              Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['HIS'], size: carSize);
-              }),
-              Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['DEC'], size: carSize);
-              }),
-              Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['SCI'], size: carSize);
-              }),
-              Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['ACT'], size: carSize);
-              }),
-              Consumer<Cache>(builder: (context, cache, child) {
-                return CarouselList(data: cache.data['CPO'], size: carSize);
-              }),
-            ]),
+            child: TabBarView(
+              controller: _tabController,
+              children: List.generate(
+                  codes.length,
+                  (index) => Consumer2<Cache, LocaleModel>(
+                          builder: (context, cache, localeModel, child) {
+                        String lang;
+                        if (localeModel.locale != null) {
+                          lang = localeModel.locale!.languageCode;
+                        } else {
+                          lang = Localizations.localeOf(context).languageCode;
+                        }
+                        return FutureBuilder(
+                            future: Future.microtask(
+                                () => cache.get(codes[index], lang)),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                return CarouselList(
+                                    data: snapshot.data!, size: carSize);
+                              } else {
+                                return Center(
+                                    child: Text(AppLocalizations.of(context)!
+                                        .strFetching));
+                              }
+                            });
+                      })),
+            ),
           ),
         ]));
   }
@@ -318,7 +333,7 @@ class _CarouselState extends State<Carousel> {
 }
 
 class CarouselList extends StatelessWidget {
-  final Map<dynamic, dynamic> data;
+  final Map<String, dynamic> data;
   final CarouselListSize size;
   late final double _imageHeight, _imageWidth;
 
@@ -344,8 +359,7 @@ class CarouselList extends StatelessWidget {
   }
 
   void _showDialogProgram(BuildContext context, Map<String, dynamic> v) {
-    final lang =
-        Provider.of<LocaleModel>(context, listen: false).locale.toLanguageTag();
+    final lang = Localizations.localeOf(context).languageCode;
     showDialog(
         context: context,
         builder: (context) {
@@ -359,8 +373,7 @@ class CarouselList extends StatelessWidget {
 
   Future<Map<String, dynamic>> _getProgramDetail(
       String programId, BuildContext context) async {
-    final lang =
-        Provider.of<LocaleModel>(context, listen: false).locale.toLanguageTag();
+    final lang = Localizations.localeOf(context).languageCode;
     final url =
         'https://www.arte.tv/api/rproxy/emac/v4/$lang/web/programs/$programId';
     final resp = await http
@@ -530,9 +543,13 @@ class CarouselList extends StatelessWidget {
 class CategoriesList extends StatefulWidget {
   final CategoriesListSize size;
   final TabController controller;
+  final String lang;
 
   const CategoriesList(
-      {super.key, required this.size, required this.controller});
+      {super.key,
+      required this.size,
+      required this.controller,
+      required this.lang});
 
   @override
   State<CategoriesList> createState() => _CategoriesListState();
@@ -641,10 +658,7 @@ class _CategoriesListState extends State<CategoriesList> {
               widget.controller.animateTo(index);
             });
             final cache = Provider.of<Cache>(context, listen: false);
-            final lang = Provider.of<LocaleModel>(context, listen: false)
-                .locale
-                .toLanguageTag();
-            cache.fetch(c['code'], lang);
+            cache.fetch(c['code'], widget.lang);
           },
           contentPadding:
               EdgeInsets.only(left: 15, top: padding, bottom: padding),
@@ -766,8 +780,13 @@ class _ShowListState extends State<ShowList> {
 
   @override
   Widget build(BuildContext context) {
-    final lang =
-        Provider.of<LocaleModel>(context, listen: false).locale.toLanguageTag();
+    String lang;
+    Locale? l = Provider.of<LocaleModel>(context, listen: false).locale;
+    if (l != null) {
+      lang = l.languageCode;
+    } else {
+      lang = Localizations.localeOf(context).languageCode;
+    }
 
     return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
       SizedBox(

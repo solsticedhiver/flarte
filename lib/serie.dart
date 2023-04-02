@@ -74,8 +74,13 @@ class _SerieScreenState extends State<SerieScreen> {
   }
 
   void _showDialogProgram(BuildContext context, Map<String, dynamic> v) {
-    final lang =
-        Provider.of<LocaleModel>(context, listen: false).locale.toLanguageTag();
+    String lang;
+    Locale? l = Provider.of<LocaleModel>(context, listen: false).locale;
+    if (l != null) {
+      lang = l.languageCode;
+    } else {
+      lang = Localizations.localeOf(context).languageCode;
+    }
 
     showDialog(
         context: context,
