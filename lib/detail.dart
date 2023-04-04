@@ -451,16 +451,14 @@ class _ShowDetailState extends State<ShowDetail> {
                           const SizedBox(height: 10),
                           Row(children: [
                             Chip(
-                              backgroundColor:
-                                  Theme.of(context).primaryColorDark,
+                              backgroundColor: Theme.of(context).primaryColor,
                               label: Text(widget.video['kind']['label']),
                             ),
                             const SizedBox(width: 10),
                             if (!widget.video['kind']['isCollection'] &&
                                 widget.video['durationLabel'] != null)
                               Chip(
-                                backgroundColor:
-                                    Theme.of(context).primaryColorDark,
+                                backgroundColor: Theme.of(context).primaryColor,
                                 label: Text(widget.video['durationLabel']),
                               ),
                           ]),

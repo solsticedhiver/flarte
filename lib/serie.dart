@@ -157,7 +157,7 @@ class _SerieScreenState extends State<SerieScreen> {
                                     if (t['durationLabel'] != null)
                                       Chip(
                                         backgroundColor:
-                                            Theme.of(context).primaryColorDark,
+                                            Theme.of(context).primaryColor,
                                         label: Text(t['durationLabel']),
                                       ),
                                   ],
