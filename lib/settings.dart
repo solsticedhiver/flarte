@@ -26,6 +26,17 @@ class _FlarteSettingsState extends State<FlarteSettings> {
 
   @override
   Widget build(BuildContext context) {
+    final themeMode =
+        Provider.of<ThemeModeProvider>(context, listen: false).themeMode;
+    String tm = '';
+    if (themeMode == ThemeMode.dark) {
+      tm = 'Dark';
+    } else if (themeMode == ThemeMode.light) {
+      tm = 'Light';
+    } else {
+      tm = 'System';
+    }
+
     return Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context)!.strSettings)),
       body: SettingsList(sections: [
@@ -34,7 +45,7 @@ class _FlarteSettingsState extends State<FlarteSettings> {
             leading: const Icon(Icons.language),
             title: const Text('Language'),
             value: const Text('English'),
-            onPressed: (context) {
+            onPressed: (context) async {
               // test
               Provider.of<LocaleModel>(context, listen: false)
                   .changeLocale(const Locale('en'));
@@ -43,14 +54,58 @@ class _FlarteSettingsState extends State<FlarteSettings> {
           SettingsTile.navigation(
             leading: const Icon(Icons.nightlight),
             title: const Text('Theme'),
-            value: Provider.of<ThemeModeProvider>(context, listen: false)
-                        .themeMode ==
-                    ThemeMode.dark
-                ? const Text('Dark')
-                : const Text('Light'),
-            onPressed: (context) {
+            value: Text(tm),
+            onPressed: (context) async {
+              ThemeMode themeMode =
+                  Provider.of<ThemeModeProvider>(context, listen: false)
+                      .themeMode;
+              await showDialog<ThemeMode>(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                        content: StatefulBuilder(builder: (context, setState) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ListTile(
+                              title: const Text('Dark'),
+                              leading: Radio<ThemeMode>(
+                                value: ThemeMode.dark,
+                                groupValue: themeMode,
+                                onChanged: (value) {
+                                  setState(() {
+                                    themeMode = value!;
+                                  });
+                                },
+                              )),
+                          ListTile(
+                              title: const Text('Light'),
+                              leading: Radio<ThemeMode>(
+                                value: ThemeMode.light,
+                                groupValue: themeMode,
+                                onChanged: (value) {
+                                  setState(() {
+                                    themeMode = value!;
+                                  });
+                                },
+                              )),
+                          ListTile(
+                              title: const Text('System'),
+                              leading: Radio<ThemeMode>(
+                                value: ThemeMode.system,
+                                groupValue: themeMode,
+                                onChanged: (value) {
+                                  setState(() {
+                                    themeMode = value!;
+                                  });
+                                },
+                              )),
+                        ],
+                      );
+                    }));
+                  });
               Provider.of<ThemeModeProvider>(context, listen: false)
-                  .switchTheme();
+                  .changeTheme(themeMode);
             },
           )
         ]),
