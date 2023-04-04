@@ -72,13 +72,39 @@ class Format {
 }
 
 class LocaleModel with ChangeNotifier {
-  Locale? locale;
-  Locale? get getLocale => locale;
+  Locale? _locale;
+  Locale? get locale => _locale;
 
   void changeLocale(Locale l) {
     if (AppLocalizations.supportedLocales.contains(l)) {
-      locale = l;
+      _locale = l;
       notifyListeners();
     }
+  }
+
+  Locale getCurrentLocale(BuildContext context) {
+    if (_locale != null) {
+      return _locale!;
+    } else {
+      return Localizations.localeOf(context);
+    }
+  }
+}
+
+class ThemeModeProvider extends ChangeNotifier {
+  ThemeMode themeMode = ThemeMode.dark;
+
+  void switchTheme() {
+    if (themeMode == ThemeMode.dark) {
+      themeMode = ThemeMode.light;
+    } else if (themeMode == ThemeMode.light) {
+      themeMode = ThemeMode.dark;
+    }
+    notifyListeners();
+  }
+
+  void changeTheme(ThemeMode tm) {
+    themeMode = tm;
+    notifyListeners();
   }
 }

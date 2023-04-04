@@ -11,5 +11,6 @@
     "strCPO": "Kultur und Pop",
     "strSettings": "Einstellungen",
     "strFetching": "Daten abrufen ...",
-    "strEpisodes": "Episoden"
+    "strEpisodes": "Episoden",
+    "strClose": "Schließen"
 }

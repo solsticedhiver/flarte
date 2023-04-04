@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:process/process.dart';
+import 'package:provider/provider.dart';
 import 'package:xdg_directories/xdg_directories.dart';
 import 'package:path/path.dart' as path;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -19,12 +20,11 @@ import 'downloader.dart';
 
 class ShowDetail extends StatefulWidget {
   final Map<String, dynamic> video;
-  final String lang;
 
   @override
   State<ShowDetail> createState() => _ShowDetailState();
 
-  const ShowDetail({super.key, required this.video, required this.lang});
+  const ShowDetail({super.key, required this.video});
 }
 
 class _ShowDetailState extends State<ShowDetail> {
@@ -42,8 +42,12 @@ class _ShowDetailState extends State<ShowDetail> {
       final programId = widget.video['programId'];
 
       debugPrint(programId);
+      final lang = Provider.of<LocaleModel>(context, listen: false)
+          .getCurrentLocale(context)
+          .languageCode;
+
       final resp = await http.get(Uri.parse(
-          'https://api.arte.tv/api/player/v2/config/${widget.lang}/$programId'));
+          'https://api.arte.tv/api/player/v2/config/$lang/$programId'));
       Map<String, dynamic> jr = json.decode(resp.body);
       if (jr['data'] == null) {
         return;
@@ -581,7 +585,8 @@ class _ShowDetailState extends State<ShowDetail> {
                               onPressed: () {
                                 Navigator.pop(context);
                               },
-                              child: const Text('Fermer'),
+                              child:
+                                  Text(AppLocalizations.of(context)!.strClose),
                             )
                           ]),
                         ]),

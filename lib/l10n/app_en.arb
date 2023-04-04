@@ -11,5 +11,6 @@
     "strCPO": "Culture",
     "strSettings": "Settings",
     "strFetching": "Fetching data ...",
-    "strEpisodes": "Episodes"
+    "strEpisodes": "Episodes",
+    "strClose": "Close"
 }

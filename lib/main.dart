@@ -18,6 +18,8 @@ void main() {
     providers: [
       ChangeNotifierProvider<Cache>(create: (_) => Cache()),
       ChangeNotifierProvider<LocaleModel>(create: (_) => LocaleModel()),
+      ChangeNotifierProvider<ThemeModeProvider>(
+          create: (_) => ThemeModeProvider()),
     ],
     builder: (context, child) {
       return const MyApp();
@@ -42,7 +44,8 @@ class MyApp extends StatelessWidget {
       },
     );
 
-    return Consumer<LocaleModel>(builder: (context, localeModel, child) {
+    return Consumer2<LocaleModel, ThemeModeProvider>(
+        builder: (context, localeModel, themeModeProvider, child) {
       return MaterialApp(
         title: 'Flarte',
         locale: localeModel.locale,
@@ -63,7 +66,7 @@ class MyApp extends StatelessWidget {
           pageTransitionsTheme: pageTransitionsTheme,
           /* dark theme settings */
         ),
-        themeMode: ThemeMode.dark,
+        themeMode: themeModeProvider.themeMode,
         /* ThemeMode.system to follow system theme,
          ThemeMode.light for light theme,
          ThemeMode.dark for dark theme
@@ -142,14 +145,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                             flex: 1,
                             child: Consumer<LocaleModel>(
                                 builder: (context, localeModel, child) {
-                              String lang;
-                              Locale? l = localeModel.locale;
-                              if (l != null) {
-                                lang = l.languageCode;
-                              } else {
-                                lang = Localizations.localeOf(context)
-                                    .languageCode;
-                              }
+                              String lang = localeModel
+                                  .getCurrentLocale(context)
+                                  .languageCode;
                               return CategoriesList(
                                   size: catSize,
                                   controller: _tabController,
@@ -183,12 +181,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   codes.length,
                   (index) => Consumer2<Cache, LocaleModel>(
                           builder: (context, cache, localeModel, child) {
-                        String lang;
-                        if (localeModel.locale != null) {
-                          lang = localeModel.locale!.languageCode;
-                        } else {
-                          lang = Localizations.localeOf(context).languageCode;
-                        }
+                        String lang =
+                            localeModel.getCurrentLocale(context).languageCode;
                         return FutureBuilder(
                             future: Future.microtask(
                                 () => cache.get(codes[index], lang)),
@@ -359,7 +353,9 @@ class CarouselList extends StatelessWidget {
   }
 
   void _showDialogProgram(BuildContext context, Map<String, dynamic> v) {
-    final lang = Localizations.localeOf(context).languageCode;
+    final lang = Provider.of<LocaleModel>(context, listen: false)
+        .getCurrentLocale(context)
+        .languageCode;
     showDialog(
         context: context,
         builder: (context) {
@@ -367,13 +363,15 @@ class CarouselList extends StatelessWidget {
               elevation: 8.0,
               child: SizedBox(
                   width: min(MediaQuery.of(context).size.width - 100, 600),
-                  child: ShowDetail(video: v, lang: lang)));
+                  child: ShowDetail(video: v)));
         });
   }
 
   Future<Map<String, dynamic>> _getProgramDetail(
       String programId, BuildContext context) async {
-    final lang = Localizations.localeOf(context).languageCode;
+    final lang = Provider.of<LocaleModel>(context, listen: false)
+        .getCurrentLocale(context)
+        .languageCode;
     final url =
         'https://www.arte.tv/api/rproxy/emac/v4/$lang/web/programs/$programId';
     final resp = await http
@@ -780,13 +778,9 @@ class _ShowListState extends State<ShowList> {
 
   @override
   Widget build(BuildContext context) {
-    String lang;
-    Locale? l = Provider.of<LocaleModel>(context, listen: false).locale;
-    if (l != null) {
-      lang = l.languageCode;
-    } else {
-      lang = Localizations.localeOf(context).languageCode;
-    }
+    final lang = Provider.of<LocaleModel>(context, listen: false)
+        .getCurrentLocale(context)
+        .languageCode;
 
     return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
       SizedBox(
@@ -810,7 +804,7 @@ class _ShowListState extends State<ShowList> {
               })),
       Expanded(
           child: selectedShowIndex != -1
-              ? ShowDetail(video: widget.videos[selectedShowIndex], lang: lang)
+              ? ShowDetail(video: widget.videos[selectedShowIndex])
               : const SizedBox.shrink())
     ]);
   }

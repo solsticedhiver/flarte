@@ -41,9 +41,18 @@ class _FlarteSettingsState extends State<FlarteSettings> {
             },
           ),
           SettingsTile.navigation(
-              leading: const Icon(Icons.nightlight),
-              title: const Text('Theme'),
-              value: const Text('Dark'))
+            leading: const Icon(Icons.nightlight),
+            title: const Text('Theme'),
+            value: Provider.of<ThemeModeProvider>(context, listen: false)
+                        .themeMode ==
+                    ThemeMode.dark
+                ? const Text('Dark')
+                : const Text('Light'),
+            onPressed: (context) {
+              Provider.of<ThemeModeProvider>(context, listen: false)
+                  .switchTheme();
+            },
+          )
         ]),
         SettingsSection(title: const Text('Playback'), tiles: [
           SettingsTile.navigation(
@@ -53,8 +62,13 @@ class _FlarteSettingsState extends State<FlarteSettings> {
           SettingsTile.navigation(
               leading: const Icon(Icons.play_arrow),
               title: const Text('Player'),
-              value: const Text('Embedded'))
+              value: const Text('Embedded')),
         ]),
+        SettingsSection(title: const Text('Downloads'), tiles: [
+          SettingsTile(
+              leading: const Icon(Icons.download),
+              title: const Text('Directory')),
+        ])
       ]),
     );
   }

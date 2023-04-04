@@ -74,14 +74,6 @@ class _SerieScreenState extends State<SerieScreen> {
   }
 
   void _showDialogProgram(BuildContext context, Map<String, dynamic> v) {
-    String lang;
-    Locale? l = Provider.of<LocaleModel>(context, listen: false).locale;
-    if (l != null) {
-      lang = l.languageCode;
-    } else {
-      lang = Localizations.localeOf(context).languageCode;
-    }
-
     showDialog(
         context: context,
         builder: (context) {
@@ -91,7 +83,6 @@ class _SerieScreenState extends State<SerieScreen> {
                   width: min(MediaQuery.of(context).size.width - 100, 600),
                   child: ShowDetail(
                     video: v,
-                    lang: lang,
                   )));
         });
   }
