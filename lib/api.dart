@@ -48,6 +48,8 @@ enum CategoriesListSize { tiny, small, normal }
 
 enum CarouselListSize { tiny, small, normal }
 
+enum PlayerTypeName { embedded, vlc, custom }
+
 class Version {
   String shortLabel;
   String label;

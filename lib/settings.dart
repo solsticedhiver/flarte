@@ -1,4 +1,7 @@
+import 'dart:ui';
+
 import 'package:flarte/api.dart';
+import 'package:flarte/config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +17,9 @@ class FlarteSettings extends StatefulWidget {
 }
 
 class _FlarteSettingsState extends State<FlarteSettings> {
+  PlayerTypeName _playerTypeName = AppConfig.player;
+  late String _playerString;
+
   @override
   void initState() {
     super.initState();
@@ -22,6 +28,16 @@ class _FlarteSettingsState extends State<FlarteSettings> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void _setPlayerString() {
+    if (_playerTypeName == PlayerTypeName.custom) {
+      _playerString = AppLocalizations.of(context)!.strCustom;
+    } else if (_playerTypeName == PlayerTypeName.vlc) {
+      _playerString = 'vlc';
+    } else if (_playerTypeName == PlayerTypeName.embedded) {
+      _playerString = AppLocalizations.of(context)!.strEmbedded;
+    }
   }
 
   @override
@@ -43,6 +59,8 @@ class _FlarteSettingsState extends State<FlarteSettings> {
       'en': AppLocalizations.of(context)!.strEnglish,
     };
     Locale? locale = Provider.of<LocaleModel>(context, listen: false).locale;
+
+    _setPlayerString();
 
     debugPrint(AppLocalizations.supportedLocales.toString());
     return Scaffold(
@@ -156,9 +174,45 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                   title: Text(AppLocalizations.of(context)!.strDefRes),
                   value: const Text('432p')),
               SettingsTile.navigation(
-                  leading: const Icon(Icons.play_arrow),
-                  title: Text(AppLocalizations.of(context)!.strPlayer),
-                  value: Text(AppLocalizations.of(context)!.strEmbedded)),
+                leading: const Icon(Icons.play_arrow),
+                title: Text(AppLocalizations.of(context)!.strPlayer),
+                value: Text(_playerString),
+                onPressed: (context) async {
+                  await showDialog<ThemeMode>(
+                      context: context,
+                      builder: (context) {
+                        final ptn = {
+                          PlayerTypeName.embedded:
+                              AppLocalizations.of(context)!.strEmbedded,
+                          PlayerTypeName.vlc: 'vlc',
+                          PlayerTypeName.custom:
+                              AppLocalizations.of(context)!.strCustom
+                        };
+                        return AlertDialog(content:
+                            StatefulBuilder(builder: (context, setState) {
+                          return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: ptn.entries.map((p) {
+                                return ListTile(
+                                    title: Text(p.value),
+                                    leading: Radio<PlayerTypeName>(
+                                      value: p.key,
+                                      groupValue: _playerTypeName,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _playerTypeName = value!;
+                                        });
+                                      },
+                                    ));
+                              }).toList());
+                        }));
+                      });
+                  setState(() {
+                    _setPlayerString();
+                  });
+                  AppConfig.player = _playerTypeName;
+                },
+              ),
             ]),
         SettingsSection(
             title: Text(AppLocalizations.of(context)!.strDownloads),

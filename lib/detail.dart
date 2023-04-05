@@ -471,7 +471,15 @@ class _ShowDetailState extends State<ShowDetail> {
                                       icon: const Icon(Icons.play_arrow),
                                       onPressed: versions.isNotEmpty &&
                                               formats.isNotEmpty
-                                          ? _libmpv
+                                          ? () {
+                                              if (AppConfig.player ==
+                                                  PlayerTypeName.embedded) {
+                                                _libmpv();
+                                              } else if (AppConfig.player ==
+                                                  PlayerTypeName.vlc) {
+                                                _cvlc();
+                                              }
+                                            }
                                           : null,
                                     ),
                                     const SizedBox(width: 24),

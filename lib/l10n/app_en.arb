@@ -27,5 +27,6 @@
     "strEmbedded": "Embedded",
     "strFrench": "French",
     "strEnglish": "English",
-    "strGerman": "German"
+    "strGerman": "German",
+    "strCustom": "Custom"
 }
