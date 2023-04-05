@@ -19,6 +19,7 @@ class FlarteSettings extends StatefulWidget {
 class _FlarteSettingsState extends State<FlarteSettings> {
   PlayerTypeName _playerTypeName = AppConfig.player;
   late String _playerString;
+  late String _qualityString;
 
   @override
   void initState() {
@@ -61,6 +62,17 @@ class _FlarteSettingsState extends State<FlarteSettings> {
     Locale? locale = Provider.of<LocaleModel>(context, listen: false).locale;
 
     _setPlayerString();
+
+    final _qualityStringList = [
+      'usually 216p',
+      'usually 360p',
+      'usually 432p',
+      'usually 720p',
+      'usually 1080p'
+    ];
+
+    int _qualityIndex = AppConfig.playerIndexQuality;
+    _qualityString = _qualityStringList[_qualityIndex];
 
     debugPrint(AppLocalizations.supportedLocales.toString());
     return Scaffold(
@@ -170,9 +182,40 @@ class _FlarteSettingsState extends State<FlarteSettings> {
             title: Text(AppLocalizations.of(context)!.strPlayback),
             tiles: [
               SettingsTile.navigation(
-                  leading: const Icon(Icons.width_normal),
-                  title: Text(AppLocalizations.of(context)!.strDefRes),
-                  value: const Text('432p')),
+                leading: const Icon(Icons.width_normal),
+                title: Text(AppLocalizations.of(context)!.strDefRes),
+                value: Text(_qualityStringList[AppConfig.playerIndexQuality]
+                    .split(' ')
+                    .last),
+                onPressed: (context) async {
+                  await showDialog<ThemeMode>(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(content:
+                            StatefulBuilder(builder: (context, setState) {
+                          return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: _qualityStringList.map((p) {
+                                return ListTile(
+                                    title: Text(p),
+                                    leading: Radio<int>(
+                                      value: _qualityStringList.indexOf(p),
+                                      groupValue: _qualityIndex,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _qualityIndex = value!;
+                                        });
+                                      },
+                                    ));
+                              }).toList());
+                        }));
+                      });
+                  setState(() {
+                    _qualityString = _qualityStringList[_qualityIndex];
+                  });
+                  AppConfig.playerIndexQuality = _qualityIndex;
+                },
+              ),
               SettingsTile.navigation(
                 leading: const Icon(Icons.play_arrow),
                 title: Text(AppLocalizations.of(context)!.strPlayer),

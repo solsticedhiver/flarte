@@ -27,5 +27,6 @@
     "strEmbedded": "Eingebettet",
     "strFrench": "Französisch",
     "strEnglish": "Englisch",
-    "strGerman": "Deutsch"
+    "strGerman": "Deutsch",
+    "strCustom": "Benutzerdefinierte"
 }

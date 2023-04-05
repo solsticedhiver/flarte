@@ -118,7 +118,11 @@ class _ShowDetailState extends State<ShowDetail> {
             }
           }
         } catch (e) {
-          selectedFormat = formats[2];
+          if (formats.length - 1 >= AppConfig.playerIndexQuality) {
+            selectedFormat = formats[AppConfig.playerIndexQuality];
+          } else {
+            selectedFormat = formats.last;
+          }
         }
         formatItems = formats
             .map((e) => DropdownMenuItem<Format>(
