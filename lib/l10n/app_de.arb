@@ -12,5 +12,20 @@
     "strSettings": "Einstellungen",
     "strFetching": "Daten abrufen ...",
     "strEpisodes": "Episoden",
-    "strClose": "Schließen"
+    "strClose": "Schließen",
+    "strInterface": "Schnittstelle",
+    "strLanguage": "Sprache",
+    "strSystem": "System",
+    "strTheme": "Thema",
+    "strDark": "Dunkel",
+    "strLight": "Licht",
+    "strPlayback": "Wiedergabe",
+    "strDefRes": "Standardauflösung",
+    "strPlayer": "Spieler",
+    "strDownloads": "Downloads",
+    "strDirectory": "Verzeichnis",
+    "strEmbedded": "Eingebettet",
+    "strFrench": "Französisch",
+    "strEnglish": "Englisch",
+    "strGerman": "Deutsch"
 }

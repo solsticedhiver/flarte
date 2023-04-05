@@ -12,5 +12,20 @@
     "strSettings": "Settings",
     "strFetching": "Fetching data ...",
     "strEpisodes": "Episodes",
-    "strClose": "Close"
+    "strClose": "Close",
+    "strInterface": "Interface",
+    "strLanguage": "Language",
+    "strSystem": "System",
+    "strTheme": "Theme",
+    "strDark": "Dark",
+    "strLight": "Light",
+    "strPlayback": "Playback",
+    "strDefRes": "Default resolution",
+    "strPlayer": "Player",
+    "strDownloads": "Downloads",
+    "strDirectory": "Directory",
+    "strEmbedded": "Embedded",
+    "strFrench": "French",
+    "strEnglish": "English",
+    "strGerman": "German"
 }

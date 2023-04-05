@@ -12,5 +12,20 @@
     "strSettings": "Paramètres",
     "strFetching": "Téléchargement des données ...",
     "strEpisodes": "Épisodes",
-    "strClose": "Fermer"
+    "strClose": "Fermer",
+    "strInterface": "Interface",
+    "strLanguage": "Langue",
+    "strSystem": "Système",
+    "strTheme": "Thème",
+    "strDark": "Sombre",
+    "strLight": "Clair",
+    "strPlayback": "Lecture",
+    "strDefRes": "Résolution par défaut",
+    "strPlayer": "Lecteur",
+    "strDownloads": "Téléchargements",
+    "strDirectory": "Répertoire",
+    "strEmbedded": "Intégré",
+    "strFrench": "Français",
+    "strEnglish": "Anglais",
+    "strGerman": "Allemand"
 }
