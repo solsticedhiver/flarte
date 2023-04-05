@@ -51,6 +51,19 @@ class MyApp extends StatelessWidget {
         locale: localeModel.locale,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
+        localeListResolutionCallback: (locales, supportedLocales) {
+          const defaultLocale = Locale('en');
+          if (locales == null) {
+            return defaultLocale;
+          } else {
+            for (var l in locales) {
+              if (supportedLocales.contains(l)) {
+                return l;
+              }
+            }
+          }
+          return defaultLocale;
+        },
         //theme: ThemeData(
         //  primarySwatch: Colors.deepOrange,
         //),

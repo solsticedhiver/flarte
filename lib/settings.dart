@@ -37,6 +37,14 @@ class _FlarteSettingsState extends State<FlarteSettings> {
       tm = 'System';
     }
 
+    final Map<String, String> localeName = {
+      'fr': 'French',
+      'de': 'German',
+      'en': 'English',
+    };
+    Locale? locale = Provider.of<LocaleModel>(context, listen: false).locale;
+
+    debugPrint(AppLocalizations.supportedLocales.toString());
     return Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context)!.strSettings)),
       body: SettingsList(sections: [
@@ -44,11 +52,36 @@ class _FlarteSettingsState extends State<FlarteSettings> {
           SettingsTile.navigation(
             leading: const Icon(Icons.language),
             title: const Text('Language'),
-            value: const Text('English'),
+            value:
+                locale != null && localeName.keys.contains(locale.languageCode)
+                    ? Text(localeName[locale.languageCode]!)
+                    : const Text('System'),
             onPressed: (context) async {
               // test
+              await showDialog<ThemeMode>(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                        content: StatefulBuilder(builder: (context, setState) {
+                      return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: AppLocalizations.supportedLocales.map((l) {
+                            return ListTile(
+                                title: Text(l.languageCode),
+                                leading: Radio<Locale>(
+                                  value: l,
+                                  groupValue: locale,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      locale = value!;
+                                    });
+                                  },
+                                ));
+                          }).toList());
+                    }));
+                  });
               Provider.of<LocaleModel>(context, listen: false)
-                  .changeLocale(const Locale('en'));
+                  .changeLocale(locale);
             },
           ),
           SettingsTile.navigation(
