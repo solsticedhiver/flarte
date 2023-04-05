@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flarte/api.dart';
 import 'package:flarte/config.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
@@ -14,6 +15,9 @@ import 'detail.dart';
 import 'settings.dart';
 
 void main() {
+  if (kReleaseMode) {
+    debugPrint = (String? message, {int? wrapWidth}) {};
+  }
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider<Cache>(create: (_) => Cache()),
