@@ -21,7 +21,8 @@ class MyScreen extends StatefulWidget {
 }
 
 class _MyScreenState extends State<MyScreen> {
-  final Player player = Player();
+  final Player player =
+      Player(configuration: const PlayerConfiguration(title: AppConfig.name));
   VideoController? controller;
 
   @override
