@@ -354,17 +354,16 @@ class _ShowDetailState extends State<ShowDetail> {
 
   void _cvlc() async {
     ProcessManager mgr = const LocalProcessManager();
-    // look for the format id that matches our resolution
-    String binary_vlc = '';
+    String cvlc = '';
     if (Platform.isLinux) {
-      binary_vlc = 'cvlc';
+      cvlc = 'cvlc';
     } else if (Platform.isWindows) {
-      binary_vlc = 'cvlc.exe';
+      cvlc = 'cvlc.exe';
     } else {
       return;
     }
     List<String> cmd = [
-      binary_vlc,
+      cvlc,
       '--play-and-exit',
       '--http-user-agent',
       'User-Agent: ${AppConfig.userAgent}',

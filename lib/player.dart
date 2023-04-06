@@ -52,9 +52,11 @@ class _MyScreenState extends State<MyScreen> {
     // use --hls-bitrate to select channel for a resolution by bitrate
     pp.setProperty('hls-bitrate', widget.bitrate);
 
-    player.setVolume(100);
-    player.open(Playlist([Media(widget.url)]));
-    debugPrint('Playing ${widget.url} at ${widget.bitrate} bps');
+    if (player.state.playlist.medias.isEmpty) {
+      player.setVolume(100);
+      player.open(Playlist([Media(widget.url)]));
+      debugPrint('Playing ${widget.url} at ${widget.bitrate} bps');
+    }
 
     double buttonSize = 24.0;
     double margin = 16.0;
