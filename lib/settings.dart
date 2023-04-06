@@ -61,7 +61,7 @@ class _FlarteSettingsState extends State<FlarteSettings> {
 
     _setPlayerString();
 
-    final _qualityStringList = [
+    final qualityStringList = [
       'usually 216p',
       'usually 360p',
       'usually 432p',
@@ -69,8 +69,8 @@ class _FlarteSettingsState extends State<FlarteSettings> {
       'usually 1080p'
     ];
 
-    int _qualityIndex = AppConfig.playerIndexQuality;
-    _qualityString = _qualityStringList[_qualityIndex];
+    int qualityIndex = AppConfig.playerIndexQuality;
+    _qualityString = qualityStringList[qualityIndex];
 
     debugPrint(AppLocalizations.supportedLocales.toString());
     return Scaffold(
@@ -182,9 +182,7 @@ class _FlarteSettingsState extends State<FlarteSettings> {
               SettingsTile.navigation(
                 leading: const Icon(Icons.width_normal),
                 title: Text(AppLocalizations.of(context)!.strDefRes),
-                value: Text(_qualityStringList[AppConfig.playerIndexQuality]
-                    .split(' ')
-                    .last),
+                value: Text(_qualityString.split(' ').last),
                 onPressed: (context) async {
                   await showDialog<ThemeMode>(
                       context: context,
@@ -193,15 +191,15 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                             StatefulBuilder(builder: (context, setState) {
                           return Column(
                               mainAxisSize: MainAxisSize.min,
-                              children: _qualityStringList.map((p) {
+                              children: qualityStringList.map((p) {
                                 return ListTile(
                                     title: Text(p),
                                     leading: Radio<int>(
-                                      value: _qualityStringList.indexOf(p),
-                                      groupValue: _qualityIndex,
+                                      value: qualityStringList.indexOf(p),
+                                      groupValue: qualityIndex,
                                       onChanged: (value) {
                                         setState(() {
-                                          _qualityIndex = value!;
+                                          qualityIndex = value!;
                                         });
                                       },
                                     ));
@@ -209,9 +207,9 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                         }));
                       });
                   setState(() {
-                    _qualityString = _qualityStringList[_qualityIndex];
+                    _qualityString = qualityStringList[qualityIndex];
                   });
-                  AppConfig.playerIndexQuality = _qualityIndex;
+                  AppConfig.playerIndexQuality = qualityIndex;
                 },
               ),
               SettingsTile.navigation(
