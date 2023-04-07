@@ -352,18 +352,37 @@ class _ShowDetailState extends State<ShowDetail> {
     }
   }
 
-  void _cvlc() async {
+  void _vlc() async {
     ProcessManager mgr = const LocalProcessManager();
-    String cvlc = '';
+    String binary = '';
     if (Platform.isLinux) {
-      cvlc = 'cvlc';
+      binary = 'cvlc';
     } else if (Platform.isWindows) {
-      cvlc = 'cvlc.exe';
+      String? programFiles = Platform.environment['ProgramFiles'];
+      if (programFiles == null || programFiles.isEmpty) {
+        debugPrint('%ProgramFiles% is empty');
+        return;
+      }
+      binary = path.join(programFiles, 'VideoLAN', 'VLC', 'vlc.exe');
+      if (!File(binary).existsSync()) {
+        debugPrint('$binary not found');
+        // try in Program Files (x86)
+        programFiles = Platform.environment['ProgramFiles(x86)'];
+        if (programFiles == null || programFiles.isEmpty) {
+          debugPrint('%ProgramFiles(x86)% is empty');
+          return;
+        }
+        binary = path.join(programFiles, 'VideoLAN', 'VLC', 'vlc.exe');
+        if (!File(binary).existsSync()) {
+          debugPrint('$binary not found either');
+          return;
+        }
+      }
     } else {
       return;
     }
     List<String> cmd = [
-      cvlc,
+      binary,
       '--play-and-exit',
       '--http-user-agent',
       'User-Agent: ${AppConfig.userAgent}',
@@ -372,6 +391,15 @@ class _ShowDetailState extends State<ShowDetail> {
       selectedFormat.resolution.split('x').last,
       selectedVersion.url
     ];
+    /*
+    if (Platform.isWindows) {
+      cmd.insertAll(1, [
+        '-I',
+        'dummy',
+        '--dummy-quiet',
+      ]);
+    }
+    */
     ProcessResult result = await mgr.run(cmd);
     if (result.exitCode != 0) {
       debugPrint(result.stderr);
@@ -480,7 +508,7 @@ class _ShowDetailState extends State<ShowDetail> {
                                                 _libmpv();
                                               } else if (AppConfig.player ==
                                                   PlayerTypeName.vlc) {
-                                                _cvlc();
+                                                _vlc();
                                               }
                                             }
                                           : null,
