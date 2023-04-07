@@ -61,7 +61,8 @@ class MyApp extends StatelessWidget {
             return defaultLocale;
           } else {
             for (var l in locales) {
-              if (supportedLocales.contains(l)) {
+              // supportedLocales is expected to be only languageCode only (no contryCode)
+              if (supportedLocales.contains(Locale(l.languageCode))) {
                 return l;
               }
             }
