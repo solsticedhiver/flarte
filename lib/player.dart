@@ -101,7 +101,8 @@ class SeekBar extends StatefulWidget {
 }
 
 class _SeekBarState extends State<SeekBar> {
-  bool isPlaying = false;
+  bool playing = false;
+  bool seeking = false;
   Duration position = Duration.zero;
   Duration duration = Duration.zero;
 
@@ -110,7 +111,7 @@ class _SeekBarState extends State<SeekBar> {
   @override
   void initState() {
     super.initState();
-    isPlaying = widget.player.state.playing;
+    playing = widget.player.state.playing;
     position = widget.player.state.position;
     duration = widget.player.state.duration;
     subscriptions.addAll(
@@ -118,14 +119,19 @@ class _SeekBarState extends State<SeekBar> {
         widget.player.streams.playing.listen((event) {
           setState(() {
             if (mounted) {
-              isPlaying = event;
+              playing = event;
             }
+          });
+        }),
+        widget.player.streams.completed.listen((event) {
+          setState(() {
+            position = Duration.zero;
           });
         }),
         widget.player.streams.position.listen((event) {
           setState(() {
             if (mounted) {
-              position = event;
+              if (!seeking) position = event;
             }
           });
         }),
@@ -162,7 +168,7 @@ class _SeekBarState extends State<SeekBar> {
             padding: EdgeInsets.all(widget.buttonSize),
           ),
           child: Icon(
-            isPlaying ? Icons.pause : Icons.play_arrow,
+            playing ? Icons.pause : Icons.play_arrow,
             color: Theme.of(context).colorScheme.primary,
           ),
         ),
@@ -176,16 +182,20 @@ class _SeekBarState extends State<SeekBar> {
                   0,
                   duration.inMilliseconds.toDouble(),
                 ),
-            /*onChanged:
-                null, // disabled because seeking fails on most streamed video with mpv
-            */
-            onChanged: (e) {
+            onChanged: position.inMilliseconds > 0
+                ? (e) {
+                    setState(() {
+                      position = Duration(milliseconds: e ~/ 1);
+                    });
+                  }
+                : null,
+            onChangeStart: (e) {
+              seeking = true;
+            },
+            onChangeEnd: (e) {
+              seeking = false;
               widget.player.seek(Duration(milliseconds: e ~/ 1));
             },
-            /*
-            onChangeEnd: (e) {
-              widget.player.seek(Duration(milliseconds: e ~/ 1));
-            },*/
           ),
         ),
         Text('0${duration.toString().substring(0, 7)}'),
