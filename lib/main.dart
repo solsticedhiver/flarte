@@ -380,7 +380,7 @@ class _CarouselState extends State<Carousel> {
 }
 
 class CarouselList extends StatelessWidget {
-  final Map<String, dynamic> data;
+  final List<dynamic> data;
   final CarouselListSize size;
   late final double _imageHeight, _imageWidth;
 
@@ -427,19 +427,10 @@ class CarouselList extends StatelessWidget {
     if (data.isEmpty) {
       zones = [];
     } else {
-      zones = data['value']['zones'];
+      zones = data;
     }
     for (var z in zones) {
-      videos = z['content']['data'];
-      final programId = videos.where((v) => v['programId'] != null).toList();
-      if (videos.isEmpty ||
-          z['displayOptions']['template'].startsWith('event') ||
-          z['displayOptions']['template'].startsWith('single') ||
-          programId.isEmpty ||
-          videos.length == 1) {
-        //debugPrint('skipped ${z['title']}/${z['code']} (${videos.length})');
-        continue;
-      }
+      videos = z['videos'];
       thumbnails
           .add(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
@@ -449,9 +440,6 @@ class CarouselList extends StatelessWidget {
         Carousel(
             size: size,
             children: videos.map((v) {
-              final imageUrl = (v['mainImage']['url'])
-                  .replaceFirst('__SIZE__', '400x225')
-                  .replaceFirst('?type=TEXT', '');
               return InkWell(
                   onTap: () {
                     _showDialogProgram(context, v);
@@ -468,7 +456,8 @@ class CarouselList extends StatelessWidget {
                                       SizedBox(
                                           width: _imageWidth,
                                           height: _imageHeight),
-                                  image: CachedNetworkImageProvider(imageUrl,
+                                  image: CachedNetworkImageProvider(
+                                      v['imageUrl'],
                                       headers: {
                                         'User-Agent': AppConfig.userAgent
                                       }),

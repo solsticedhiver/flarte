@@ -43,7 +43,7 @@ class _ShowDetailState extends State<ShowDetail> {
     Future.microtask(() async {
       final programId = widget.video['programId'];
 
-      debugPrint(programId);
+      debugPrint('programId: $programId');
       final lang = Provider.of<LocaleModel>(context, listen: false)
           .getCurrentLocale(context)
           .languageCode;
@@ -479,9 +479,7 @@ class _ShowDetailState extends State<ShowDetail> {
   Widget build(BuildContext context) {
     //debugPrint(json.encode(widget.video));
 
-    final imageUrl = (widget.video['mainImage']['url'])
-        .replaceFirst('__SIZE__', '400x225')
-        .replaceFirst('?type=TEXT', '');
+    final imageUrl = widget.video['imageUrl'];
     return Container(
         padding: const EdgeInsets.all(15),
         child: Column(
@@ -532,10 +530,10 @@ class _ShowDetailState extends State<ShowDetail> {
                           Row(children: [
                             Chip(
                               backgroundColor: Theme.of(context).primaryColor,
-                              label: Text(widget.video['kind']['label']),
+                              label: Text(widget.video['label']),
                             ),
                             const SizedBox(width: 10),
-                            if (!widget.video['kind']['isCollection'] &&
+                            if (!widget.video['isCollection'] &&
                                 widget.video['durationLabel'] != null)
                               Chip(
                                 backgroundColor: Theme.of(context).primaryColor,
@@ -543,7 +541,7 @@ class _ShowDetailState extends State<ShowDetail> {
                               ),
                           ]),
                           const SizedBox(height: 10),
-                          widget.video['kind']['isCollection']
+                          widget.video['isCollection']
                               ? const SizedBox.shrink()
                               : Row(
                                   children: [
@@ -596,7 +594,7 @@ class _ShowDetailState extends State<ShowDetail> {
                                   ],
                                 ),
                           const SizedBox(height: 10),
-                          widget.video['kind']['isCollection']
+                          widget.video['isCollection']
                               ? const SizedBox.shrink()
                               : Row(children: [
                                   versionItems.isNotEmpty
@@ -662,7 +660,7 @@ class _ShowDetailState extends State<ShowDetail> {
                                           })
                                       : const SizedBox(height: 24),
                                 ]),
-                          widget.video['kind']['isCollection']
+                          widget.video['isCollection']
                               ? TextButton(
                                   onPressed: () {
                                     Navigator.pop(context);

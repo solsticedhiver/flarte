@@ -106,7 +106,7 @@ class _SerieScreenState extends State<SerieScreen> {
       }
       if (zoneCount > 1) {
         body = CarouselList(
-          data: data,
+          data: Cache.parseJson(data),
           size: CarouselListSize.normal,
         );
       } else {
@@ -119,7 +119,7 @@ class _SerieScreenState extends State<SerieScreen> {
                   children: teasers.map((t) {
                     return InkWell(
                         onTap: () {
-                          _showDialogProgram(context, t);
+                          _showDialogProgram(context, Cache.buildVideo(t));
                         },
                         child: Card(
                             child: Container(
