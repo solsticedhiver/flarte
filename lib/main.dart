@@ -1,14 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flarte/api.dart';
-import 'package:flarte/config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'detail.dart';
@@ -382,88 +379,6 @@ class CarouselList extends StatelessWidget {
               child: SizedBox(
                   width: min(MediaQuery.of(context).size.width - 100, 600),
                   child: ShowDetail(video: v)));
-        });
-  }
-
-  Future<Map<String, dynamic>> _getProgramDetail(
-      String programId, BuildContext context) async {
-    final lang = Provider.of<LocaleModel>(context, listen: false)
-        .getCurrentLocale(context)
-        .languageCode;
-    final url =
-        'https://www.arte.tv/api/rproxy/emac/v4/$lang/web/programs/$programId';
-    final resp = await http
-        .get(Uri.parse(url), headers: {'User-Agent': AppConfig.userAgent});
-    final Map<String, dynamic> jr = json.decode(resp.body);
-    return jr;
-  }
-
-  void _showBigDialogProgram(
-      BuildContext context, Map<String, dynamic> v) async {
-    final programId = v['programId'];
-    showDialog(
-        context: context,
-        builder: (context) {
-          return Dialog(
-              child: SizedBox(
-            width: min(MediaQuery.of(context).size.width - 50, 900),
-            child: FutureBuilder(
-              future: _getProgramDetail(programId, context),
-              builder: (context, snapshot) {
-                Widget trailer = const Text('');
-                if (snapshot.hasData) {
-                  if (snapshot.data != null) {
-                    final content = snapshot.data?['value']['zones'][0]
-                        ['content']['data'][0];
-                    String? description = content['fullDescription'];
-                    description ??= content['shortDescription'];
-                    description = description
-                        ?.replaceAll('<p>', '')
-                        .replaceAll('</p>', '\n')
-                        .replaceAll('<br>', '\n')
-                        .replaceAll('<br />', '\n')
-                        .replaceAll(RegExp('\n{2,}'), '\n\n')
-                        .replaceFirst(RegExp(r'\n$'), '');
-                    trailer = Text(description!,
-                        style: Theme.of(context).textTheme.bodyMedium);
-                  }
-                }
-                return Container(
-                    padding: const EdgeInsets.all(15),
-                    child: Stack(children: [
-                      ColorFiltered(
-                          colorFilter: ColorFilter.mode(
-                            Colors.black.withOpacity(0.8),
-                            BlendMode.darken,
-                          ),
-                          child: Image(
-                              image: CachedNetworkImageProvider(v['mainImage']
-                                      ['url']
-                                  .replaceFirst('__SIZE__', '1280x720')
-                                  .replaceFirst('?type=TEXT', '')))),
-                      Container(
-                          padding: const EdgeInsets.all(10),
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(v['title'],
-                                    style:
-                                        Theme.of(context).textTheme.titleLarge),
-                                if (v['subtile'] != null)
-                                  const SizedBox(height: 10),
-                                if (v['subtile'] != null)
-                                  Text(v['subtitle'],
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium),
-                                const SizedBox(height: 10),
-                                trailer,
-                              ])),
-                    ]));
-              },
-            ),
-          ));
         });
   }
 

@@ -29,5 +29,9 @@
     "strEnglish": "Anglais",
     "strGerman": "Allemand",
     "strCustom": "Personnalisé",
-    "strCopiedClipboard": "Copié dans le presse-papier"
+    "strCopiedClipboard": "Copié dans le presse-papier",
+    "strDuration": "Durée",
+    "strAvailability": "Disponibilité",
+    "strGenre": "Genre",
+    "strDetails": "Détails"
 }

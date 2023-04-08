@@ -29,5 +29,9 @@
     "strEnglish": "Englisch",
     "strGerman": "Deutsch",
     "strCustom": "Benutzerdefinierte",
-    "strCopiedClipboard": "In die Zwischenablage kopiert"
+    "strCopiedClipboard": "In die Zwischenablage kopiert",
+    "strDuration": "Dauer",
+    "strAvailability": "Verfügbarkeit",
+    "strGenre": "Genre",
+    "strDetails": "Einzelheiten"
 }

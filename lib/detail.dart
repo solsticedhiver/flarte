@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flarte/fulldetail.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -531,6 +532,19 @@ class _ShowDetailState extends State<ShowDetail> {
                                             }
                                           : null,
                                     ),
+                                    const SizedBox(width: 24),
+                                    IconButton(
+                                        icon: const Icon(Icons.read_more),
+                                        onPressed: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      FullDetailScreen(
+                                                          programId: widget
+                                                                  .video[
+                                                              'programId'])));
+                                        }),
                                   ],
                                 ),
                           const SizedBox(height: 10),

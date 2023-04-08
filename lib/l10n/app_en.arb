@@ -29,5 +29,9 @@
     "strEnglish": "English",
     "strGerman": "German",
     "strCustom": "Custom",
-    "strCopiedClipboard": "Copied to clipboard"
+    "strCopiedClipboard": "Copied to clipboard",
+    "strDuration": "Duration",
+    "strAvailability": "Availability",
+    "strGenre": "Genre",
+    "strDetails": "Details"
 }
