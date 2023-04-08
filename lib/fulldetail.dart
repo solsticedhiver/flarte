@@ -113,6 +113,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                 ],
               );
             }
+            //debugPrint(json.encode(content).toString());
             return Container(
                 padding: const EdgeInsets.all(15),
                 child: Center(
@@ -182,6 +183,13 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Row(children: [
+                                const Expanded(flex: 1, child: Text('ID')),
+                                Expanded(
+                                    flex: 1,
+                                    child: Text('${content['programId']}'))
+                              ]),
+                              const SizedBox(height: 10),
+                              Row(children: [
                                 Expanded(
                                     flex: 1,
                                     child: Text(AppLocalizations.of(context)!
@@ -199,7 +207,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                 Expanded(
                                     flex: 1,
                                     child: Text(
-                                        '$availabilityStart\n$availabilityEnd'))
+                                        '${AppLocalizations.of(context)!.strFrom} $availabilityStart\n${AppLocalizations.of(context)!.strTo} $availabilityEnd'))
                               ]),
                               const SizedBox(height: 10),
                               Row(children: [

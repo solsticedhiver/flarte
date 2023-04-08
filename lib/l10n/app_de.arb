@@ -33,5 +33,7 @@
     "strDuration": "Dauer",
     "strAvailability": "Verfügbarkeit",
     "strGenre": "Genre",
-    "strDetails": "Einzelheiten"
+    "strDetails": "Einzelheiten",
+    "strFrom": "vom",
+    "strTo": "bis"
 }

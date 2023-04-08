@@ -33,5 +33,7 @@
     "strDuration": "Durée",
     "strAvailability": "Disponibilité",
     "strGenre": "Genre",
-    "strDetails": "Détails"
+    "strDetails": "Détails",
+    "strFrom": "du",
+    "strTo": "au"
 }

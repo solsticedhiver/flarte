@@ -33,5 +33,7 @@
     "strDuration": "Duration",
     "strAvailability": "Availability",
     "strGenre": "Genre",
-    "strDetails": "Details"
+    "strDetails": "Details",
+    "strFrom": "from",
+    "strTo": "to"
 }
