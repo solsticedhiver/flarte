@@ -28,5 +28,6 @@
     "strFrench": "Französisch",
     "strEnglish": "Englisch",
     "strGerman": "Deutsch",
-    "strCustom": "Benutzerdefinierte"
+    "strCustom": "Benutzerdefinierte",
+    "strCopiedClipboard": "In die Zwischenablage kopiert"
 }

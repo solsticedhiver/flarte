@@ -635,9 +635,9 @@ class _ShowDetailState extends State<ShowDetail> {
 
   Future<void> _copyToClipboard(BuildContext context, String text) async {
     Clipboard.setData(ClipboardData(text: text));
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content:
-          Text('Copied to clipboard', style: TextStyle(color: Colors.white)),
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(AppLocalizations.of(context)!.strCopiedClipboard,
+          style: TextStyle(color: Colors.white)),
       backgroundColor: Colors.black87,
       behavior: SnackBarBehavior.floating,
     ));

@@ -28,5 +28,6 @@
     "strFrench": "Français",
     "strEnglish": "Anglais",
     "strGerman": "Allemand",
-    "strCustom": "Personnalisé"
+    "strCustom": "Personnalisé",
+    "strCopiedClipboard": "Copié dans le presse-papier"
 }

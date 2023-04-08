@@ -28,5 +28,6 @@
     "strFrench": "French",
     "strEnglish": "English",
     "strGerman": "German",
-    "strCustom": "Custom"
+    "strCustom": "Custom",
+    "strCopiedClipboard": "Copied to clipboard"
 }
