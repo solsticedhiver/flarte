@@ -478,7 +478,9 @@ class _ShowDetailState extends State<ShowDetail> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           widget.video['shortDescription'] != null
-                              ? Text(widget.video['shortDescription'],
+                              ? Text(
+                                  widget.video['shortDescription']
+                                      .replaceAll(RegExp('\u{00a0}?'), ''),
                                   maxLines: 16,
                                   overflow: TextOverflow.ellipsis,
                                   style: Theme.of(context).textTheme.bodyMedium)
