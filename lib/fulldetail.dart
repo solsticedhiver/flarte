@@ -53,14 +53,12 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
     return text
         .replaceAll('<p>', '')
         .replaceAll('</p>', '\n')
-        .replaceAll('<br>', '\n')
-        .replaceAll('<br />', '\n')
+        .replaceAll(RegExp('<br ?/?>'), '\n')
         .replaceAll(RegExp('\n{2,}'), '\n\n')
         .replaceFirst(RegExp(r'\n$'), '')
-        .replaceAll('<strong>', '')
-        .replaceAll('</strong>', '')
-        .replaceAll('<em>', '')
-        .replaceAll('</em>', '');
+        .replaceAll(RegExp('</?strong>'), '')
+        .replaceAll(RegExp('</?b>'), '')
+        .replaceAll(RegExp('</?em>'), '');
   }
 
   @override
@@ -210,14 +208,25 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                         '${AppLocalizations.of(context)!.strFrom} $availabilityStart\n${AppLocalizations.of(context)!.strTo} $availabilityEnd'))
                               ]),
                               const SizedBox(height: 10),
+                              if (content['genre'] != null)
+                                Row(children: [
+                                  Expanded(
+                                      flex: 1,
+                                      child: Text(AppLocalizations.of(context)!
+                                          .strGenre)),
+                                  Expanded(
+                                      flex: 1,
+                                      child:
+                                          Text('${content['genre']['label']}'))
+                                ]),
+                              const SizedBox(height: 10),
                               Row(children: [
+                                const Expanded(
+                                    flex: 1, child: Text('GeoBlocking')),
                                 Expanded(
                                     flex: 1,
-                                    child: Text(AppLocalizations.of(context)!
-                                        .strGenre)),
-                                Expanded(
-                                    flex: 1,
-                                    child: Text('${content['genre']['label']}'))
+                                    child: Text(
+                                        '${content['geoblocking']['code']}'))
                               ]),
                               const SizedBox(height: 10),
                               ...credits,
