@@ -466,8 +466,11 @@ class _ShowDetailState extends State<ShowDetail> {
                   Image(
                     width: 200,
                     height: 300,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const SizedBox(width: 200, height: 300),
                     image: CachedNetworkImageProvider(
-                        '${imageUrl.replaceFirst('400x225', '300x450')}?type=TEXT'),
+                        '${imageUrl.replaceFirst('400x225', '300x450')}?type=TEXT',
+                        headers: {'User-Agent': AppConfig.userAgent}),
                   ),
                   const SizedBox(width: 15),
                   Flexible(

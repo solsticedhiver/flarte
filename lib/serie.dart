@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flarte/api.dart';
+import 'package:flarte/config.dart';
 import 'package:flarte/main.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -131,6 +132,12 @@ class _SerieScreenState extends State<SerieScreen> {
                                         child: CachedNetworkImage(
                                       imageUrl: t['mainImage']['url']
                                           .replaceFirst('__SIZE__', '400x225'),
+                                      httpHeaders: {
+                                        'User-Agent': AppConfig.userAgent
+                                      },
+                                      errorWidget: (context, url, error) =>
+                                          const SizedBox(
+                                              height: 148, width: 265),
                                       height: 148,
                                       width: 265,
                                     )),

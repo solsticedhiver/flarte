@@ -123,7 +123,10 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                         Expanded(
                             flex: 1,
                             child: Image(
-                              image: CachedNetworkImageProvider(imageUrl),
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const SizedBox.shrink(),
+                              image: CachedNetworkImageProvider(imageUrl,
+                                  headers: {'User-Agent': AppConfig.userAgent}),
                               fit: BoxFit.fill,
                             )),
                       Expanded(

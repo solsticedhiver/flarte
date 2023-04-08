@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flarte/api.dart';
+import 'package:flarte/config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -426,7 +427,14 @@ class CarouselList extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Image(
-                                  image: CachedNetworkImageProvider(imageUrl),
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      SizedBox(
+                                          width: _imageWidth,
+                                          height: _imageHeight),
+                                  image: CachedNetworkImageProvider(imageUrl,
+                                      headers: {
+                                        'User-Agent': AppConfig.userAgent
+                                      }),
                                   height: _imageHeight,
                                   width: _imageWidth,
                                 ),
