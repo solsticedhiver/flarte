@@ -183,7 +183,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                           onTap: () {
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (context) {
-                              return FlarteSettings();
+                              return const FlarteSettings();
                             }));
                           },
                         ),
@@ -368,16 +368,13 @@ class CarouselList extends StatelessWidget {
   }
 
   void _showDialogProgram(BuildContext context, Map<String, dynamic> v) {
-    final lang = Provider.of<LocaleModel>(context, listen: false)
-        .getCurrentLocale(context)
-        .languageCode;
     showDialog(
         context: context,
         builder: (context) {
           return Dialog(
               elevation: 8.0,
               child: SizedBox(
-                  width: min(MediaQuery.of(context).size.width - 100, 600),
+                  width: min(MediaQuery.of(context).size.width, 600),
                   child: ShowDetail(video: v)));
         });
   }
@@ -711,10 +708,6 @@ class _ShowListState extends State<ShowList> {
 
   @override
   Widget build(BuildContext context) {
-    final lang = Provider.of<LocaleModel>(context, listen: false)
-        .getCurrentLocale(context)
-        .languageCode;
-
     return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
       SizedBox(
           width: 450,

@@ -652,7 +652,7 @@ class _ShowDetailState extends State<ShowDetail> {
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(AppLocalizations.of(context)!.strCopiedClipboard,
-          style: TextStyle(color: Colors.white)),
+          style: const TextStyle(color: Colors.white)),
       backgroundColor: Colors.black87,
       behavior: SnackBarBehavior.floating,
     ));
