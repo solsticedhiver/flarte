@@ -75,14 +75,14 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
             String description = content['fullDescription'] ?? '';
             String shortDescription = content['shortDescription'] ?? '';
             if (description.isEmpty) {
-              description = shortDescription.trim();
+              description = shortDescription;
               shortDescription = '';
             }
             description = description.trim();
             if (!description.startsWith('<p>')) {
               description = '<p>$description</p>';
             }
-            shortDescription = _removeTag(shortDescription);
+            shortDescription = _removeTag(shortDescription).trim();
             final imageUrl =
                 '${content['mainImage']['url'].replaceFirst('__SIZE__', '300x450')}?type=TEXT';
             bool showImage = MediaQuery.of(context).size.width > 1280;
