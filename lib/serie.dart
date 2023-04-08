@@ -7,6 +7,7 @@ import 'package:flarte/main.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as parser;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'detail.dart';
 
@@ -165,7 +166,7 @@ class _SerieScreenState extends State<SerieScreen> {
                 )));
       }
     } else {
-      body = const SizedBox.shrink();
+      body = Center(child: Text(AppLocalizations.of(context)!.strFetching));
     }
 
     return Scaffold(appBar: AppBar(title: Text(widget.title)), body: body);

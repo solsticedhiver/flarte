@@ -617,6 +617,7 @@ class _ShowDetailState extends State<ShowDetail> {
                           widget.video['kind']['isCollection']
                               ? TextButton(
                                   onPressed: () {
+                                    Navigator.pop(context);
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(

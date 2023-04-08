@@ -162,7 +162,6 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                             child: Html(
                                                 data: description,
                                                 tagsList: Html.tags,
-                                                //Optional parameters:
                                                 style: {
                                           'p': Style(
                                               letterSpacing: 1.0,
@@ -172,8 +171,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                               fontSize: FontSize.medium),
                                           'strong': Style(
                                               fontWeight: FontWeight.bold,
-                                              fontSize: FontSize.larger,
-                                              after: '\n')
+                                              fontSize: FontSize.larger),
                                         }))),
                                   ]))),
                       Expanded(
@@ -219,7 +217,8 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                           ))),
                     ])));
           } else {
-            return const SizedBox.shrink();
+            return Center(
+                child: Text(AppLocalizations.of(context)!.strFetching));
           }
         },
       ),
