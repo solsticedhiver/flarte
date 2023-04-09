@@ -78,6 +78,14 @@ class _ShowDetailState extends State<ShowDetail> {
     });
   }
 
+  void _showMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message, style: const TextStyle(color: Colors.white)),
+      backgroundColor: Colors.black87,
+      behavior: SnackBarBehavior.floating,
+    ));
+  }
+
   void _getFormats() async {
     // directly parse the .m3u8 to get the bandwidth value to pass to libmpv backend
     final resp = await http.get(Uri.parse(selectedVersion.url),
@@ -204,13 +212,8 @@ class _ShowDetailState extends State<ShowDetail> {
     }
     if (result.exitCode != 0) {
       debugPrint(result.stderr);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(
-            'Erreur de téléchargement de ${widget.video['programId']} avec yt-dlp',
-            style: const TextStyle(color: Colors.white)),
-        backgroundColor: Colors.black87,
-        behavior: SnackBarBehavior.floating,
-      ));
+      _showMessage(context,
+          'Error downloading video ${widget.video['programId']} with yt-dlp');
       return;
     }
   }
@@ -318,18 +321,18 @@ class _ShowDetailState extends State<ShowDetail> {
         cmd =
             '$ffmpeg -i $videoFilename -i $audioFilename -i $subFilename -map 0:v -map 1:a -map 2:s -c:v copy -c:a copy -c:s mov_text $outputFilename';
       }
-      message = 'Téléchargement de ${widget.video['programId']} terminé';
+      message = 'Download of video ${widget.video['programId']} finished';
       if (cmd.isNotEmpty) {
         final result =
             await mgr.run(cmd.split(' '), workingDirectory: workingDirectory);
         if (result.exitCode != 0) {
           debugPrint(
               'Failed to combine video/audio/subtitle for ${widget.video['programId']}\n${result.stderr}');
-          message = 'Erreur téléchargement de ${widget.video['programId']}';
+          message = 'Error downloading video ${widget.video['programId']}';
         } else {
           debugPrint(
               'Finished combining video/audio/subtitle for ${widget.video['programId']}');
-          message = 'Téléchargement de ${widget.video['programId']} terminé';
+          message = 'Download of video ${widget.video['programId']} finished';
         }
       }
       if (stream.audio != null && audioFilename.isNotEmpty) {
@@ -342,14 +345,10 @@ class _ShowDetailState extends State<ShowDetail> {
     } catch (e) {
       debugPrint(e.toString());
       message =
-          'Erreur de téléchargement de ${widget.video['programId']} avec ffmpeg';
+          'Error downloading video ${widget.video['programId']} with ffmpeg';
     }
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(message, style: const TextStyle(color: Colors.white)),
-        backgroundColor: Colors.black87,
-        behavior: SnackBarBehavior.floating,
-      ));
+      _showMessage(context, message);
     }
   }
 
@@ -361,37 +360,49 @@ class _ShowDetailState extends State<ShowDetail> {
     } else if (Platform.isWindows) {
       String? programFiles = Platform.environment['ProgramFiles'];
       if (programFiles == null || programFiles.isEmpty) {
-        debugPrint('%ProgramFiles% is empty');
+        _showMessage(context, '%ProgramFiles% is empty');
         return;
       }
       binary = path.join(programFiles, 'VideoLAN', 'VLC', 'vlc.exe');
       if (!File(binary).existsSync()) {
-        debugPrint('$binary not found');
+        _showMessage(context, '$binary not found');
         // try in Program Files (x86)
         programFiles = Platform.environment['ProgramFiles(x86)'];
         if (programFiles == null || programFiles.isEmpty) {
-          debugPrint('%ProgramFiles(x86)% is empty');
+          _showMessage(context, '%ProgramFiles(x86)% is empty');
           return;
         }
         binary = path.join(programFiles, 'VideoLAN', 'VLC', 'vlc.exe');
         if (!File(binary).existsSync()) {
-          debugPrint('$binary not found either');
+          _showMessage(context, '$binary not found');
           return;
         }
       }
     } else {
       return;
     }
-    List<String> cmd = [
-      binary,
-      '--play-and-exit',
-      '--http-user-agent',
-      'User-Agent: ${AppConfig.userAgent}',
-      '--quiet',
-      '--adaptive-maxheight',
-      selectedFormat.resolution.split('x').last,
-      selectedVersion.url
-    ];
+    List<String> cmd;
+    if (Platform.isWindows) {
+      cmd = [
+        binary,
+        '--play-and-exit',
+        '--quiet',
+        '--http-user-agent="${AppConfig.userAgent}"',
+        '--adaptive-maxheight="${selectedFormat.resolution.split('x').last}"',
+        selectedVersion.url
+      ];
+    } else {
+      cmd = [
+        binary,
+        '--play-and-exit',
+        '--quiet',
+        '--http-user-agent',
+        AppConfig.userAgent,
+        '--adaptive-maxheight',
+        selectedFormat.resolution.split('x').last,
+        selectedVersion.url
+      ];
+    }
     /*
     if (Platform.isWindows) {
       cmd.insertAll(1, [
@@ -401,10 +412,16 @@ class _ShowDetailState extends State<ShowDetail> {
       ]);
     }
     */
-    ProcessResult result = await mgr.run(cmd);
-    if (result.exitCode != 0) {
-      debugPrint(result.stderr);
-      return;
+    try {
+      ProcessResult result = await mgr.run(cmd);
+      if (result.exitCode != 0) {
+        //debugPrint(result.stderr);
+        _showMessage(context, 'Error: ${result.stderr}');
+        return;
+      }
+    } on ProcessException catch (e) {
+      //debugPrint('ProcessException: ${e.message}');
+      _showMessage(context, 'Error: ${e.message}');
     }
   }
 
