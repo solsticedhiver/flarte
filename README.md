@@ -18,20 +18,24 @@ Will be configurable, once settings dialog is done.
 There are currently 2 archives with precompiled binaries:
 
 - windows_x64.zip:  needs *ffmpeg.exe* (preferably in same directory as *flarte.exe*) to be able to download videos.
-- linux_x64.tar.gz: this is built on an *Ubuntu 22.04* and expects *libmpv.so.1* to be present. Otherwise, you will have to compile it yourself with the *flutter* SDK.
+- linux_x64.tar.gz: this is built on an *Ubuntu 22.04* VM and expects *libmpv.so.1* to be present. If you have a more *recent mpv version* (with libmpv.so.2), you will have to build *flarte* with `flutter build`
+
+## Building and running
+
+To build and run yourself the app, once the flutter SDK is installed, you simply run `flutter run` in the directory of the source code.
 
 ## Known issues
 
-Embedded player is sub-optimal (based on mpv/libmpv):
+Embedded player is sub-optimal (based on mpv/libmpv), because of the following:
+
 - no sound on some videos (ffmpeg bug)
 - seeking (forward/backward) does not always work
-- bug: download is aborted if dialog is closed
 
-Using an external [c]vlc instance will be an option, once settings will be done. This will fix only the first issue, though :-(
+Using an external [c]vlc instance is an alternative but this is a work-around for only the first issue, though :-(
 
 ## TODO
 
-- settings dialog/route
 - better control for player (fullscreen, sound)
-- make it usable on android tablet/phone?
+- text only mode
+- cast to chromecast on android
 - add france.tv and other network?
