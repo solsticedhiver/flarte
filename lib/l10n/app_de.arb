@@ -35,5 +35,6 @@
     "strGenre": "Genre",
     "strDetails": "Einzelheiten",
     "strFrom": "vom",
-    "strTo": "bis"
+    "strTo": "bis",
+    "strFirstBroadcastDate": "Erstausstrahlungsdatum"
 }

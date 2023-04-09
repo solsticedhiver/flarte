@@ -35,5 +35,6 @@
     "strGenre": "Genre",
     "strDetails": "Details",
     "strFrom": "from",
-    "strTo": "to"
+    "strTo": "to",
+    "strFirstBroadcastDate": "First broadcast date"
 }

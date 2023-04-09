@@ -86,18 +86,18 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
             final imageUrl =
                 '${content['mainImage']['url'].replaceFirst('__SIZE__', '300x450')}?type=TEXT';
             bool showImage = MediaQuery.of(context).size.width > 1280;
-            final availabilityStart = DateFormat.yMd(
-                    Provider.of<LocaleModel>(context, listen: false)
-                        .getCurrentLocale(context)
-                        .toString())
-                .format(
-                    DateTime.parse(content['availability']['start']).toLocal());
-            final availabilityEnd = DateFormat.yMd(
-                    Provider.of<LocaleModel>(context, listen: false)
-                        .getCurrentLocale(context)
-                        .toString())
-                .format(
-                    DateTime.parse(content['availability']['end']).toLocal());
+            Locale locale = Provider.of<LocaleModel>(context, listen: false)
+                .getCurrentLocale(context);
+            DateFormat dateFormat = DateFormat.yMd(locale.toString());
+            final availabilityStart = dateFormat.format(
+                DateTime.parse(content['availability']['start']).toLocal());
+            final availabilityEnd = dateFormat.format(
+                DateTime.parse(content['availability']['end']).toLocal());
+            String firstBroadcastDate = '';
+            if (content['firstBroadcastDate'] != null) {
+              firstBroadcastDate = dateFormat.format(
+                  DateTime.parse(content['firstBroadcastDate']).toLocal());
+            }
             List<Widget> credits = [];
             for (var c in content['credits']) {
               credits.addAll(
@@ -199,6 +199,17 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                     flex: 1,
                                     child: Text('${content['durationLabel']}'))
                               ]),
+                              if (firstBroadcastDate.isNotEmpty) ...[
+                                const SizedBox(height: 10),
+                                Row(children: [
+                                  Expanded(
+                                      flex: 1,
+                                      child: Text(AppLocalizations.of(context)!
+                                          .strFirstBroadcastDate)),
+                                  Expanded(
+                                      flex: 1, child: Text(firstBroadcastDate))
+                                ])
+                              ],
                               const SizedBox(height: 10),
                               Row(children: [
                                 Expanded(

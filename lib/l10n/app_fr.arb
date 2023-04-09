@@ -35,5 +35,6 @@
     "strGenre": "Genre",
     "strDetails": "Détails",
     "strFrom": "du",
-    "strTo": "au"
+    "strTo": "au",
+    "strFirstBroadcastDate": "Date 1ère diffusion"
 }
