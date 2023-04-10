@@ -9,6 +9,7 @@ import 'package:html/parser.dart' as parser;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'detail.dart';
+import 'fulldetail.dart';
 
 class SerieScreen extends StatefulWidget {
   final String title;
@@ -119,7 +120,12 @@ class _SerieScreenState extends State<SerieScreen> {
                     VideoData v = VideoData.fromJson(t);
                     return InkWell(
                         onTap: () {
-                          _showDialogProgram(context, v);
+                          //_showDialogProgram(context, Video.fromJson(t));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => FullDetailScreen(
+                                      programId: t.programId)));
                         },
                         child: VideoCard(
                             video: v,

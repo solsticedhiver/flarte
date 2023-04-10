@@ -13,8 +13,10 @@ import 'package:window_manager/window_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'detail.dart';
+import 'fulldetail.dart';
 import 'settings.dart';
 import 'search.dart';
+import 'serie.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -505,7 +507,15 @@ class CarouselList extends StatelessWidget {
             children: videos.map((v) {
               return InkWell(
                 onTap: () {
-                  _showDialogProgram(context, v);
+                  //_showDialogProgram(context, v);
+                  StatefulWidget screen;
+                  if (v.isCollection) {
+                    screen = SerieScreen(title: v.title, url: v.url);
+                  } else {
+                    screen = FullDetailScreen(programId: v.programId);
+                  }
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => screen));
                 },
                 child: VideoCard(video: v, size: size),
               );
