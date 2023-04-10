@@ -63,7 +63,7 @@ class _ShowDetailState extends State<ShowDetail> {
             shortLabel: v['shortLabel'], label: v['label'], url: s['url']));
       }
       debugPrint(cv.toString());
-      if (cv.isNotEmpty) {
+      if (cv.isNotEmpty && mounted) {
         setState(() {
           versions.clear();
           versions.addAll(cv);
@@ -113,7 +113,7 @@ class _ShowDetailState extends State<ShowDetail> {
       }
     }
     debugPrint(tf.toString());
-    if (tf.isNotEmpty) {
+    if (tf.isNotEmpty && mounted) {
       setState(() {
         formats.clear();
         formats.addAll(tf);
@@ -413,6 +413,8 @@ class _ShowDetailState extends State<ShowDetail> {
     }
     */
     try {
+      _showMessage(context,
+          'Launching external [c]vlc instance to read video ${widget.video['programId']}');
       ProcessResult result = await mgr.run(cmd);
       if (result.exitCode != 0) {
         //debugPrint(result.stderr);
