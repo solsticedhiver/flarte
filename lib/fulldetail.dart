@@ -126,13 +126,15 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                       if (showImage)
                         Expanded(
                             flex: 1,
-                            child: Image(
+                            child: Center(
+                                child: SizedBox.expand(
+                                    child: Image(
                               errorBuilder: (context, error, stackTrace) =>
                                   const SizedBox.shrink(),
                               image: CachedNetworkImageProvider(imageUrl,
                                   headers: {'User-Agent': AppConfig.userAgent}),
-                              fit: BoxFit.contain,
-                            )),
+                              fit: BoxFit.fitWidth,
+                            )))),
                       Expanded(
                           flex: 2,
                           child: Container(
@@ -163,6 +165,41 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                               .textTheme
                                               .titleLarge),
                                     const SizedBox(height: 10),
+                                    Row(children: [
+                                      Chip(
+                                        backgroundColor:
+                                            Theme.of(context).primaryColor,
+                                        label: Text(content['kind']['label']),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      if (!content['kind']['isCollection'] &&
+                                          content['durationLabel'] != null)
+                                        Chip(
+                                          backgroundColor:
+                                              Theme.of(context).primaryColor,
+                                          label: Text(content['durationLabel']),
+                                        ),
+                                    ]),
+                                    const SizedBox(height: 10),
+                                    content['kind']['isCollection']
+                                        ? const SizedBox.shrink()
+                                        : Row(children: [
+                                            IconButton(
+                                              icon:
+                                                  const Icon(Icons.play_arrow),
+                                              onPressed: null,
+                                            ),
+                                            const SizedBox(width: 24),
+                                            IconButton(
+                                              icon: const Icon(Icons.download),
+                                              onPressed: null,
+                                            ),
+                                            const SizedBox(width: 24),
+                                            IconButton(
+                                              icon: const Icon(Icons.copy),
+                                              onPressed: null,
+                                            ),
+                                          ]),
                                     Flexible(
                                         child: SingleChildScrollView(
                                             child: Html(
@@ -182,8 +219,9 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                   ]))),
                       Expanded(
                           flex: 1,
-                          child: SingleChildScrollView(
-                              child: Column(
+                          child: Center(
+                              child: SingleChildScrollView(
+                                  child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -253,7 +291,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                               const SizedBox(height: 10),
                               ...credits,
                             ],
-                          ))),
+                          )))),
                     ])));
           } else {
             return Center(
