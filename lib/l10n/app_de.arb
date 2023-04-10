@@ -36,5 +36,6 @@
     "strDetails": "Einzelheiten",
     "strFrom": "vom",
     "strTo": "bis",
-    "strFirstBroadcastDate": "Erstausstrahlungsdatum"
+    "strFirstBroadcastDate": "Erstausstrahlungsdatum",
+    "strNothingDisplay": "Nichts zu zeigen"
 }

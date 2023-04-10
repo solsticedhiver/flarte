@@ -36,5 +36,6 @@
     "strDetails": "Détails",
     "strFrom": "du",
     "strTo": "au",
-    "strFirstBroadcastDate": "Date 1ère diffusion"
+    "strFirstBroadcastDate": "Date 1ère diffusion",
+    "strNothingDisplay": "Rien à afficher"
 }

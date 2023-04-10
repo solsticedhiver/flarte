@@ -14,7 +14,7 @@ class Cache extends ChangeNotifier {
       return;
     }
     debugPrint(
-        '${DateTime.now().toIso8601String().substring(11, 19)}: in Cache.fetch($key)');
+        '${DateTime.now().toIso8601String().substring(11, 19)}: in Cache.fetch($key, $lang)');
 
     final String url =
         "https://www.arte.tv/api/rproxy/emac/v4/$lang/web/pages/$key/";
@@ -29,7 +29,6 @@ class Cache extends ChangeNotifier {
 
   Future<Map<String, dynamic>> get(String key, String lang) async {
     final cacheKey = '$key-$lang';
-    debugPrint(cacheKey);
     if (!data.keys.contains(cacheKey) || !data[cacheKey].isEmpty) {
       await fetch(key, lang);
     }

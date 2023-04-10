@@ -480,7 +480,8 @@ class CarouselList extends StatelessWidget {
                     },
                   )
                 : Center(
-                    child: Text(AppLocalizations.of(context)!.strFetching))));
+                    child: Text(
+                        AppLocalizations.of(context)!.strNothingDisplay))));
   }
 }
 

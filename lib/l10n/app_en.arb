@@ -36,5 +36,6 @@
     "strDetails": "Details",
     "strFrom": "from",
     "strTo": "to",
-    "strFirstBroadcastDate": "First broadcast date"
+    "strFirstBroadcastDate": "First broadcast date",
+    "strNothingDisplay": "Nothing to display"
 }
