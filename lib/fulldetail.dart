@@ -127,7 +127,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                   const SizedBox.shrink(),
                               image: CachedNetworkImageProvider(imageUrl,
                                   headers: {'User-Agent': AppConfig.userAgent}),
-                              fit: BoxFit.fill,
+                              fit: BoxFit.contain,
                             )),
                       Expanded(
                           flex: 2,
