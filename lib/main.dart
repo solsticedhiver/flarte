@@ -282,8 +282,12 @@ class _CarouselState extends State<Carousel> {
                       ? null
                       : () {
                           final box = context.findRenderObject() as RenderBox;
+                          double scrollWidth = widget._width;
+                          while (scrollWidth + widget._width < box.size.width) {
+                            scrollWidth += widget._width;
+                          }
                           _controller.animateTo(
-                              _controller.offset - box.size.width,
+                              _controller.offset - scrollWidth,
                               duration: const Duration(milliseconds: 500),
                               curve: Curves.easeInOut);
                           setState(() {
@@ -314,8 +318,12 @@ class _CarouselState extends State<Carousel> {
                       ? null
                       : () {
                           final box = context.findRenderObject() as RenderBox;
+                          double scrollWidth = widget._width;
+                          while (scrollWidth + widget._width < box.size.width) {
+                            scrollWidth += widget._width;
+                          }
                           _controller.animateTo(
-                              _controller.offset + box.size.width,
+                              _controller.offset + scrollWidth,
                               duration: const Duration(milliseconds: 500),
                               curve: Curves.easeInOut);
                           setState(() {
