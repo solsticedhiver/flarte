@@ -61,13 +61,7 @@ class _FlarteSettingsState extends State<FlarteSettings> {
 
     _setPlayerString();
 
-    final qualityStringList = [
-      'usually 216p',
-      'usually 360p',
-      'usually 432p',
-      'usually 720p',
-      'usually 1080p'
-    ];
+    final qualityStringList = ['216p', '360p', '432p', '720p', '1080p'];
 
     int qualityIndex = AppConfig.playerIndexQuality;
     _qualityString = qualityStringList[qualityIndex];
@@ -223,7 +217,7 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                         final ptn = {
                           PlayerTypeName.embedded:
                               AppLocalizations.of(context)!.strEmbedded,
-                          PlayerTypeName.vlc: 'vlc',
+                          PlayerTypeName.vlc: 'VLC',
                           PlayerTypeName.custom:
                               AppLocalizations.of(context)!.strCustom
                         };
