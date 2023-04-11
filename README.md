@@ -24,15 +24,6 @@ There are currently 2 archives with precompiled binaries:
 
 To build and run yourself the app, once the flutter SDK is installed, you simply run `flutter run` in the directory of the source code.
 
-## Known issues
-
-Embedded player is sub-optimal (based on mpv/libmpv), because of the following:
-
-- no sound on some videos (ffmpeg bug)
-- seeking (forward/backward) does not always work
-
-Using an external [c]vlc instance is an alternative but this is a work-around for only the first issue, though :-(
-
 ## TODO
 
 - better control for player (fullscreen, sound)
