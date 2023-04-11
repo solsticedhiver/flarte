@@ -42,3 +42,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+/AppImage.d
+/pubspec.lock
+.vscode/launch.json
+test/widget_test.dart
