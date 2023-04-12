@@ -8,7 +8,6 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:process/process.dart';
 import 'package:provider/provider.dart';
-import 'package:xdg_directories/xdg_directories.dart';
 import 'package:path/path.dart' as path;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:path_provider/path_provider.dart';
@@ -143,26 +142,6 @@ class _ShowDetailState extends State<ShowDetail> {
     }
   }
 
-  String _dlDirectory() {
-    String workingDirectory = '';
-
-    if (Platform.isLinux) {
-      // download with yt-dlp in $XDG_DOWNLOAD_DIR if defined, else $HOME
-      Directory? downloadDir = getUserDirectory('DOWNLOAD');
-      if (downloadDir == null) {
-        workingDirectory = const String.fromEnvironment('HOME');
-      } else {
-        workingDirectory = downloadDir.path;
-      }
-    } else if (Platform.isWindows) {
-      // download to %USERPORFILE%\Downloads
-      workingDirectory =
-          path.join(Platform.environment['USERPROFILE']!, 'Downloads');
-    }
-    debugPrint('workingDirectory: $workingDirectory');
-    return workingDirectory;
-  }
-
   String _outputFilename() {
     return "${widget.video['programId']}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat.resolution}.mp4";
   }
@@ -210,7 +189,7 @@ class _ShowDetailState extends State<ShowDetail> {
         _outputFilename(),
         selectedVersion.url
       ];
-      result = await mgr.run(cmd, workingDirectory: _dlDirectory());
+      result = await mgr.run(cmd, workingDirectory: AppConfig.dlDirectory);
     }
     if (result.exitCode != 0) {
       debugPrint(result.stderr);
@@ -260,7 +239,7 @@ class _ShowDetailState extends State<ShowDetail> {
     } else if (!Platform.isLinux) {
       return;
     }
-    final workingDirectory = _dlDirectory();
+    final workingDirectory = AppConfig.dlDirectory;
     final videoFilename =
         stream.video.toString().split('/').last.replaceFirst('m3u8', 'mp4');
     String audioFilename = '';
