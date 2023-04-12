@@ -13,6 +13,7 @@ import 'package:window_manager/window_manager.dart';
 
 import 'detail.dart';
 import 'settings.dart';
+import 'search.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -136,6 +137,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     double padding = 10;
     if (MediaQuery.of(context).size.height < 720) {
       padding = 5;
+      if (MediaQuery.of(context).size.height < 640) {
+        padding = 0;
+      }
     }
 
     // WARNING: this should match the order of categories in _CategoriesListState
@@ -176,6 +180,24 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                   controller: _tabController,
                                   lang: lang);
                             })),
+                        ListTile(
+                          selectedTileColor: Theme.of(context).highlightColor,
+                          contentPadding: EdgeInsets.only(
+                            left: 25,
+                            top: padding,
+                          ),
+                          minLeadingWidth: 30,
+                          leading: const Icon(Icons.search),
+                          title: leftSideWidth != 64
+                              ? Text(AppLocalizations.of(context)!.strSearch)
+                              : null,
+                          onTap: () {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) {
+                              return const SearchScreen();
+                            }));
+                          },
+                        ),
                         ListTile(
                           selectedTileColor: Theme.of(context).highlightColor,
                           contentPadding: EdgeInsets.only(

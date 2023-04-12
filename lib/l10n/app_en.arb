@@ -37,5 +37,6 @@
     "strFrom": "from",
     "strTo": "to",
     "strFirstBroadcastDate": "First broadcast date",
-    "strNothingDisplay": "Nothing to display"
+    "strNothingDisplay": "Nothing to display",
+    "strSearch": "Search"
 }
