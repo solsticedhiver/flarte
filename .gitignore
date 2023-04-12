@@ -47,4 +47,8 @@ app.*.map.json
 /pubspec.lock
 .vscode/launch.json
 test/widget_test.dart
-/flatpak
+/flatpak/build-dir
+/flatpak/repo.d
+/flatpak/flarte*.flatpak
+/flatpak/.flatpak-builder/
+/flatpak/flarte.tar.gz

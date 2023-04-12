@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.solsticedhiver.flarte</id>
+  
+  <name>Flarte</name>
+  <summary>View and download videos from arte.tv catch up TV site</summary>
+  
+  <metadata_license>MIT</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  
+  <description>
+    <p>
+      View and download videos from arte.tv catch up TV site
+    </p>
+  </description>
+  
+  <launchable type="desktop-id">io.github.solsticedhiver.flarte.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://cdn.githubraw.com/solsticedhiver/flarte/main/screenshots/20230324-flarte.png</image>
+    </screenshot>
+  </screenshots>
+</component>

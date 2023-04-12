@@ -1,0 +1,89 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/flatpak/flatpak-builder/main/data/flatpak-manifest.schema.json
+
+---
+app-id: io.github.solsticedhiver.flarte
+runtime: org.freedesktop.Platform
+runtime-version: "22.08"
+sdk: org.freedesktop.Sdk
+command: flarte
+separate-locales: false
+finish-args:
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --device=dri
+  - --socket=pulseaudio
+  - --share=network
+  #- --filesystem=/usr/bin/cvlc:ro
+  - --filesystem=xdg-download
+modules:
+  - name: ffmpeg
+    cleanup:
+      - '/include'
+      - '/lib/pkgconfig'
+      - '/share/ffmpeg/examples'
+    config-opts:
+      - --enable-shared
+      - --disable-static
+      - --enable-gnutls
+      - --disable-doc
+      - --enable-encoder=png
+      - --disable-libv4l2
+      - --enable-libdav1d
+    sources:
+      - type: git
+        url: https://github.com/FFmpeg/FFmpeg.git
+        tag: n6.0
+
+  - name: libass
+    cleanup:
+      - '/include'
+      - '/lib/*.la'
+      - '/lib/pkgconfig'
+    config-opts:
+      - --disable-static
+    sources:
+      - type: git
+        url: https://github.com/libass/libass.git
+        tag: 0.17.1
+
+  - name: libmpv
+    cleanup:
+    - '/include'
+    - '/lib/pkgconfig'
+    - '/share/name'
+    buildsystem: simple
+    build-commands:
+      - python3 waf configure --prefix=/app --enable-libmpv-shared --disable-cplayer --disable-build-date --disable-alsa
+      - python3 waf build
+      - python3 waf install
+    sources:
+      - type: git
+        url: https://github.com/mpv-player/mpv.git
+        tag: v0.35.1
+      - type: file
+        url: https://waf.io/waf-2.0.25
+        sha256: 21199cd220ccf60434133e1fd2ab8c8e5217c3799199c82722543970dc8e38d5
+        dest-filename: waf
+    
+  - name: Flarte
+    buildsystem: simple
+    only-arches:
+      - x86_64
+    build-commands:
+      - mkdir -p /app/bin
+      - tar xzf flarte.tar.gz -C /app
+      - ln -s /app/flarte /app/bin/flarte
+      - mkdir -p /app/share/{metainfo,applications,icons/hicolor/256x256/apps}
+      - cp io.github.solsticedhiver.flarte.png /app/share/icons/hicolor/256x256/apps
+      - cp io.github.solsticedhiver.flarte.desktop /app/share/applications/
+      - cp io.github.solsticedhiver.flarte.metainfo.xml /app/share/metainfo/
+    sources:
+      - type: file
+        path: flarte.tar.gz
+      - type: file
+        path: io.github.solsticedhiver.flarte.png
+      - type: file
+        path: io.github.solsticedhiver.flarte.metainfo.xml
+      - type: file
+        path: io.github.solsticedhiver.flarte.desktop

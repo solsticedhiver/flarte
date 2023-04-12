@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+
+Name=Flarte
+Comment=View and download videos from arte.tv catch up TV site
+Categories=AudioVideo;TV;
+
+Icon=io.github.solsticedhiver.flarte
+Exec=flarte
+Terminal=false
