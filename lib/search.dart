@@ -29,3 +29,5 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 }
+
+// https://www.arte.tv/api/rproxy/emac/v4/fr/web/pages/SEARCH/?page=1&query=test
