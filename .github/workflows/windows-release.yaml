@@ -35,12 +35,15 @@ jobs:
     #- run: flutter test
     - run: flutter config --enable-windows-desktop
     - run: flutter build windows --release
+    - name: rename main folder
+      run: mv build/windows/runner/Release build/windows/runner/flarte
+      shell: bash
     - name: Archive Release
       uses: thedoctor0/zip-release@0.7.1
       with:
         type: 'zip'
         directory: 'build/windows/runner/'
-        path: 'Release'
+        path: 'flarte'
         filename: 'windows_x64.zip'
     - name: Create a Release in GitHub
       uses: ncipollo/release-action@v1
