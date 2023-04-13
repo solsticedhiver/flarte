@@ -47,3 +47,4 @@ app.*.map.json
 /pubspec.lock
 .vscode/launch.json
 test/widget_test.dart
+/flatpak
