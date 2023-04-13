@@ -20,4 +20,8 @@
       <image>https://cdn.githubraw.com/solsticedhiver/flarte/main/screenshots/20230324-flarte.png</image>
     </screenshot>
   </screenshots>
+
+  <url type="homepage">https://github.com/solsticedhiver/flarte</url>
+  <url type="bugtracker">https://github.com/solsticedhiver/flarte/issues</url>
+  <update_contact>solstice.dhiver@gmail.com</update_contact>
 </component>

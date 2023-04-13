@@ -17,7 +17,7 @@ flatpak-builder --ccache --force-clean build-dir io.github.solsticedhiver.flarte
 
 version=`grep ^version ../pubspec.yaml |cut -f 2 -d ' '|cut -f 1 -d '+'`
 sha=`git rev-parse --short main`
-rm flarte-*.flatpak
+rm -f flarte-*.flatpak
 # build flatpak single-file bundle
 echo ":: making flatpak single-file bundle: flarte-${version}-${sha}-x86_64.flatpak"
 flatpak build-export repo.d build-dir
