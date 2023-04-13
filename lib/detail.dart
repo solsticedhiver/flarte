@@ -50,9 +50,12 @@ class _ShowDetailState extends State<ShowDetail> {
       final resp = await http.get(Uri.parse(
           'https://api.arte.tv/api/player/v2/config/$lang/$programId'));
       Map<String, dynamic> jr = json.decode(resp.body);
-      if (jr['data'] == null) {
+      if (jr['data'] == null ||
+          jr['data']['attributes'] == null ||
+          jr['data']['attributes']['streams'] == null) {
         return;
       }
+      //debugPrint(json.encode(jr).toString());
       final streams = jr['data']['attributes']['streams'];
       //debugPrint(json.encode(streams).toString());
       List<Version> cv = [];

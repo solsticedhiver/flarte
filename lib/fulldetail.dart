@@ -89,10 +89,14 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
             Locale locale = Provider.of<LocaleModel>(context, listen: false)
                 .getCurrentLocale(context);
             DateFormat dateFormat = DateFormat.yMd(locale.toString());
-            final availabilityStart = dateFormat.format(
-                DateTime.parse(content['availability']['start']).toLocal());
-            final availabilityEnd = dateFormat.format(
-                DateTime.parse(content['availability']['end']).toLocal());
+            String availabilityStart = '';
+            String availabilityEnd = '';
+            if (content['availability'] != null) {
+              availabilityStart = dateFormat.format(
+                  DateTime.parse(content['availability']['start']).toLocal());
+              availabilityEnd = dateFormat.format(
+                  DateTime.parse(content['availability']['end']).toLocal());
+            }
             String firstBroadcastDate = '';
             if (content['firstBroadcastDate'] != null) {
               firstBroadcastDate = dateFormat.format(
@@ -210,17 +214,19 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                       flex: 1, child: Text(firstBroadcastDate))
                                 ])
                               ],
-                              const SizedBox(height: 10),
-                              Row(children: [
-                                Expanded(
-                                    flex: 1,
-                                    child: Text(AppLocalizations.of(context)!
-                                        .strAvailability)),
-                                Expanded(
-                                    flex: 1,
-                                    child: Text(
-                                        '${AppLocalizations.of(context)!.strFrom} $availabilityStart\n${AppLocalizations.of(context)!.strTo} $availabilityEnd'))
-                              ]),
+                              if (availabilityStart.isNotEmpty) ...[
+                                const SizedBox(height: 10),
+                                Row(children: [
+                                  Expanded(
+                                      flex: 1,
+                                      child: Text(AppLocalizations.of(context)!
+                                          .strAvailability)),
+                                  Expanded(
+                                      flex: 1,
+                                      child: Text(
+                                          '${AppLocalizations.of(context)!.strFrom} $availabilityStart\n${AppLocalizations.of(context)!.strTo} $availabilityEnd'))
+                                ])
+                              ],
                               const SizedBox(height: 10),
                               if (content['genre'] != null)
                                 Row(children: [
@@ -233,15 +239,17 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                       child:
                                           Text('${content['genre']['label']}'))
                                 ]),
-                              const SizedBox(height: 10),
-                              Row(children: [
-                                const Expanded(
-                                    flex: 1, child: Text('GeoBlocking')),
-                                Expanded(
-                                    flex: 1,
-                                    child: Text(
-                                        '${content['geoblocking']['code']}'))
-                              ]),
+                              if (content['geoblocking'] != null) ...[
+                                const SizedBox(height: 10),
+                                Row(children: [
+                                  const Expanded(
+                                      flex: 1, child: Text('GeoBlocking')),
+                                  Expanded(
+                                      flex: 1,
+                                      child: Text(
+                                          '${content['geoblocking']['code']}'))
+                                ])
+                              ],
                               const SizedBox(height: 10),
                               ...credits,
                             ],
