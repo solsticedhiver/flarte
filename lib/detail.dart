@@ -242,8 +242,9 @@ class _ShowDetailState extends State<ShowDetail> {
     } else if (!Platform.isLinux) {
       return;
     }
-    final workingDirectory = AppConfig.dlDirectory;
-    final videoFilename =
+    final cwd = AppConfig.dlDirectory;
+    debugPrint(cwd);
+    String videoFilename =
         stream.video.toString().split('/').last.replaceFirst('m3u8', 'mp4');
     String audioFilename = '';
     String subFilename = '';
@@ -257,7 +258,7 @@ class _ShowDetailState extends State<ShowDetail> {
       '-c',
       'copy',
       videoFilename
-    ], workingDirectory: workingDirectory);
+    ], workingDirectory: cwd);
     List<Future> tasks = [dlVideo];
     if (stream.audio != null) {
       audioFilename = stream.audio.toString().split('/').last;
@@ -271,47 +272,47 @@ class _ShowDetailState extends State<ShowDetail> {
         '-c',
         'copy',
         audioFilename
-      ], workingDirectory: workingDirectory);
+      ], workingDirectory: cwd);
       tasks.add(dlAudio);
     }
     String message;
+    String programId = widget.video['programId'];
     try {
       List responses = await Future.wait(tasks, eagerError: true);
-      /*
       if (responses[0].exitCode != 0) {
         debugPrint(responses[0].stderr);
-        throw (Exception('Erreur lors du téléchargement du flux video'));
+        throw (Exception('Error downloading video $programId'));
       }
-      if (stream.audio != null && responses[1] is ProcessResult && responses[1].exitCode != 0) {
+      if (stream.audio != null &&
+          responses[1] is ProcessResult &&
+          responses[1].exitCode != 0) {
         debugPrint(responses[0].stderr);
-        throw (Exception('Erreur lors du téléchargement du flux audio'));
+        throw (Exception('Error downloading audio $programId'));
       }
-      */
       // combine video/audio/subtitle together
-      final outputFilename = path.join(workingDirectory,
-          '${widget.video['programId']}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat.resolution}.mp4');
+      final outputFilename =
+          '${widget.video['programId']}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat.resolution}.mp4';
       debugPrint(outputFilename);
       final String cmd;
       if (stream.audio == null && stream.subtitle == null) {
-        await File(path.join(workingDirectory, videoFilename))
-            .rename(outputFilename);
+        await File(path.join(cwd, videoFilename))
+            .rename(path.join(cwd, outputFilename));
         cmd = '';
       } else if (stream.subtitle == null) {
         cmd =
             '$ffmpeg -i $videoFilename -i $audioFilename -map 0:v -map 1:a -c copy $outputFilename';
       } else {
         // WORKAROUND: because of ffmpeg bug #10169, remove all STYLE blocks in webvtt
-        subFilename = path.join(
-            workingDirectory, stream.subtitle.toString().split('/').last);
-        await _webvtt(stream.subtitle!, subFilename);
-        debugPrint(subFilename);
+        subFilename = stream.subtitle.toString().split('/').last;
+        final subn = path.join(cwd, subFilename);
+        await _webvtt(stream.subtitle!, subn);
+        debugPrint(subn);
         cmd =
             '$ffmpeg -i $videoFilename -i $audioFilename -i $subFilename -map 0:v -map 1:a -map 2:s -c:v copy -c:a copy -c:s mov_text $outputFilename';
       }
       message = 'Download of video ${widget.video['programId']} finished';
       if (cmd.isNotEmpty) {
-        final result =
-            await mgr.run(cmd.split(' '), workingDirectory: workingDirectory);
+        final result = await mgr.run(cmd.split(' '), workingDirectory: cwd);
         if (result.exitCode != 0) {
           debugPrint(
               'Failed to combine video/audio/subtitle for ${widget.video['programId']}\n${result.stderr}');
@@ -323,11 +324,13 @@ class _ShowDetailState extends State<ShowDetail> {
         }
       }
       if (stream.audio != null && audioFilename.isNotEmpty) {
-        await File(path.join(workingDirectory, audioFilename)).delete();
-        await File(path.join(workingDirectory, videoFilename)).delete();
+        await File(path.join(cwd, audioFilename)).delete();
       }
-      if (stream.subtitle != null) {
-        await File(subFilename).delete();
+      if (stream.subtitle != null && subFilename.isNotEmpty) {
+        await File(path.join(cwd, subFilename)).delete();
+      }
+      if (File(path.join(cwd, videoFilename)).existsSync()) {
+        await File(path.join(cwd, videoFilename)).delete();
       }
     } catch (e) {
       debugPrint(e.toString());
