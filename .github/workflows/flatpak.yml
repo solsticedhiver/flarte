@@ -1,0 +1,42 @@
+on:
+  push:
+    branches: [main]
+  pull_request:
+name: flatpak CI
+jobs:
+  version:
+    name: Create version number
+    runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.version.outputs.version }}
+    steps:
+    - uses: actions/checkout@v3
+    - name: Fetch all history for all tags and branches
+      run: |
+        git fetch --prune --depth=1000
+    - name: Create version
+      id: version
+      run: echo "version=v$(grep ^version pubspec.yaml |cut -f 2 -d ' '|cut -f 1 -d '+')" >> $GITHUB_OUTPUT
+  flatpak:
+    name: "Flatpak"
+    runs-on: ubuntu-latest
+    container:
+      image: bilelmoussaoui/flatpak-github-actions:gnome-44
+      options: --privileged
+    steps:
+    - uses: actions/checkout@v3
+    - uses: benjlevesque/short-sha@v2.2
+      id: short-sha
+    - uses: flatpak/flatpak-github-actions/flatpak-builder@v6.1
+      with:
+        bundle: flarte-${{ steps.short-sha.outputs.sha }}-x86_64.flatpak
+        manifest-path: flatpak/io.github.solsticedhiver.flarte.yml
+        cache-key: flatpak-builder-${{ github.sha }}
+    - name: Create a release in GitHub
+      uses: ncipollo/release-action@v1
+      with:
+        allowUpdates: true
+        artifacts: "flarte-${{ steps.short-sha.outputs.sha }}-x86_64.flatpak"
+        token: "${{ secrets.GH_TOKEN }}"
+        tag: "${{ needs.version.outputs.output1 }}"
+        commit: "${{ github.sha }}"
