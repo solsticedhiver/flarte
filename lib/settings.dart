@@ -34,24 +34,8 @@ class _FlarteSettingsState extends State<FlarteSettings> {
     super.dispose();
   }
 
-  void _setPlayerString() {
-    if (_playerTypeName == PlayerTypeName.custom) {
-      _playerString = AppLocalizations.of(context)!.strCustom;
-    } else if (_playerTypeName == PlayerTypeName.vlc) {
-      _playerString = 'vlc';
-    } else if (_playerTypeName == PlayerTypeName.embedded) {
-      _playerString = AppLocalizations.of(context)!.strEmbedded;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final Map<ThemeMode, String> themeModeString = {
-      ThemeMode.dark: AppLocalizations.of(context)!.strDark,
-      ThemeMode.light: AppLocalizations.of(context)!.strLight,
-      ThemeMode.system: AppLocalizations.of(context)!.strSystem,
-    };
-
     final Map<String, String> localeName = {
       'fr': AppLocalizations.of(context)!.strFrench,
       'de': AppLocalizations.of(context)!.strGerman,
@@ -59,10 +43,20 @@ class _FlarteSettingsState extends State<FlarteSettings> {
     };
     Locale? locale = Provider.of<LocaleModel>(context, listen: false).locale;
 
-    _setPlayerString();
+    final Map<ThemeMode, String> themeModeString = {
+      ThemeMode.dark: AppLocalizations.of(context)!.strDark,
+      ThemeMode.light: AppLocalizations.of(context)!.strLight,
+      ThemeMode.system: AppLocalizations.of(context)!.strSystem,
+    };
+
+    final Map<PlayerTypeName, String> playerString = {
+      PlayerTypeName.custom: AppLocalizations.of(context)!.strCustom,
+      PlayerTypeName.vlc: 'VLC',
+      PlayerTypeName.embedded: AppLocalizations.of(context)!.strEmbedded,
+    };
+    _playerString = playerString[_playerTypeName]!;
 
     final qualityStringList = ['216p', '360p', '432p', '720p', '1080p'];
-
     int qualityIndex = AppConfig.playerIndexQuality;
     _qualityString = qualityStringList[qualityIndex];
 
@@ -254,7 +248,7 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                         }));
                       });
                   setState(() {
-                    _setPlayerString();
+                    _playerString = playerString[_playerTypeName]!;
                   });
                   AppConfig.player = _playerTypeName;
                 },
