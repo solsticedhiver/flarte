@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flarte/api.dart';
 import 'package:flarte/config.dart';
 import 'package:flutter/material.dart';
@@ -211,15 +213,25 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                 title: Text(AppLocalizations.of(context)!.strPlayer),
                 value: Text(_playerString),
                 onPressed: (context) async {
-                  await showDialog<ThemeMode>(
+                  await showDialog<PlayerTypeName>(
                       context: context,
                       builder: (context) {
-                        final ptn = {
-                          PlayerTypeName.embedded:
-                              AppLocalizations.of(context)!.strEmbedded,
-                          PlayerTypeName.vlc: 'VLC',
-                          PlayerTypeName.custom:
-                              AppLocalizations.of(context)!.strCustom
+                        final Map<PlayerTypeName, Map<String, dynamic>> ptn = {
+                          PlayerTypeName.embedded: {
+                            'str': AppLocalizations.of(context)!.strEmbedded,
+                            'disabled': false
+                          },
+                          PlayerTypeName.vlc: {
+                            'str': 'VLC',
+                            // disable VLC choice when in flatpak
+                            'disabled':
+                                Platform.environment['FLATPAK_ID'] != null
+                          },
+                          PlayerTypeName.custom: {
+                            'str': AppLocalizations.of(context)!.strCustom,
+                            'disabled': true
+                            //Platform.environment['FLATPAK_ID'] != null
+                          },
                         };
                         return AlertDialog(content:
                             StatefulBuilder(builder: (context, setState) {
@@ -227,15 +239,17 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                               mainAxisSize: MainAxisSize.min,
                               children: ptn.entries.map((p) {
                                 return ListTile(
-                                    title: Text(p.value),
+                                    title: Text(p.value['str']),
                                     leading: Radio<PlayerTypeName>(
                                       value: p.key,
                                       groupValue: _playerTypeName,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _playerTypeName = value!;
-                                        });
-                                      },
+                                      onChanged: (!p.value['disabled'])
+                                          ? (value) {
+                                              setState(() {
+                                                _playerTypeName = value!;
+                                              });
+                                            }
+                                          : null,
                                     ));
                               }).toList());
                         }));
