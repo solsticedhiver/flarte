@@ -11,7 +11,7 @@ On *Windows*, excepts the binary *ffmpeg.exe* to be in flarte directory. Downloa
 
 On *Linux*, downloads to `$XDG_DOWNLOAD_DIR` if set else to `$HOME`.
 
-Will be configurable, once settings dialog is done.
+Will be configurable, once Settings dialog is finished.
 
 ## Release archives
 
@@ -26,7 +26,7 @@ To build and run yourself the app, once the flutter SDK is installed, you simply
 
 ## TODO
 
-- better control for player (fullscreen, sound)
-- text only mode
+- better control for embedded player (sound ?)
 - cast to chromecast on android
+- text only mode
 - add france.tv and other network?
