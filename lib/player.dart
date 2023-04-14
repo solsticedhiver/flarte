@@ -100,8 +100,44 @@ class MyScreenState extends State<MyScreen> {
             if (event.logicalKey.keyLabel == "Escape" && isFullScreen) {
               windowManager.setFullScreen(!isFullScreen);
               _isFullScreen = !isFullScreen;
-            } else if (event.logicalKey.keyLabel == " ") {
+            } else if (event.isKeyPressed(LogicalKeyboardKey.space)) {
               player.playOrPause();
+            } else if (event.isKeyPressed(LogicalKeyboardKey.arrowLeft)) {
+              final position = player.state.position -
+                  Duration(seconds: event.repeat ? 30 : 10);
+              if (position > Duration.zero) {
+                player.seek(position);
+              }
+            } else if (event.isKeyPressed(LogicalKeyboardKey.arrowRight)) {
+              final position = player.state.position +
+                  Duration(seconds: event.repeat ? 30 : 10);
+              if (position < player.state.duration) {
+                player.seek(position);
+              }
+            } else if (event.isKeyPressed(LogicalKeyboardKey.arrowUp)) {
+              final position = player.state.position -
+                  Duration(seconds: event.repeat ? 90 : 60);
+              if (position > Duration.zero) {
+                player.seek(position);
+              }
+            } else if (event.isKeyPressed(LogicalKeyboardKey.arrowDown)) {
+              final position = player.state.position +
+                  Duration(seconds: event.repeat ? 90 : 60);
+              if (position < player.state.duration) {
+                player.seek(position);
+              }
+            } else if (event.isKeyPressed(LogicalKeyboardKey.pageUp)) {
+              final position =
+                  player.state.position - const Duration(minutes: 5);
+              if (position > Duration.zero) {
+                player.seek(position);
+              }
+            } else if (event.isKeyPressed(LogicalKeyboardKey.pageDown)) {
+              final position =
+                  player.state.position + const Duration(minutes: 5);
+              if (position < player.state.duration) {
+                player.seek(position);
+              }
             }
           }
         },
@@ -112,6 +148,7 @@ class MyScreenState extends State<MyScreen> {
               children: [
                 Expanded(
                   child: InkWell(
+                      focusColor: Theme.of(context).canvasColor,
                       hoverColor: Theme.of(context).canvasColor,
                       onDoubleTap: () {
                         windowManager.setFullScreen(!isFullScreen);
