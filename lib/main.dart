@@ -328,13 +328,14 @@ class Carousel extends StatefulWidget {
 class _CarouselState extends State<Carousel> {
   final _controller = ScrollController();
 
-  bool isChevronRightVisible = true;
-  bool isChevronLeftVisible = true;
   bool isChevronRightEnabled = true;
   bool isChevronLeftEnabled = false;
 
   @override
   Widget build(BuildContext context) {
+    bool isChevronRightVisible = true;
+    bool isChevronLeftVisible = true;
+
     return LayoutBuilder(builder: (context, constraints) {
       if (285 * widget.children.length < constraints.maxWidth) {
         isChevronLeftVisible = false;
