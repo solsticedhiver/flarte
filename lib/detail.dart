@@ -21,11 +21,12 @@ import 'downloader.dart';
 
 class ShowDetail extends StatefulWidget {
   final Map<String, dynamic> video;
+  final bool imageTop;
 
   @override
   State<ShowDetail> createState() => _ShowDetailState();
 
-  const ShowDetail({super.key, required this.video});
+  const ShowDetail({super.key, required this.video, this.imageTop = false});
 }
 
 class _ShowDetailState extends State<ShowDetail> {
@@ -483,21 +484,34 @@ class _ShowDetailState extends State<ShowDetail> {
                       style: Theme.of(context).textTheme.titleMedium,
                     )
                   : const SizedBox.shrink(),
+              if (widget.imageTop) ...[
+                const SizedBox(height: 15),
+                Image(
+                  width: 400,
+                  height: 225,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const SizedBox(width: 400, height: 225),
+                  image: CachedNetworkImageProvider(imageUrl,
+                      headers: {'User-Agent': AppConfig.userAgent}),
+                )
+              ],
               const SizedBox(height: 15),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Image(
-                    width: 200,
-                    height: 300,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const SizedBox(width: 200, height: 300),
-                    image: CachedNetworkImageProvider(
-                        '${imageUrl.replaceFirst('400x225', '300x450')}?type=TEXT',
-                        headers: {'User-Agent': AppConfig.userAgent}),
-                  ),
+                  if (!widget.imageTop) ...[
+                    Image(
+                      width: 200,
+                      height: 300,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const SizedBox(width: 200, height: 300),
+                      image: CachedNetworkImageProvider(
+                          '${imageUrl.replaceFirst('400x225', '300x450')}?type=TEXT',
+                          headers: {'User-Agent': AppConfig.userAgent}),
+                    )
+                  ],
                   const SizedBox(width: 15),
                   Flexible(
                     child: Column(
@@ -648,7 +662,9 @@ class _ShowDetailState extends State<ShowDetail> {
                           widget.video['isCollection']
                               ? TextButton(
                                   onPressed: () {
-                                    Navigator.pop(context);
+                                    if (!widget.imageTop) {
+                                      Navigator.pop(context);
+                                    }
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -660,18 +676,20 @@ class _ShowDetailState extends State<ShowDetail> {
                                       .strEpisodes),
                                 )
                               : const SizedBox.shrink(),
-                          const SizedBox(height: 10),
-                          Row(children: [
-                            const Expanded(
-                                flex: 1, child: SizedBox(height: 10)),
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child:
-                                  Text(AppLocalizations.of(context)!.strClose),
-                            )
-                          ]),
+                          if (!widget.imageTop) ...[
+                            const SizedBox(height: 10),
+                            Row(children: [
+                              const Expanded(
+                                  flex: 1, child: SizedBox(height: 10)),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text(
+                                    AppLocalizations.of(context)!.strClose),
+                              )
+                            ])
+                          ],
                         ]),
                   )
                 ],

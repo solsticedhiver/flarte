@@ -270,7 +270,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
                                 return CarouselList(
-                                    data: snapshot.data!, size: carSize);
+                                    // or ZoneList()
+                                    data: snapshot.data!,
+                                    size: carSize);
                               } else {
                                 return Center(
                                     child: Text(AppLocalizations.of(context)!
@@ -694,33 +696,13 @@ class _CategoriesListState extends State<CategoriesList> {
 }
 
 class ZoneList extends StatefulWidget {
-  final Map<dynamic, dynamic> data;
-  final List<Map<String, dynamic>> _zones = [];
-  final CategoriesListSize size;
+  final List<dynamic> data;
+  final CarouselListSize size;
+  final List<dynamic> _zones = [];
 
   ZoneList(
-      {super.key, required this.data, this.size = CategoriesListSize.normal}) {
-    final List<dynamic> dvz;
-    List<Map<String, dynamic>> tmp = [];
-    if (data.isEmpty) {
-      dvz = [];
-    } else {
-      dvz = data['value']['zones'];
-    }
-    for (var z in dvz) {
-      final shows = z['content']['data'];
-      final programId = shows.where((v) => v['programId'] != null).toList();
-      if (shows.isEmpty ||
-          z['displayOptions']['template'].startsWith('event') ||
-          z['displayOptions']['template'].startsWith('single') ||
-          programId.isEmpty ||
-          shows.length == 1) {
-        //debugPrint('skipped ${z['title']}/${z['code']} (${videos.length})');
-        continue;
-      }
-      tmp.add({'title': z['title'], 'shows': shows});
-    }
-    _zones.addAll(tmp);
+      {super.key, required this.data, this.size = CarouselListSize.normal}) {
+    _zones.addAll(data);
   }
 
   @override
@@ -738,7 +720,7 @@ class _ZoneListState extends State<ZoneList> {
   @override
   Widget build(BuildContext context) {
     if (widget._zones.isEmpty) {
-      return const Center(child: Text('Fetching data...'));
+      return Center(child: Text(AppLocalizations.of(context)!.strFetching));
     }
     return Row(mainAxisSize: MainAxisSize.max, children: [
       SizedBox(
@@ -759,7 +741,7 @@ class _ZoneListState extends State<ZoneList> {
                       });
                     },
                     title: Text(
-                      '${widget._zones[index]['title']} (${widget._zones[index]['shows'].length})',
+                      '${widget._zones[index]['title']} (${widget._zones[index]['videos'].length})',
                       softWrap: true,
                     ));
               } else {
@@ -772,7 +754,7 @@ class _ZoneListState extends State<ZoneList> {
           child: ShowList(
               key: Key('$selectedZoneIndex'),
               videos: widget._zones.isNotEmpty
-                  ? widget._zones[selectedZoneIndex]['shows']
+                  ? widget._zones[selectedZoneIndex]['videos']
                   : [])),
     ]);
   }
@@ -826,7 +808,8 @@ class _ShowListState extends State<ShowList> {
               })),
       Expanded(
           child: selectedShowIndex != -1
-              ? ShowDetail(video: widget.videos[selectedShowIndex])
+              ? ShowDetail(
+                  video: widget.videos[selectedShowIndex], imageTop: true)
               : const SizedBox.shrink())
     ]);
   }
