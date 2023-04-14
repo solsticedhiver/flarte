@@ -20,10 +20,13 @@ class _FlarteSettingsState extends State<FlarteSettings> {
   PlayerTypeName _playerTypeName = AppConfig.player;
   late String _playerString;
   late String _qualityString;
+  late ThemeMode _themeMode;
 
   @override
   void initState() {
     super.initState();
+    _themeMode =
+        Provider.of<ThemeModeProvider>(context, listen: false).themeMode;
   }
 
   @override
@@ -43,16 +46,11 @@ class _FlarteSettingsState extends State<FlarteSettings> {
 
   @override
   Widget build(BuildContext context) {
-    final themeMode =
-        Provider.of<ThemeModeProvider>(context, listen: false).themeMode;
-    String tm = '';
-    if (themeMode == ThemeMode.dark) {
-      tm = AppLocalizations.of(context)!.strDark;
-    } else if (themeMode == ThemeMode.light) {
-      tm = AppLocalizations.of(context)!.strLight;
-    } else {
-      tm = AppLocalizations.of(context)!.strSystem;
-    }
+    final Map<ThemeMode, String> themeModeString = {
+      ThemeMode.dark: AppLocalizations.of(context)!.strDark,
+      ThemeMode.light: AppLocalizations.of(context)!.strLight,
+      ThemeMode.system: AppLocalizations.of(context)!.strSystem,
+    };
 
     final Map<String, String> localeName = {
       'fr': AppLocalizations.of(context)!.strFrench,
@@ -114,11 +112,9 @@ class _FlarteSettingsState extends State<FlarteSettings> {
               SettingsTile.navigation(
                 leading: const Icon(Icons.nightlight),
                 title: Text(AppLocalizations.of(context)!.strTheme),
-                value: Text(tm),
+                value: Text(themeModeString[_themeMode]!),
                 onPressed: (context) async {
-                  ThemeMode themeMode =
-                      Provider.of<ThemeModeProvider>(context, listen: false)
-                          .themeMode;
+                  ThemeMode themeMode = _themeMode;
                   await showDialog<ThemeMode>(
                       context: context,
                       builder: (context) {
@@ -169,6 +165,9 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                       });
                   Provider.of<ThemeModeProvider>(context, listen: false)
                       .changeTheme(themeMode);
+                  setState(() {
+                    _themeMode = themeMode;
+                  });
                 },
               )
             ]),
