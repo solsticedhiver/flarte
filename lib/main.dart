@@ -116,7 +116,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(initialIndex: 0, length: 10, vsync: this);
+    _tabController = TabController(
+        initialIndex: 0, length: CategoriesList.codes.length, vsync: this);
   }
 
   @override
@@ -141,21 +142,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         padding = 0;
       }
     }
-
-    // WARNING: this should match the order of categories in _CategoriesListState
-    // TODO: find a more elegant way to declare that
-    List<String> codes = [
-      'HOME',
-      'DOR',
-      'SER',
-      'CIN',
-      'EMI',
-      'HIS',
-      'DEC',
-      'SCI',
-      'ACT',
-      'CPO'
-    ];
 
     return Scaffold(
         drawer: const Drawer(),
@@ -223,14 +209,14 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             child: TabBarView(
               controller: _tabController,
               children: List.generate(
-                  codes.length,
+                  CategoriesList.codes.length,
                   (index) => Consumer2<Cache, LocaleModel>(
                           builder: (context, cache, localeModel, child) {
                         String lang =
                             localeModel.getCurrentLocale(context).languageCode;
                         return FutureBuilder(
-                            future: Future.microtask(
-                                () => cache.get(codes[index], lang)),
+                            future: Future.microtask(() =>
+                                cache.get(CategoriesList.codes[index], lang)),
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
                                 return CarouselList(
@@ -513,6 +499,20 @@ class CategoriesList extends StatefulWidget {
       required this.size,
       required this.controller,
       required this.lang});
+
+  // WARNING: this should match the order of categories in _CategoriesListState
+  static List<String> codes = [
+    'HOME',
+    'DOR',
+    'SER',
+    'CIN',
+    'EMI',
+    'HIS',
+    'DEC',
+    'SCI',
+    'ACT',
+    'CPO'
+  ];
 
   @override
   State<CategoriesList> createState() => _CategoriesListState();
