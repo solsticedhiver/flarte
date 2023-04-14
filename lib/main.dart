@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'detail.dart';
 import 'settings.dart';
@@ -24,6 +25,45 @@ void main() async {
   if (kReleaseMode) {
     debugPrint = (String? message, {int? wrapWidth}) {};
   }
+
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? loc = prefs.getString('locale');
+  Locale? locale;
+  if (loc != null) {
+    locale = Locale.fromSubtags(languageCode: loc);
+  }
+  String? tm = prefs.getString('theme');
+  ThemeMode? themeMode;
+  if (tm != null) {
+    switch (tm) {
+      case 'dark':
+        themeMode = ThemeMode.dark;
+        break;
+      case 'light':
+        themeMode = ThemeMode.light;
+        break;
+      case 'system':
+        themeMode = ThemeMode.system;
+        break;
+    }
+  }
+  AppConfig.playerIndexQuality =
+      prefs.getInt('quality') ?? AppConfig.playerIndexQuality;
+  String? ptn = prefs.getString('player');
+  if (ptn != null) {
+    switch (ptn) {
+      case 'embedded':
+        AppConfig.player = PlayerTypeName.embedded;
+        break;
+      case 'custom':
+        AppConfig.player = PlayerTypeName.custom;
+        break;
+      case 'vlc':
+        AppConfig.player = PlayerTypeName.vlc;
+        break;
+    }
+  }
+
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider<Cache>(create: (_) => Cache()),
@@ -32,6 +72,14 @@ void main() async {
           create: (_) => ThemeModeProvider()),
     ],
     builder: (context, child) {
+      if (locale != null) {
+        Provider.of<LocaleModel>(context, listen: false)
+            .changeLocale(locale, notify: false);
+      }
+      if (themeMode != null) {
+        Provider.of<ThemeModeProvider>(context, listen: false).themeMode =
+            themeMode;
+      }
       return const MyApp();
     },
   ));
@@ -196,11 +244,13 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                           title: leftSideWidth != 64
                               ? Text(AppLocalizations.of(context)!.strSettings)
                               : null,
-                          onTap: () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) {
+                          onTap: () async {
+                            final settings = await Navigator.push(context,
+                                MaterialPageRoute<Map<String, dynamic>>(
+                                    builder: (context) {
                               return const FlarteSettings();
                             }));
+                            _saveSettings(settings);
                           },
                         ),
                       ]))),
@@ -232,6 +282,17 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           ),
         ]));
   }
+}
+
+void _saveSettings(Map<String, dynamic>? settings) async {
+  if (settings == null) {
+    return;
+  }
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setString('locale', settings['locale'].languageCode);
+  prefs.setString('theme', settings['theme'].toString().split('.').last);
+  prefs.setInt('quality', settings['quality']);
+  prefs.setString('player', settings['player'].toString().split('.').last);
 }
 
 class Carousel extends StatefulWidget {

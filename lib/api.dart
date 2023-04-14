@@ -160,10 +160,12 @@ class LocaleModel with ChangeNotifier {
   Locale? _locale;
   Locale? get locale => _locale;
 
-  void changeLocale(Locale? l) {
+  void changeLocale(Locale? l, {notify = true}) {
     if (AppLocalizations.supportedLocales.contains(l)) {
       _locale = l;
-      notifyListeners();
+      if (notify) {
+        notifyListeners();
+      }
     }
   }
 

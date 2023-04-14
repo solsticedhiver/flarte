@@ -62,7 +62,20 @@ class _FlarteSettingsState extends State<FlarteSettings> {
 
     debugPrint(AppLocalizations.supportedLocales.toString());
     return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context)!.strSettings)),
+      appBar: AppBar(
+          leading: BackButton(
+            onPressed: () {
+              Map<String, dynamic> settings = {
+                'locale': Provider.of<LocaleModel>(context, listen: false)
+                    .getCurrentLocale(context),
+                'theme': _themeMode,
+                'quality': qualityIndex,
+                'player': _playerTypeName,
+              };
+              Navigator.of(context).pop(settings);
+            },
+          ),
+          title: Text(AppLocalizations.of(context)!.strSettings)),
       body: SettingsList(sections: [
         SettingsSection(
             title: Text(AppLocalizations.of(context)!.strInterface),
@@ -173,7 +186,7 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                 title: Text(AppLocalizations.of(context)!.strDefRes),
                 value: Text(_qualityString.split(' ').last),
                 onPressed: (context) async {
-                  await showDialog<ThemeMode>(
+                  await showDialog<int>(
                       context: context,
                       builder: (context) {
                         return AlertDialog(content:
