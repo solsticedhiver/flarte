@@ -148,6 +148,7 @@ class MyScreenState extends State<MyScreen> {
               children: [
                 Expanded(
                   child: InkWell(
+                      highlightColor: Theme.of(context).canvasColor,
                       focusColor: Theme.of(context).canvasColor,
                       hoverColor: Theme.of(context).canvasColor,
                       onDoubleTap: () {
