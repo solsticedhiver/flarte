@@ -12,7 +12,7 @@ import 'package:path/path.dart' as path;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:path_provider/path_provider.dart';
 
-import 'api.dart';
+import 'helpers.dart';
 import 'config.dart';
 import 'serie.dart';
 import 'player.dart';

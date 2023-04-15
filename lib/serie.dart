@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flarte/api.dart';
+import 'package:flarte/helpers.dart';
 import 'package:flarte/config.dart';
 import 'package:flarte/main.dart';
 import 'package:flutter/material.dart';
@@ -119,7 +119,7 @@ class _SerieScreenState extends State<SerieScreen> {
                   children: teasers.map((t) {
                     return InkWell(
                         onTap: () {
-                          _showDialogProgram(context, Video.buildVideo(t));
+                          _showDialogProgram(context, Video.fromJson(t));
                         },
                         child: Card(
                             child: Container(

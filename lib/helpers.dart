@@ -63,7 +63,7 @@ class Cache extends ChangeNotifier {
       }
       result.add({
         'title': z['title'],
-        'videos': videos.map((v) => Video.buildVideo(v)).toList()
+        'videos': videos.map((v) => Video.fromJson(v)).toList()
       });
     }
     return result;
@@ -201,7 +201,7 @@ class Video {
       required this.durationLabel,
       required this.url});
 
-  static Video buildVideo(Map<String, dynamic> video) {
+  factory Video.fromJson(Map<String, dynamic> video) {
     return Video(
       programId: video['programId'],
       title: video['title'],
