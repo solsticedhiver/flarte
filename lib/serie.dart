@@ -74,7 +74,7 @@ class _SerieScreenState extends State<SerieScreen> {
     super.dispose();
   }
 
-  void _showDialogProgram(BuildContext context, Map<String, dynamic> v) {
+  void _showDialogProgram(BuildContext context, Video v) {
     showDialog(
         context: context,
         builder: (context) {
@@ -119,7 +119,7 @@ class _SerieScreenState extends State<SerieScreen> {
                   children: teasers.map((t) {
                     return InkWell(
                         onTap: () {
-                          _showDialogProgram(context, Cache.buildVideo(t));
+                          _showDialogProgram(context, Video.buildVideo(t));
                         },
                         child: Card(
                             child: Container(

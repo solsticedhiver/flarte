@@ -32,37 +32,20 @@ class Cache extends ChangeNotifier {
         String? imageUrl = '';
         final image = i.querySelector('span.c-card-poster__image-wrapper img');
         if (image != null) imageUrl = image.attributes['data-src'];
-        debugPrint(imageUrl);
-        videos.add({
-          'title': title.trim(),
-          'subtitle': subtitle.trim(),
-          'imageUrl': imageUrl,
-          'shortDescription': '',
-          'isCollection': false,
-          'label': '',
-          'durationLabel': '',
-          'url': ''
-        });
+        videos.add(Video(
+            programId: 'unknown',
+            title: title.trim(),
+            subtitle: subtitle.trim(),
+            imageUrl: imageUrl,
+            shortDescription: '',
+            isCollection: false,
+            label: '',
+            durationLabel: '',
+            url: ''));
       }
       result.add({'title': zoneTitle, 'videos': videos});
     }
     return result;
-  }
-
-  static Map<String, dynamic> buildVideo(Map<String, dynamic> video) {
-    return {
-      'programId': video['programId'],
-      'title': video['title'],
-      'subtitle': video['subtitle'],
-      'imageUrl': (video['mainImage']['url'])
-          .replaceFirst('__SIZE__', '400x225')
-          .replaceFirst('?type=TEXT', ''),
-      'shortDescription': video['shortDescription'],
-      'isCollection': video['kind']['isCollection'],
-      'label': video['kind']['label'],
-      'durationLabel': video['durationLabel'],
-      'url': video['url'],
-    };
   }
 
   static List<dynamic> parseJson(Map<String, dynamic> data) {
@@ -80,7 +63,7 @@ class Cache extends ChangeNotifier {
       }
       result.add({
         'title': z['title'],
-        'videos': videos.map((v) => buildVideo(v)).toList()
+        'videos': videos.map((v) => Video.buildVideo(v)).toList()
       });
     }
     return result;
@@ -193,5 +176,44 @@ class ThemeModeProvider extends ChangeNotifier {
   void changeTheme(ThemeMode tm) {
     themeMode = tm;
     notifyListeners();
+  }
+}
+
+class Video {
+  String programId;
+  String title;
+  String? subtitle;
+  String? imageUrl;
+  String? shortDescription;
+  bool isCollection;
+  String? label;
+  String? durationLabel;
+  String url;
+
+  Video(
+      {required this.programId,
+      required this.title,
+      required this.subtitle,
+      required this.imageUrl,
+      required this.shortDescription,
+      required this.isCollection,
+      required this.label,
+      required this.durationLabel,
+      required this.url});
+
+  static Video buildVideo(Map<String, dynamic> video) {
+    return Video(
+      programId: video['programId'],
+      title: video['title'],
+      subtitle: video['subtitle'],
+      imageUrl: (video['mainImage']['url'])
+          .replaceFirst('__SIZE__', '400x225')
+          .replaceFirst('?type=TEXT', ''),
+      shortDescription: video['shortDescription'],
+      isCollection: video['kind']['isCollection'],
+      label: video['kind']['label'],
+      durationLabel: video['durationLabel'],
+      url: video['url'],
+    );
   }
 }

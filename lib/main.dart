@@ -455,7 +455,7 @@ class CarouselList extends StatelessWidget {
     }
   }
 
-  void _showDialogProgram(BuildContext context, Map<String, dynamic> v) {
+  void _showDialogProgram(BuildContext context, Video v) {
     showDialog(
         context: context,
         builder: (context) {
@@ -470,7 +470,7 @@ class CarouselList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Widget> thumbnails = [];
-    List<dynamic> videos = [];
+    List<Video> videos = [];
 
     //debugPrint('in CarouselList.build()');
     final List<dynamic> zones;
@@ -507,7 +507,7 @@ class CarouselList extends StatelessWidget {
                                           width: _imageWidth,
                                           height: _imageHeight),
                                   image: CachedNetworkImageProvider(
-                                      v['imageUrl'],
+                                      v.imageUrl ?? '',
                                       headers: {
                                         'User-Agent': AppConfig.userAgent
                                       }),
@@ -517,13 +517,13 @@ class CarouselList extends StatelessWidget {
                                 ListTile(
                                   contentPadding: EdgeInsets.zero,
                                   title: Text(
-                                    v['title'],
+                                    v.title,
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 2,
                                   ),
                                   subtitle: (size == CarouselListSize.normal)
                                       ? Text(
-                                          v['subtitle'] ?? '',
+                                          v.subtitle ?? '',
                                           overflow: TextOverflow.ellipsis,
                                           maxLines: 2,
                                         )
@@ -762,7 +762,7 @@ class _ZoneListState extends State<ZoneList> {
 }
 
 class ShowList extends StatefulWidget {
-  final List<dynamic> videos;
+  final List<Video> videos;
 
   const ShowList({super.key, required this.videos});
 
@@ -796,9 +796,9 @@ class _ShowListState extends State<ShowList> {
                 return ListTile(
                   selectedTileColor: Theme.of(context).highlightColor,
                   selected: index == selectedShowIndex,
-                  title: Text(widget.videos[index]['title']),
-                  subtitle: (widget.videos[index]['subtitle'] != null)
-                      ? Text(widget.videos[index]['subtitle'])
+                  title: Text(widget.videos[index].title),
+                  subtitle: (widget.videos[index].subtitle != null)
+                      ? Text(widget.videos[index].subtitle!)
                       : null,
                   onTap: () {
                     setState(() {

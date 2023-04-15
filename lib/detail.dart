@@ -20,7 +20,7 @@ import 'mobile_player.dart';
 import 'downloader.dart';
 
 class ShowDetail extends StatefulWidget {
-  final Map<String, dynamic> video;
+  final Video video;
   final bool imageTop;
 
   @override
@@ -41,7 +41,7 @@ class _ShowDetailState extends State<ShowDetail> {
   void initState() {
     super.initState();
     Future.microtask(() async {
-      final programId = widget.video['programId'];
+      final programId = widget.video.programId;
 
       debugPrint('programId: $programId');
       final lang = Provider.of<LocaleModel>(context, listen: false)
@@ -147,7 +147,7 @@ class _ShowDetailState extends State<ShowDetail> {
   }
 
   String _outputFilename() {
-    return "${widget.video['programId']}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat.resolution}.mp4";
+    return "${widget.video.programId}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat.resolution}.mp4";
   }
 
   void _ytdlp() async {
@@ -198,7 +198,7 @@ class _ShowDetailState extends State<ShowDetail> {
     if (result.exitCode != 0) {
       debugPrint(result.stderr);
       _showMessage(context,
-          'Error downloading video ${widget.video['programId']} with yt-dlp');
+          'Error downloading video ${widget.video.programId} with yt-dlp');
       return;
     }
   }
@@ -277,7 +277,7 @@ class _ShowDetailState extends State<ShowDetail> {
       tasks.add(dlAudio);
     }
     String message;
-    String programId = widget.video['programId'];
+    String programId = widget.video.programId;
     try {
       List responses = await Future.wait(tasks, eagerError: true);
       if (responses[0].exitCode != 0) {
@@ -292,7 +292,7 @@ class _ShowDetailState extends State<ShowDetail> {
       }
       // combine video/audio/subtitle together
       final outputFilename =
-          '${widget.video['programId']}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat.resolution}.mp4';
+          '${widget.video.programId}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat.resolution}.mp4';
       debugPrint(outputFilename);
       final String cmd;
       if (stream.audio == null && stream.subtitle == null) {
@@ -311,17 +311,17 @@ class _ShowDetailState extends State<ShowDetail> {
         cmd =
             '$ffmpeg -i $videoFilename -i $audioFilename -i $subFilename -map 0:v -map 1:a -map 2:s -c:v copy -c:a copy -c:s mov_text $outputFilename';
       }
-      message = 'Download of video ${widget.video['programId']} finished';
+      message = 'Download of video ${widget.video.programId} finished';
       if (cmd.isNotEmpty) {
         final result = await mgr.run(cmd.split(' '), workingDirectory: cwd);
         if (result.exitCode != 0) {
           debugPrint(
-              'Failed to combine video/audio/subtitle for ${widget.video['programId']}\n${result.stderr}');
-          message = 'Error downloading video ${widget.video['programId']}';
+              'Failed to combine video/audio/subtitle for ${widget.video.programId}\n${result.stderr}');
+          message = 'Error downloading video ${widget.video.programId}';
         } else {
           debugPrint(
-              'Finished combining video/audio/subtitle for ${widget.video['programId']}');
-          message = 'Download of video ${widget.video['programId']} finished';
+              'Finished combining video/audio/subtitle for ${widget.video.programId}');
+          message = 'Download of video ${widget.video.programId} finished';
         }
       }
       if (stream.audio != null && audioFilename.isNotEmpty) {
@@ -335,8 +335,7 @@ class _ShowDetailState extends State<ShowDetail> {
       }
     } catch (e) {
       debugPrint(e.toString());
-      message =
-          'Error downloading video ${widget.video['programId']} with ffmpeg';
+      message = 'Error downloading video ${widget.video.programId} with ffmpeg';
     }
     if (mounted) {
       _showMessage(context, message);
@@ -405,7 +404,7 @@ class _ShowDetailState extends State<ShowDetail> {
     */
     try {
       _showMessage(context,
-          'Launching external [c]vlc instance to read video ${widget.video['programId']}');
+          'Launching external [c]vlc instance to read video ${widget.video.programId}');
       ProcessResult result = await mgr.run(cmd);
       if (result.exitCode != 0) {
         //debugPrint(result.stderr);
@@ -420,11 +419,11 @@ class _ShowDetailState extends State<ShowDetail> {
 
   void _libmpv() async {
     String title = '';
-    String? subtitle = widget.video['subtitle'];
+    String? subtitle = widget.video.subtitle;
     if (subtitle != null && subtitle.isNotEmpty) {
-      title = '${widget.video['title']} / $subtitle';
+      title = '${widget.video.title} / $subtitle';
     } else {
-      title = widget.video['title'];
+      title = widget.video.title;
     }
 
     MediaStream stream;
@@ -465,7 +464,7 @@ class _ShowDetailState extends State<ShowDetail> {
   Widget build(BuildContext context) {
     //debugPrint(json.encode(widget.video));
 
-    final imageUrl = widget.video['imageUrl'];
+    final imageUrl = widget.video.imageUrl ?? '';
     return Container(
         padding: const EdgeInsets.all(15),
         child: Column(
@@ -473,13 +472,13 @@ class _ShowDetailState extends State<ShowDetail> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                widget.video['title'],
+                widget.video.title,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
-              widget.video['subtitle'] != null
+              widget.video.subtitle != null
                   ? Text(
-                      widget.video['subtitle'],
+                      widget.video.subtitle!,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.titleMedium,
                     )
@@ -517,9 +516,9 @@ class _ShowDetailState extends State<ShowDetail> {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          widget.video['shortDescription'] != null
+                          widget.video.shortDescription != null
                               ? Text(
-                                  widget.video['shortDescription']
+                                  widget.video.shortDescription!
                                       .replaceAll(RegExp('\u{00a0}?'), ''),
                                   maxLines: 16,
                                   overflow: TextOverflow.ellipsis,
@@ -527,20 +526,22 @@ class _ShowDetailState extends State<ShowDetail> {
                               : const SizedBox.shrink(),
                           const SizedBox(height: 10),
                           Row(children: [
-                            Chip(
-                              backgroundColor: Theme.of(context).primaryColor,
-                              label: Text(widget.video['label']),
-                            ),
-                            const SizedBox(width: 10),
-                            if (!widget.video['isCollection'] &&
-                                widget.video['durationLabel'] != null)
+                            if (widget.video.label != null) ...[
                               Chip(
                                 backgroundColor: Theme.of(context).primaryColor,
-                                label: Text(widget.video['durationLabel']),
+                                label: Text(widget.video.label!),
+                              )
+                            ],
+                            const SizedBox(width: 10),
+                            if (!widget.video.isCollection &&
+                                widget.video.durationLabel != null)
+                              Chip(
+                                backgroundColor: Theme.of(context).primaryColor,
+                                label: Text(widget.video.durationLabel!),
                               ),
                           ]),
                           const SizedBox(height: 10),
-                          widget.video['isCollection']
+                          widget.video.isCollection
                               ? const SizedBox.shrink()
                               : Row(
                                   children: [
@@ -587,13 +588,13 @@ class _ShowDetailState extends State<ShowDetail> {
                                                   builder: (context) =>
                                                       FullDetailScreen(
                                                           programId: widget
-                                                                  .video[
-                                                              'programId'])));
+                                                              .video
+                                                              .programId)));
                                         }),
                                   ],
                                 ),
                           const SizedBox(height: 10),
-                          widget.video['isCollection']
+                          widget.video.isCollection
                               ? const SizedBox.shrink()
                               : Row(children: [
                                   versionItems.isNotEmpty
@@ -659,7 +660,7 @@ class _ShowDetailState extends State<ShowDetail> {
                                           })
                                       : const SizedBox(height: 24),
                                 ]),
-                          widget.video['isCollection']
+                          widget.video.isCollection
                               ? TextButton(
                                   onPressed: () {
                                     if (!widget.imageTop) {
@@ -669,8 +670,8 @@ class _ShowDetailState extends State<ShowDetail> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) => SerieScreen(
-                                                title: widget.video['title'],
-                                                url: widget.video['url'])));
+                                                title: widget.video.title,
+                                                url: widget.video.url)));
                                   },
                                   child: Text(AppLocalizations.of(context)!
                                       .strEpisodes),
