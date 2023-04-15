@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flarte/config.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -189,17 +190,20 @@ class Video {
   String? label;
   String? durationLabel;
   String url;
+  String? srcJson;
 
-  Video(
-      {required this.programId,
-      required this.title,
-      required this.subtitle,
-      required this.imageUrl,
-      required this.shortDescription,
-      required this.isCollection,
-      required this.label,
-      required this.durationLabel,
-      required this.url});
+  Video({
+    required this.programId,
+    required this.title,
+    required this.subtitle,
+    required this.imageUrl,
+    required this.shortDescription,
+    required this.isCollection,
+    required this.label,
+    required this.durationLabel,
+    required this.url,
+    this.srcJson,
+  });
 
   factory Video.fromJson(Map<String, dynamic> video) {
     return Video(
@@ -214,6 +218,7 @@ class Video {
       label: video['kind']['label'],
       durationLabel: video['durationLabel'],
       url: video['url'],
+      srcJson: !kReleaseMode ? json.encode(video) : null,
     );
   }
 }

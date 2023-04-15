@@ -462,6 +462,8 @@ class _ShowDetailState extends State<ShowDetail> {
 
   @override
   Widget build(BuildContext context) {
+    //debugPrint(widget.video.srcJson);
+
     final imageUrl = widget.video.imageUrl ?? '';
     return Container(
         padding: const EdgeInsets.all(15),
