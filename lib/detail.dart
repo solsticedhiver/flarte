@@ -20,7 +20,7 @@ import 'mobile_player.dart';
 import 'downloader.dart';
 
 class ShowDetail extends StatefulWidget {
-  final Video video;
+  final VideoData video;
   final bool imageTop;
 
   @override
@@ -40,6 +40,7 @@ class _ShowDetailState extends State<ShowDetail> {
   @override
   void initState() {
     super.initState();
+
     Future.microtask(() async {
       final programId = widget.video.programId;
 
@@ -78,6 +79,7 @@ class _ShowDetailState extends State<ShowDetail> {
                   DropdownMenuItem<Version>(value: e, child: Text(e.label)))
               .toList();
         });
+        widget.video.versions = versions;
         _getFormats();
       }
     });
@@ -448,9 +450,10 @@ class _ShowDetailState extends State<ShowDetail> {
       if (Platform.isLinux || Platform.isWindows) {
         return MyScreen(
             title: title,
-            video: stream.video!.toString(),
-            audio: stream.audio != null ? stream.audio.toString() : '',
-            subtitle: subFilename);
+            video_stream: stream.video!.toString(),
+            audio_stream: stream.audio != null ? stream.audio.toString() : '',
+            subtitle: subFilename,
+            video: widget.video);
       } else {
         return MyMobileScreen(
             title: title,

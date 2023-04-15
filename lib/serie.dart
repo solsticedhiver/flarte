@@ -74,7 +74,7 @@ class _SerieScreenState extends State<SerieScreen> {
     super.dispose();
   }
 
-  void _showDialogProgram(BuildContext context, Video v) {
+  void _showDialogProgram(BuildContext context, VideoData v) {
     showDialog(
         context: context,
         builder: (context) {
@@ -117,58 +117,16 @@ class _SerieScreenState extends State<SerieScreen> {
                   childAspectRatio: 0.85,
                   crossAxisCount: count,
                   children: teasers.map((t) {
+                    VideoData v = VideoData.fromJson(t);
                     return InkWell(
                         onTap: () {
-                          _showDialogProgram(context, Video.fromJson(t));
+                          _showDialogProgram(context, v);
                         },
-                        child: Card(
-                            child: Container(
-                                padding: const EdgeInsets.all(10),
-                                child: Column(
-                                  //mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Center(
-                                        child: CachedNetworkImage(
-                                      imageUrl: t['mainImage']['url']
-                                          .replaceFirst('__SIZE__', '400x225'),
-                                      httpHeaders: {
-                                        'User-Agent': AppConfig.userAgent
-                                      },
-                                      errorWidget: (context, url, error) =>
-                                          const SizedBox(
-                                              height: 148, width: 265),
-                                      height: 148,
-                                      width: 265,
-                                    )),
-                                    const SizedBox(height: 10),
-                                    Text(
-                                        useSubtitle && t['subtitle'] != null
-                                            ? t['subtitle']
-                                            : t['title'],
-                                        maxLines: 2,
-                                        softWrap: true,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium),
-                                    const SizedBox(height: 10),
-                                    Text(t['teaserText'].toString().trim(),
-                                        maxLines: 3,
-                                        softWrap: true,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium),
-                                    const SizedBox(height: 10),
-                                    if (t['durationLabel'] != null)
-                                      Chip(
-                                        backgroundColor:
-                                            Theme.of(context).primaryColor,
-                                        label: Text(t['durationLabel']),
-                                      ),
-                                  ],
-                                ))));
+                        child: VideoCard(
+                            video: v,
+                            size: CarouselListSize.normal,
+                            useSubtitle: useSubtitle,
+                            withShortDescription: true));
                   }).toList(),
                 )));
       }

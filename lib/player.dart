@@ -5,21 +5,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'config.dart';
+import 'helpers.dart';
 
 class MyScreen extends StatefulWidget {
   final String title;
-  final String video;
-  final String audio;
+  final String video_stream;
+  final String audio_stream;
   final String subtitle;
+  final VideoData video;
   const MyScreen(
       {super.key,
       required this.title,
-      required this.video,
-      required this.audio,
-      required this.subtitle});
+      required this.video_stream,
+      required this.audio_stream,
+      required this.subtitle,
+      required this.video});
 
   @override
   State<MyScreen> createState() => MyScreenState();
@@ -69,10 +73,10 @@ class MyScreenState extends State<MyScreen> {
         debugPrint('Playing with subtitle from ${widget.subtitle}');
         pp.setProperty('sub-files', widget.subtitle);
       }
-      if (widget.audio.isNotEmpty) {
-        debugPrint('Playing audio from ${widget.audio}');
+      if (widget.audio_stream.isNotEmpty) {
+        debugPrint('Playing audio from ${widget.audio_stream}');
         // escape character usedd as list seprator by mpv
-        String audio = widget.audio;
+        String audio = widget.audio_stream;
         if (Platform.isLinux) {
           audio = audio.replaceAll(':', '\\:');
         } else if (Platform.isWindows) {
@@ -81,7 +85,7 @@ class MyScreenState extends State<MyScreen> {
         pp.setProperty('audio-files', audio);
       }
       player.setVolume(100);
-      player.open(Playlist([Media(widget.video)]));
+      player.open(Playlist([Media(widget.video_stream)]));
       debugPrint('Playing ${widget.video}');
     }
 
@@ -162,7 +166,10 @@ class MyScreenState extends State<MyScreen> {
                       )),
                 ),
                 if (!isFullScreen) ...[
-                  SeekBar(player: player, buttonSize: buttonSize),
+                  SeekBar(
+                      player: player,
+                      buttonSize: buttonSize,
+                      video: widget.video),
                   SizedBox(height: margin)
                 ],
               ],
@@ -173,10 +180,12 @@ class MyScreenState extends State<MyScreen> {
 class SeekBar extends StatefulWidget {
   final Player player;
   final double buttonSize;
+  final VideoData video;
   const SeekBar({
     super.key,
     required this.player,
     required this.buttonSize,
+    required this.video,
   });
 
   @override
@@ -215,6 +224,11 @@ class _SeekBarState extends State<SeekBar> {
           setState(() {
             if (mounted) {
               if (!seeking) position = event;
+            }
+            final ad = Provider.of<AppData>(context, listen: false);
+            if (position > duration * 0.9 &&
+                !ad.watched.contains(widget.video.programId)) {
+              ad.addWatched(widget.video.programId);
             }
           });
         }),

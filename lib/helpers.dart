@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flarte/config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:html/parser.dart' as parser;
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Cache extends ChangeNotifier {
   final Map<String, dynamic> data = {};
@@ -33,7 +36,7 @@ class Cache extends ChangeNotifier {
         String? imageUrl = '';
         final image = i.querySelector('span.c-card-poster__image-wrapper img');
         if (image != null) imageUrl = image.attributes['data-src'];
-        videos.add(Video(
+        videos.add(VideoData(
             programId: 'unknown',
             title: title.trim(),
             subtitle: subtitle.trim(),
@@ -64,7 +67,7 @@ class Cache extends ChangeNotifier {
       }
       result.add({
         'title': z['title'],
-        'videos': videos.map((v) => Video.fromJson(v)).toList()
+        'videos': videos.map((v) => VideoData.fromJson(v)).toList()
       });
     }
     return result;
@@ -180,7 +183,7 @@ class ThemeModeProvider extends ChangeNotifier {
   }
 }
 
-class Video {
+class VideoData {
   String programId;
   String title;
   String? subtitle;
@@ -191,8 +194,12 @@ class Video {
   String? durationLabel;
   String url;
   String? srcJson;
+  //bool hasBeenPlayed;
+  //bool isFavorite;
+  List<Version>? versions;
+  String? teaserText;
 
-  Video({
+  VideoData({
     required this.programId,
     required this.title,
     required this.subtitle,
@@ -203,10 +210,12 @@ class Video {
     required this.durationLabel,
     required this.url,
     this.srcJson,
+    this.versions,
+    this.teaserText,
   });
 
-  factory Video.fromJson(Map<String, dynamic> video) {
-    return Video(
+  factory VideoData.fromJson(Map<String, dynamic> video) {
+    return VideoData(
       programId: video['programId'],
       title: video['title'],
       subtitle: video['subtitle'],
@@ -218,7 +227,235 @@ class Video {
       label: video['kind']['label'],
       durationLabel: video['durationLabel'],
       url: video['url'],
+      teaserText: video['teaserText'],
       srcJson: !kReleaseMode ? json.encode(video) : null,
     );
+  }
+}
+
+class VideoCard extends StatefulWidget {
+  final VideoData video;
+  final CarouselListSize size;
+  final bool withShortDescription;
+  final bool useSubtitle;
+
+  const VideoCard({
+    super.key,
+    required this.video,
+    required this.size,
+    this.withShortDescription = false,
+    this.useSubtitle = false,
+  });
+
+  @override
+  State<VideoCard> createState() => VideoCardState();
+}
+
+class VideoCardState extends State<VideoCard> {
+  late bool hasBeenPlayed;
+  late bool isFavorite;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double imageHeight, imageWidth;
+    switch (widget.size) {
+      case CarouselListSize.normal:
+        // image size divided by 1.5
+        imageHeight = 148;
+        imageWidth = 265;
+        break;
+      case CarouselListSize.small:
+        // image size divided by 2
+        imageHeight = 112;
+        imageWidth = 200;
+        break;
+      case CarouselListSize.tiny:
+        // image size divided by 2.5
+        imageHeight = 90;
+        imageWidth = 160;
+        break;
+    }
+
+    Widget bottomText;
+    if (widget.withShortDescription) {
+      Color? color;
+      if (Theme.of(context).brightness == Brightness.dark) {
+        color = Colors.grey[400];
+      } else {
+        color = null;
+      }
+      bottomText = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 10),
+            Text(
+                widget.useSubtitle && widget.video.subtitle != null
+                    ? widget.video.subtitle!
+                    : widget.video.title,
+                maxLines: 2,
+                softWrap: true,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 5),
+            Text(
+              widget.video.teaserText.toString().trim(),
+              maxLines: 3,
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.copyWith(color: color),
+            ),
+            const SizedBox(height: 10),
+            if (widget.video.durationLabel != null)
+              Chip(
+                backgroundColor: Theme.of(context).primaryColor,
+                label: Text(widget.video.durationLabel!),
+              ),
+          ]);
+    } else {
+      bottomText = ListTile(
+        contentPadding: EdgeInsets.zero,
+        title: Text(
+          widget.video.title,
+          overflow: TextOverflow.ellipsis,
+          maxLines: 2,
+        ),
+        subtitle: (widget.size == CarouselListSize.normal)
+            ? Text(
+                widget.video.subtitle ?? '',
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+              )
+            : null,
+        isThreeLine: widget.size == CarouselListSize.normal,
+      );
+    }
+    return Card(
+        child: Container(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Stack(alignment: AlignmentDirectional.topEnd, children: [
+                    Image(
+                      errorBuilder: (context, error, stackTrace) =>
+                          SizedBox(width: imageWidth, height: imageHeight),
+                      image: CachedNetworkImageProvider(
+                          widget.video.imageUrl ?? '',
+                          headers: {'User-Agent': AppConfig.userAgent}),
+                      height: imageHeight,
+                      width: imageWidth,
+                    ),
+                    Consumer<AppData>(builder: (context, appData, child) {
+                      isFavorite =
+                          appData.favorites.contains(widget.video.programId);
+                      return Container(
+                          //margin: const EdgeInsets.only(top: 2, right: 2),
+                          child: IconButton(
+                              hoverColor: Theme.of(context).cardColor,
+                              highlightColor: Theme.of(context).cardColor,
+                              splashColor: Theme.of(context).cardColor,
+                              onPressed: () {
+                                setState(() {
+                                  isFavorite = !isFavorite;
+                                  //widget.video.isFavorite = isFavorite;
+                                });
+
+                                if (isFavorite) {
+                                  appData.addFavorite(widget.video.programId);
+                                } else {
+                                  appData
+                                      .removeFavorite(widget.video.programId);
+                                }
+                              },
+                              icon: Icon(Icons.favorite,
+                                  color: isFavorite
+                                      ? Colors.deepOrange
+                                      : Theme.of(context).disabledColor)));
+                    }),
+                    if (!widget.video.isCollection)
+                      Consumer<AppData>(builder: (context, appData, child) {
+                        hasBeenPlayed =
+                            appData.watched.contains(widget.video.programId);
+                        return Container(
+                            margin: EdgeInsets.only(top: imageHeight - 24 - 16),
+                            child: IconButton(
+                                hoverColor: Theme.of(context).cardColor,
+                                highlightColor: Theme.of(context).cardColor,
+                                splashColor: Theme.of(context).cardColor,
+                                onPressed: () {
+                                  setState(() {
+                                    hasBeenPlayed = !hasBeenPlayed;
+                                  });
+                                  if (hasBeenPlayed) {
+                                    appData.addWatched(widget.video.programId);
+                                  } else {
+                                    appData
+                                        .removeWatched(widget.video.programId);
+                                  }
+                                },
+                                icon: Icon(Icons.check_circle_outline,
+                                    color: hasBeenPlayed
+                                        ? Colors.deepOrange
+                                        : Theme.of(context).disabledColor)));
+                      }),
+                  ]),
+                  bottomText,
+                ])));
+  }
+}
+
+class AppData extends ChangeNotifier {
+  List<String> watched = [];
+  List<String> favorites = [];
+
+  void addFavorite(String id) async {
+    if (!favorites.contains(id)) {
+      favorites.add(id);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList('favorites', favorites);
+      notifyListeners();
+    }
+  }
+
+  void removeFavorite(String id) async {
+    if (favorites.contains(id)) {
+      favorites.remove(id);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList('favorites', favorites);
+      notifyListeners();
+    }
+  }
+
+  void addWatched(String id) async {
+    if (!watched.contains(id)) {
+      watched.add(id);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList('watched', watched);
+      notifyListeners();
+    }
+  }
+
+  void removeWatched(String id) async {
+    if (watched.contains(id)) {
+      watched.remove(id);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList('watched', watched);
+      notifyListeners();
+    }
   }
 }

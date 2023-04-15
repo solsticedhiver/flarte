@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
@@ -63,10 +64,13 @@ void main() async {
         break;
     }
   }
+  List<String>? adw = prefs.getStringList('watched');
+  List<String>? adf = prefs.getStringList('favorites');
 
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider<Cache>(create: (_) => Cache()),
+      ChangeNotifierProvider<AppData>(create: (_) => AppData()),
       ChangeNotifierProvider<LocaleModel>(create: (_) => LocaleModel()),
       ChangeNotifierProvider<ThemeModeProvider>(
           create: (_) => ThemeModeProvider()),
@@ -79,6 +83,12 @@ void main() async {
       if (themeMode != null) {
         Provider.of<ThemeModeProvider>(context, listen: false).themeMode =
             themeMode;
+      }
+      if (adw != null) {
+        Provider.of<AppData>(context, listen: false).watched = adw;
+      }
+      if (adf != null) {
+        Provider.of<AppData>(context, listen: false).favorites = adf;
       }
       return const MyApp();
     },
@@ -432,30 +442,11 @@ class _CarouselState extends State<Carousel> {
 class CarouselList extends StatelessWidget {
   final List<dynamic> data;
   final CarouselListSize size;
-  late final double _imageHeight, _imageWidth;
 
   CarouselList(
-      {super.key, required this.data, this.size = CarouselListSize.normal}) {
-    switch (size) {
-      case CarouselListSize.normal:
-        // image size divided by 1.5
-        _imageHeight = 148;
-        _imageWidth = 265;
-        break;
-      case CarouselListSize.small:
-        // image size divided by 2
-        _imageHeight = 112;
-        _imageWidth = 200;
-        break;
-      case CarouselListSize.tiny:
-        // image size divided by 2.5
-        _imageHeight = 90;
-        _imageWidth = 160;
-        break;
-    }
-  }
+      {super.key, required this.data, this.size = CarouselListSize.normal}) {}
 
-  void _showDialogProgram(BuildContext context, Video v) {
+  void _showDialogProgram(BuildContext context, VideoData v) {
     showDialog(
         context: context,
         builder: (context) {
@@ -470,7 +461,7 @@ class CarouselList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Widget> thumbnails = [];
-    List<Video> videos = [];
+    List<VideoData> videos = [];
 
     //debugPrint('in CarouselList.build()');
     final List<dynamic> zones;
@@ -491,46 +482,11 @@ class CarouselList extends StatelessWidget {
             size: size,
             children: videos.map((v) {
               return InkWell(
-                  onTap: () {
-                    _showDialogProgram(context, v);
-                  },
-                  child: Card(
-                      child: Container(
-                          padding: const EdgeInsets.all(10),
-                          child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Image(
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      SizedBox(
-                                          width: _imageWidth,
-                                          height: _imageHeight),
-                                  image: CachedNetworkImageProvider(
-                                      v.imageUrl ?? '',
-                                      headers: {
-                                        'User-Agent': AppConfig.userAgent
-                                      }),
-                                  height: _imageHeight,
-                                  width: _imageWidth,
-                                ),
-                                ListTile(
-                                  contentPadding: EdgeInsets.zero,
-                                  title: Text(
-                                    v.title,
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 2,
-                                  ),
-                                  subtitle: (size == CarouselListSize.normal)
-                                      ? Text(
-                                          v.subtitle ?? '',
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 2,
-                                        )
-                                      : null,
-                                  isThreeLine: size == CarouselListSize.normal,
-                                ),
-                              ]))));
+                onTap: () {
+                  _showDialogProgram(context, v);
+                },
+                child: VideoCard(video: v, size: size),
+              );
             }).toList())
       ]));
     }
@@ -762,7 +718,7 @@ class _ZoneListState extends State<ZoneList> {
 }
 
 class ShowList extends StatefulWidget {
-  final List<Video> videos;
+  final List<VideoData> videos;
 
   const ShowList({super.key, required this.videos});
 
