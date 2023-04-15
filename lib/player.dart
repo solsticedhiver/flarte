@@ -85,12 +85,8 @@ class MyScreenState extends State<MyScreen> {
       debugPrint('Playing ${widget.video}');
     }
 
-    double buttonSize = 24.0;
-    double margin = 16.0;
-    if (MediaQuery.of(context).size.height <= 720) {
-      buttonSize = 16.0;
-      margin = 10.0;
-    }
+    double buttonSize = 16.0;
+    double margin = 10.0;
 
     return RawKeyboardListener(
         autofocus: true,
@@ -99,7 +95,7 @@ class MyScreenState extends State<MyScreen> {
           if (event is RawKeyDownEvent) {
             if (event.logicalKey.keyLabel == "Escape" && isFullScreen) {
               windowManager.setFullScreen(!isFullScreen);
-              _isFullScreen = !isFullScreen;
+              isFullScreen = !isFullScreen;
             } else if (event.isKeyPressed(LogicalKeyboardKey.space)) {
               player.playOrPause();
             } else if (event.isKeyPressed(LogicalKeyboardKey.arrowLeft)) {
@@ -148,12 +144,13 @@ class MyScreenState extends State<MyScreen> {
               children: [
                 Expanded(
                   child: InkWell(
+                      splashColor: Theme.of(context).canvasColor,
                       highlightColor: Theme.of(context).canvasColor,
                       focusColor: Theme.of(context).canvasColor,
                       hoverColor: Theme.of(context).canvasColor,
                       onDoubleTap: () {
                         windowManager.setFullScreen(!isFullScreen);
-                        _isFullScreen = !isFullScreen;
+                        isFullScreen = !isFullScreen;
                       },
                       child: Card(
                         elevation: 8.0,
