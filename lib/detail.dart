@@ -462,8 +462,6 @@ class _ShowDetailState extends State<ShowDetail> {
 
   @override
   Widget build(BuildContext context) {
-    //debugPrint(json.encode(widget.video));
-
     final imageUrl = widget.video.imageUrl ?? '';
     return Container(
         padding: const EdgeInsets.all(15),
@@ -518,8 +516,8 @@ class _ShowDetailState extends State<ShowDetail> {
                         children: [
                           widget.video.shortDescription != null
                               ? Text(
-                                  widget.video.shortDescription!
-                                      .replaceAll(RegExp('\u{00a0}?'), ''),
+                                  widget.video.shortDescription!.replaceAll(
+                                      RegExp('\u{00a0}+'), '\u{00a0}'),
                                   maxLines: 16,
                                   overflow: TextOverflow.ellipsis,
                                   style: Theme.of(context).textTheme.bodyMedium)
