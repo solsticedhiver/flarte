@@ -392,7 +392,7 @@ class VideoCardState extends State<VideoCard> {
                         hasBeenPlayed =
                             appData.watched.contains(widget.video.programId);
                         return Container(
-                            margin: EdgeInsets.only(top: imageHeight - 24 - 16),
+                            margin: EdgeInsets.only(top: imageHeight - 24 - 24),
                             child: IconButton(
                                 hoverColor: Theme.of(context).cardColor,
                                 highlightColor: Theme.of(context).cardColor,
