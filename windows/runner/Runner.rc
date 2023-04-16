@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "io.github.solsticedhiver" "\0"
-            VALUE "FileDescription", "flarte" "\0"
+            VALUE "FileDescription", "Flarte" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "flarte" "\0"
+            VALUE "InternalName", "Flarte" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2023 io.github.solsticedhiver. All rights reserved." "\0"
             VALUE "OriginalFilename", "flarte.exe" "\0"
-            VALUE "ProductName", "flarte" "\0"
+            VALUE "ProductName", "Flarte" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
