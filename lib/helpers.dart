@@ -363,29 +363,26 @@ class VideoCardState extends State<VideoCard> {
                     Consumer<AppData>(builder: (context, appData, child) {
                       isFavorite =
                           appData.favorites.contains(widget.video.programId);
-                      return Container(
-                          //margin: const EdgeInsets.only(top: 2, right: 2),
-                          child: IconButton(
-                              hoverColor: Theme.of(context).cardColor,
-                              highlightColor: Theme.of(context).cardColor,
-                              splashColor: Theme.of(context).cardColor,
-                              onPressed: () {
-                                setState(() {
-                                  isFavorite = !isFavorite;
-                                  //widget.video.isFavorite = isFavorite;
-                                });
+                      return IconButton(
+                          hoverColor: Theme.of(context).cardColor,
+                          highlightColor: Theme.of(context).cardColor,
+                          splashColor: Theme.of(context).cardColor,
+                          onPressed: () {
+                            setState(() {
+                              isFavorite = !isFavorite;
+                              //widget.video.isFavorite = isFavorite;
+                            });
 
-                                if (isFavorite) {
-                                  appData.addFavorite(widget.video.programId);
-                                } else {
-                                  appData
-                                      .removeFavorite(widget.video.programId);
-                                }
-                              },
-                              icon: Icon(Icons.favorite,
-                                  color: isFavorite
-                                      ? Colors.deepOrange
-                                      : Theme.of(context).disabledColor)));
+                            if (isFavorite) {
+                              appData.addFavorite(widget.video.programId);
+                            } else {
+                              appData.removeFavorite(widget.video.programId);
+                            }
+                          },
+                          icon: Icon(Icons.favorite,
+                              color: isFavorite
+                                  ? Colors.deepOrange
+                                  : Theme.of(context).disabledColor));
                     }),
                     if (!widget.video.isCollection)
                       Consumer<AppData>(builder: (context, appData, child) {
