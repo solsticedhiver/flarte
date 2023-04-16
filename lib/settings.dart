@@ -112,6 +112,7 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                               }).toList());
                         }));
                       });
+                  if (!context.mounted) return;
                   Provider.of<LocaleModel>(context, listen: false)
                       .changeLocale(locale);
                 },
@@ -170,6 +171,7 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                           );
                         }));
                       });
+                  if (!context.mounted) return;
                   Provider.of<ThemeModeProvider>(context, listen: false)
                       .changeTheme(themeMode);
                   setState(() {

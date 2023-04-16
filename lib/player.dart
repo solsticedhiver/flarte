@@ -13,15 +13,15 @@ import 'helpers.dart';
 
 class MyScreen extends StatefulWidget {
   final String title;
-  final String video_stream;
-  final String audio_stream;
+  final String videoStream;
+  final String audioStream;
   final String subtitle;
   final VideoData video;
   const MyScreen(
       {super.key,
       required this.title,
-      required this.video_stream,
-      required this.audio_stream,
+      required this.videoStream,
+      required this.audioStream,
       required this.subtitle,
       required this.video});
 
@@ -73,10 +73,10 @@ class MyScreenState extends State<MyScreen> {
         debugPrint('Playing with subtitle from ${widget.subtitle}');
         pp.setProperty('sub-files', widget.subtitle);
       }
-      if (widget.audio_stream.isNotEmpty) {
-        debugPrint('Playing audio from ${widget.audio_stream}');
+      if (widget.audioStream.isNotEmpty) {
+        debugPrint('Playing audio from ${widget.audioStream}');
         // escape character usedd as list seprator by mpv
-        String audio = widget.audio_stream;
+        String audio = widget.audioStream;
         if (Platform.isLinux) {
           audio = audio.replaceAll(':', '\\:');
         } else if (Platform.isWindows) {
@@ -85,7 +85,7 @@ class MyScreenState extends State<MyScreen> {
         pp.setProperty('audio-files', audio);
       }
       player.setVolume(100);
-      player.open(Playlist([Media(widget.video_stream)]));
+      player.open(Playlist([Media(widget.videoStream)]));
       debugPrint('Playing ${widget.video}');
     }
 

@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flarte/helpers.dart';
-import 'package:flarte/config.dart';
 import 'package:flarte/main.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;

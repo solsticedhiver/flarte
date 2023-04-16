@@ -199,6 +199,7 @@ class _ShowDetailState extends State<ShowDetail> {
     }
     if (result.exitCode != 0) {
       debugPrint(result.stderr);
+      if (!context.mounted) return;
       _showMessage(context,
           'Error downloading video ${widget.video.programId} with yt-dlp');
       return;
@@ -410,6 +411,7 @@ class _ShowDetailState extends State<ShowDetail> {
       ProcessResult result = await mgr.run(cmd);
       if (result.exitCode != 0) {
         //debugPrint(result.stderr);
+        if (!context.mounted) return;
         _showMessage(context, 'Error: ${result.stderr}');
         return;
       }
@@ -446,12 +448,13 @@ class _ShowDetailState extends State<ShowDetail> {
       await _webvtt(stream.subtitle!, subFilename);
     }
     debugPrint(stream.toString());
+    if (!context.mounted) return;
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       if (Platform.isLinux || Platform.isWindows) {
         return MyScreen(
             title: title,
-            video_stream: stream.video!.toString(),
-            audio_stream: stream.audio != null ? stream.audio.toString() : '',
+            videoStream: stream.video!.toString(),
+            audioStream: stream.audio != null ? stream.audio.toString() : '',
             subtitle: subFilename,
             video: widget.video);
       } else {

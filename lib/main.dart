@@ -1,9 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flarte/helpers.dart';
 import 'package:flarte/config.dart';
 import 'package:flutter/foundation.dart';
@@ -443,8 +441,8 @@ class CarouselList extends StatelessWidget {
   final List<dynamic> data;
   final CarouselListSize size;
 
-  CarouselList(
-      {super.key, required this.data, this.size = CarouselListSize.normal}) {}
+  const CarouselList(
+      {super.key, required this.data, this.size = CarouselListSize.normal});
 
   void _showDialogProgram(BuildContext context, VideoData v) {
     showDialog(

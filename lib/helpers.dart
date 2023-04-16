@@ -13,7 +13,7 @@ class Cache extends ChangeNotifier {
   final Map<String, dynamic> data = {};
   //int index = 0;
 
-  Future<List<dynamic>> _test_france_tv() async {
+  Future<List<dynamic>> _testFranceTv() async {
     List<dynamic> result = [];
     final resp = await http.get(Uri.parse('https://www.france.tv'));
     if (resp.statusCode != 200) {
