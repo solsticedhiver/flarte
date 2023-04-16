@@ -38,5 +38,6 @@
     "strTo": "bis",
     "strFirstBroadcastDate": "Erstausstrahlungsdatum",
     "strNothingDisplay": "Nichts zu zeigen",
-    "strSearch": "Suchen"
+    "strSearch": "Suchen",
+    "strNotImpl": "Noch nicht implementiert"
 }

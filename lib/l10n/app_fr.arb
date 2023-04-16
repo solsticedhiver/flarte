@@ -38,5 +38,6 @@
     "strTo": "au",
     "strFirstBroadcastDate": "Date 1ère diffusion",
     "strNothingDisplay": "Rien à afficher",
-    "strSearch": "Recherche"
+    "strSearch": "Recherche",
+    "strNotImpl": "Non implémenté"
 }

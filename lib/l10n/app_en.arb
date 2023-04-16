@@ -38,5 +38,6 @@
     "strTo": "to",
     "strFirstBroadcastDate": "First broadcast date",
     "strNothingDisplay": "Nothing to display",
-    "strSearch": "Search"
+    "strSearch": "Search",
+    "strNotImpl": "Not implemented yet"
 }

@@ -25,8 +25,8 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: Text(AppLocalizations.of(context)!.strSearch)),
-        body: const Center(
-          child: Text('Not implemented yet'),
+        body: Center(
+          child: Text(AppLocalizations.of(context)!.strNotImpl),
         ));
   }
 }
