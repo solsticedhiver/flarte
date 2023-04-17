@@ -92,7 +92,13 @@ class _SearchScreenState extends State<SearchScreen> {
             }).toList(),
           ));
     } else {
-      results = const SizedBox.shrink();
+      String text;
+      if (search.isEmpty) {
+        text = AppLocalizations.of(context)!.strNothingDisplay;
+      } else {
+        text = AppLocalizations.of(context)!.strNoResults;
+      }
+      results = Container(width: width, child: Center(child: Text(text)));
     }
 
     if (search.isNotEmpty) {
@@ -150,8 +156,11 @@ class _SearchScreenState extends State<SearchScreen> {
                               style: const TextStyle(fontSize: 20)))),
                 ]),
               ),
-              Text(AppLocalizations.of(context)!.strResults,
-                  style: Theme.of(context).textTheme.titleLarge),
+              Container(
+                  padding: const EdgeInsets.only(left: 16),
+                  width: width,
+                  child: Text(AppLocalizations.of(context)!.strResults,
+                      style: Theme.of(context).textTheme.titleLarge)),
               const SizedBox(height: 16),
               Expanded(flex: 6, child: results),
             ])));

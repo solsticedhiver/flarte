@@ -46,5 +46,6 @@
     "strResults": "Results",
     "strItalian": "Italian",
     "strSpanish": "Spanish",
-    "strPolish": "Polish"
+    "strPolish": "Polish",
+    "strNoResults": "No results"
 }

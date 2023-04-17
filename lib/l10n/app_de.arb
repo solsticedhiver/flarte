@@ -46,5 +46,6 @@
     "strResults": "Ergebnisse",
     "strItalian": "Italienisch",
     "strSpanish": "Spanisch",
-    "strPolish": "Polirien"
+    "strPolish": "Polirien",
+    "strNoResults": "Keine Ergebnisse"
 }
