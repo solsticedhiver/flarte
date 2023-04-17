@@ -19,6 +19,7 @@ There are currently 2 archives with precompiled binaries:
 
 - windows_x64.zip:  needs *ffmpeg.exe* (preferably in same directory as *flarte.exe*) to be able to download videos.
 - linux_x64.tar.gz: this is built on an *Ubuntu 22.04* VM and expects *libmpv.so.1* to be present. If you have a more *recent mpv version* (with libmpv.so.2), you will have to build *flarte* with `flutter build`
+- a flatpak is also available for now, manually generated.
 
 ## Building and running
 
