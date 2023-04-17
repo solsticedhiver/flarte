@@ -350,7 +350,7 @@ class VideoCardState extends State<VideoCard> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Stack(alignment: AlignmentDirectional.topEnd, children: [
+                  Stack(children: [
                     Image(
                       errorBuilder: (context, error, stackTrace) =>
                           SizedBox(width: imageWidth, height: imageHeight),
@@ -363,33 +363,38 @@ class VideoCardState extends State<VideoCard> {
                     Consumer<AppData>(builder: (context, appData, child) {
                       isFavorite =
                           appData.favorites.contains(widget.video.programId);
-                      return IconButton(
-                          hoverColor: Theme.of(context).cardColor,
-                          highlightColor: Theme.of(context).cardColor,
-                          splashColor: Theme.of(context).cardColor,
-                          onPressed: () {
-                            setState(() {
-                              isFavorite = !isFavorite;
-                              //widget.video.isFavorite = isFavorite;
-                            });
+                      return Positioned(
+                          right: 0,
+                          top: 0,
+                          child: IconButton(
+                              hoverColor: Theme.of(context).cardColor,
+                              highlightColor: Theme.of(context).cardColor,
+                              splashColor: Theme.of(context).cardColor,
+                              onPressed: () {
+                                setState(() {
+                                  isFavorite = !isFavorite;
+                                  //widget.video.isFavorite = isFavorite;
+                                });
 
-                            if (isFavorite) {
-                              appData.addFavorite(widget.video.programId);
-                            } else {
-                              appData.removeFavorite(widget.video.programId);
-                            }
-                          },
-                          icon: Icon(Icons.favorite,
-                              color: isFavorite
-                                  ? Colors.deepOrange
-                                  : Theme.of(context).disabledColor));
+                                if (isFavorite) {
+                                  appData.addFavorite(widget.video.programId);
+                                } else {
+                                  appData
+                                      .removeFavorite(widget.video.programId);
+                                }
+                              },
+                              icon: Icon(Icons.favorite,
+                                  color: isFavorite
+                                      ? Colors.deepOrange
+                                      : Theme.of(context).disabledColor)));
                     }),
                     if (!widget.video.isCollection)
                       Consumer<AppData>(builder: (context, appData, child) {
                         hasBeenPlayed =
                             appData.watched.contains(widget.video.programId);
-                        return Container(
-                            margin: EdgeInsets.only(top: imageHeight - 24 - 24),
+                        return Positioned(
+                            bottom: 0,
+                            right: 0,
                             child: IconButton(
                                 hoverColor: Theme.of(context).cardColor,
                                 highlightColor: Theme.of(context).cardColor,
