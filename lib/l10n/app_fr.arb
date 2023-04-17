@@ -39,5 +39,8 @@
     "strFirstBroadcastDate": "Date 1ère diffusion",
     "strNothingDisplay": "Rien à afficher",
     "strSearch": "Recherche",
-    "strNotImpl": "Non implémenté"
+    "strNotImpl": "Non implémenté",
+    "strSubmit": "Envoyer",
+    "strSearchTerms": "Termes de la recherche",
+    "strResults": "Résultats"
 }

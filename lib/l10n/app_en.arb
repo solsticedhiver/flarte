@@ -39,5 +39,8 @@
     "strFirstBroadcastDate": "First broadcast date",
     "strNothingDisplay": "Nothing to display",
     "strSearch": "Search",
-    "strNotImpl": "Not implemented yet"
+    "strNotImpl": "Not implemented yet",
+    "strSubmit": "Submit",
+    "strSearchTerms": "Search terms",
+    "strResults": "Results"
 }

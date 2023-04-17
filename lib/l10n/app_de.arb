@@ -39,5 +39,8 @@
     "strFirstBroadcastDate": "Erstausstrahlungsdatum",
     "strNothingDisplay": "Nichts zu zeigen",
     "strSearch": "Suchen",
-    "strNotImpl": "Noch nicht implementiert"
+    "strNotImpl": "Noch nicht implementiert",
+    "strSubmit": "Einreichen",
+    "strSearchTerms": "Suchbegriffe",
+    "strResults": "Ergebnisse"
 }
