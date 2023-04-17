@@ -43,5 +43,8 @@
     "strNotImpl": "Non implémenté",
     "strSubmit": "Envoyer",
     "strSearchTerms": "Termes de la recherche",
-    "strResults": "Résultats"
+    "strResults": "Résultats",
+    "strItalian": "Italien",
+    "strSpanish": "Espagnol",
+    "strPolish": "Polonais"
 }

@@ -43,5 +43,8 @@
     "strNotImpl": "Not implemented yet",
     "strSubmit": "Submit",
     "strSearchTerms": "Search terms",
-    "strResults": "Results"
+    "strResults": "Results",
+    "strItalian": "Italian",
+    "strSpanish": "Spanish",
+    "strPolish": "Polish"
 }

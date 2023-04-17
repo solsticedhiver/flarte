@@ -40,7 +40,11 @@ class _FlarteSettingsState extends State<FlarteSettings> {
       'fr': AppLocalizations.of(context)!.strFrench,
       'de': AppLocalizations.of(context)!.strGerman,
       'en': AppLocalizations.of(context)!.strEnglish,
+      'it': AppLocalizations.of(context)!.strItalian,
+      'es': AppLocalizations.of(context)!.strSpanish,
+      'pl': AppLocalizations.of(context)!.strPolish,
     };
+    final notImplementedLocales = ['it', 'es', 'pl'];
     Locale? locale = Provider.of<LocaleModel>(context, listen: false).locale;
 
     final Map<ThemeMode, String> themeModeString = {
@@ -94,20 +98,32 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                       builder: (context) {
                         return AlertDialog(content:
                             StatefulBuilder(builder: (context, setState) {
+                          final supportedLocales = AppLocalizations
+                                  .supportedLocales +
+                              [
+                                const Locale.fromSubtags(languageCode: 'it'),
+                                const Locale.fromSubtags(languageCode: 'es'),
+                                const Locale.fromSubtags(languageCode: 'pl')
+                              ];
                           return Column(
                               mainAxisSize: MainAxisSize.min,
-                              children:
-                                  AppLocalizations.supportedLocales.map((l) {
+                              children: supportedLocales.map((l) {
+                                final isSupported = !notImplementedLocales
+                                    .contains(l.languageCode);
                                 return ListTile(
+                                    enabled: isSupported,
                                     title: Text(localeName[l.languageCode]!),
                                     leading: Radio<Locale>(
+                                      toggleable: isSupported,
                                       value: l,
                                       groupValue: locale,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          locale = value!;
-                                        });
-                                      },
+                                      onChanged: isSupported
+                                          ? (value) {
+                                              setState(() {
+                                                locale = value!;
+                                              });
+                                            }
+                                          : null,
                                     ));
                               }).toList());
                         }));
@@ -247,6 +263,7 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                               mainAxisSize: MainAxisSize.min,
                               children: ptn.entries.map((p) {
                                 return ListTile(
+                                    enabled: !p.value['disabled'],
                                     title: Text(p.value['str']),
                                     leading: Radio<PlayerTypeName>(
                                       value: p.key,
