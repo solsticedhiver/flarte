@@ -274,7 +274,7 @@ class _FlarteSettingsState extends State<FlarteSettings> {
             tiles: [
               SettingsTile(
                 leading: const Icon(Icons.download),
-                title: Text(AppLocalizations.of(context)!.strDirectory),
+                title: Text(AppLocalizations.of(context)!.strFolder),
                 value: Text(AppConfig.dlDirectory),
               ),
             ])
