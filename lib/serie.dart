@@ -102,12 +102,13 @@ class _SerieScreenState extends State<SerieScreen> {
           zoneCount++;
         }
       }
+      debugPrint(zoneCount.toString());
       if (zoneCount > 1) {
         body = CarouselList(
           data: Cache.parseJson(data),
           size: CarouselListSize.normal,
         );
-      } else {
+      } else if (zoneCount > 0) {
         body = Center(
             child: Container(
                 width: width,
@@ -127,6 +128,8 @@ class _SerieScreenState extends State<SerieScreen> {
                             withShortDescription: true));
                   }).toList(),
                 )));
+      } else {
+        body = Center(child: Text(AppLocalizations.of(context)!.strNoResults));
       }
     } else {
       body = Center(child: Text(AppLocalizations.of(context)!.strFetching));
