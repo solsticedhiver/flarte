@@ -71,16 +71,18 @@ modules:
     only-arches:
       - x86_64
     build-commands:
+      - cp flarte /app/
+      - cp -a lib /app/
+      - cp -a data /app/
       - mkdir -p /app/bin
-      - tar xzf flarte.tar.gz -C /app
       - ln -s /app/flarte /app/bin/flarte
       - mkdir -p /app/share/{metainfo,applications,icons/hicolor/256x256/apps}
       - cp io.github.solsticedhiver.flarte.png /app/share/icons/hicolor/256x256/apps
       - cp io.github.solsticedhiver.flarte.desktop /app/share/applications/
       - cp io.github.solsticedhiver.flarte.metainfo.xml /app/share/metainfo/
     sources:
-      - type: file
-        path: flarte.tar.gz
+      - type: dir
+        path: flarte
       - type: file
         path: io.github.solsticedhiver.flarte.png
       - type: file

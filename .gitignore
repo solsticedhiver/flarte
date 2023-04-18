@@ -51,4 +51,4 @@ test/widget_test.dart
 /flatpak/repo.d
 /flatpak/flarte*.flatpak
 /flatpak/.flatpak-builder/
-/flatpak/flarte.tar.gz
+/flatpak/flarte

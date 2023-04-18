@@ -1,0 +1,58 @@
+on:
+  push:
+    branches: [main]
+  pull_request:
+name: flatpak CI
+jobs:
+  flatpak:
+    name: "Flatpak"
+    runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.version.outputs.version }}
+    container:
+      image: bilelmoussaoui/flatpak-github-actions:gnome-44
+      options: --privileged
+    steps:
+    - uses: actions/checkout@v3
+    - name: Fetch all history for all tags and branches
+      if: ${{ !env.ACT }}
+      run: |
+        git fetch --prune --depth=1000
+    - name: Create version
+      id: version
+      run: echo "version=v$(grep ^version pubspec.yaml |cut -f 2 -d ' '|cut -f 1 -d '+')" >> $GITHUB_OUTPUT
+    - name: short sha
+      id: short_sha
+      run: echo "short_sha=$(echo ${{ github.sha }}|head -c 7)" >> $GITHUB_OUTPUT
+    - name: install missing node
+      if: ${{ env.ACT }}
+      run: |
+        sudo dnf install -y nodejs tar zstd ninja-build meson gtk3-devel cmake clang jq curl pkgconf mpv-devel mpv-libs mpv
+    - uses: subosito/flutter-action@v2
+      with:
+        channel : 'stable'
+        cache: true
+    - name: trust flutter git repo
+      run: git config --global --add safe.directory /opt/hostedtoolcache/flutter/stable-*
+    - run: flutter pub get
+    #- run: flutter test
+    - run: flutter config --enable-linux-desktop
+    - run: flutter build linux --release
+    - run: rm -rf flatpak/flarte
+    - run: mv build/linux/x64/release/bundle/ flatpak/flarte
+    - uses: flatpak/flatpak-github-actions/flatpak-builder@v6.1
+      with:
+        bundle: flarte-${{ steps.short_sha.outputs.short_sha }}-x86_64.flatpak
+        manifest-path: flatpak/io.github.solsticedhiver.flarte.yml
+        cache-key: flatpak-builder-${{ github.sha }}
+        #if: ${{ env.ACT }}
+        #verbose: true
+    - name: Create a release in GitHub
+      if: ${{!env.ACT}}
+      uses: ncipollo/release-action@v1
+      with:
+        allowUpdates: true
+        artifacts: "flarte-${{ steps.short_sha.outputs.short_sha }}-x86_64.flatpak"
+        token: "${{ secrets.GH_TOKEN }}"
+        tag: "${{ steps.version.outputs.version }}"
+        commit: "${{ github.sha }}"

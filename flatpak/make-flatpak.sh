@@ -2,14 +2,12 @@
 buildtype=${1:-release}
 
 CWD=`pwd`
-rm ./flarte.tar.gz
 pushd ..
 flutter build linux --${buildtype}
 popd
-pushd ../build/linux/x64/${buildtype}/bundle
-echo ':: making tarball'
-tar czf $CWD/flarte.tar.gz ./*
-popd
+
+rm -rf flarte
+ln -s ../build/linux/x64/${buildtype}/bundle flarte
 
 # build flatpak
 echo ':: running flatpak-builder'
