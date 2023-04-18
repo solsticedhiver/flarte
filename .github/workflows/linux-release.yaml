@@ -5,8 +5,8 @@ on:
     branches: [ main ]
 
 jobs:
-  version:
-    name: Create version number
+  build:
+    name: Build and create linux release
     runs-on: ubuntu-latest
     outputs:
       output1: ${{ steps.version.outputs.version }}
@@ -17,13 +17,7 @@ jobs:
         git fetch --prune --depth=1000
     - name: Create version
       id: version
-      run: echo "version=v$(grep ^version pubspec.yaml |cut -f 2 -d ' '|cut -f 1 -d '+')" >> $GITHUB_OUTPUT
-  build:
-    name: Build and create release
-    needs: [ version ]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
+      run: echo "version=$(grep ^version pubspec.yaml |cut -f 2 -d ' '|cut -f 1 -d '+')" >> $GITHUB_OUTPUT
     - uses: subosito/flutter-action@v2
       with:
         channel : 'stable'
@@ -35,19 +29,19 @@ jobs:
     #- run: flutter test
     - run: flutter config --enable-linux-desktop
     - run: flutter build linux --release
-    - run: mv build/linux/x64/release/bundle build/linux/x64/release/flarte/
+    - run: mv build/linux/x64/release/bundle build/linux/x64/release/flarte-${{ steps.version.outputs.version }}/
     - name: Archive release
       uses: thedoctor0/zip-release@0.7.1
       with:
         type: 'tar'
         directory: 'build/linux/x64/release/'
-        path: 'flarte'
-        filename: 'linux_x64.tar.gz'
+        path: 'flarte-${{ steps.version.outputs.version }}'
+        filename: 'flarte-linux_x64.tar.gz'
     - name: Create a release in GitHub
       uses: ncipollo/release-action@v1
       with:
         allowUpdates: true
-        artifacts: 'build/linux/x64/release/linux_x64.tar.gz'
+        artifacts: 'build/linux/x64/release/flarte-linux_x64.tar.gz'
         token: "${{ secrets.GH_TOKEN }}"
-        tag: "${{ needs.version.outputs.output1 }}"
+        tag: "v${{ steps.version.outputs.version }}"
         commit: "${{ github.sha }}"

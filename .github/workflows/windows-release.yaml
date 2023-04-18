@@ -5,11 +5,9 @@ on:
     branches: [ main ]
 
 jobs:
-  version:
-    name: Create version number
+  build:
+    name: Build and create windows release
     runs-on: windows-latest
-    outputs:
-      output1: ${{ steps.version.outputs.version }}
     steps:
     - uses: actions/checkout@v3
     - name: Fetch all history for all tags and branches
@@ -19,14 +17,8 @@ jobs:
       id: version
       #run: |
       #  'Select-String -Path .\pubspec.yaml -Pattern "^version: (\d+.\d+.\d+)\+\d+"|%{"version=$($_.matches.groups[1].value)"}' >> $env:GITHUB_OUTPUT
-      run: echo "version=v$(grep ^version pubspec.yaml |cut -f 2 -d ' '|cut -f 1 -d '+')" >> $GITHUB_OUTPUT
+      run: echo "version=$(grep ^version pubspec.yaml |cut -f 2 -d ' '|cut -f 1 -d '+')" >> $GITHUB_OUTPUT
       shell: bash
-  build:
-    name: Build and Create release
-    needs: [ version ]
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v3
     - uses: subosito/flutter-action@v2
       with:
         channel : 'stable'
@@ -36,20 +28,20 @@ jobs:
     - run: flutter config --enable-windows-desktop
     - run: flutter build windows --release
     - name: rename main folder
-      run: mv build/windows/runner/Release build/windows/runner/flarte
+      run: mv build/windows/runner/Release build/windows/runner/flarte-${{ steps.version.outputs.version }}
       shell: bash
     - name: Archive Release
       uses: thedoctor0/zip-release@0.7.1
       with:
         type: 'zip'
         directory: 'build/windows/runner/'
-        path: 'flarte'
-        filename: 'windows_x64.zip'
-    - name: Create a Release in GitHub
+        path: 'flarte-${{ steps.version.outputs.version }}'
+        filename: 'flarte-windows_x64.zip'
+    - name: Create a release on GitHub
       uses: ncipollo/release-action@v1
       with:
         allowUpdates: true
-        artifacts: "build/windows/runner/windows_x64.zip"
+        artifacts: "build/windows/runner/flarte-windows_x64.zip"
         token: "${{ secrets.GH_TOKEN }}"
-        tag: "${{ needs.version.outputs.output1 }}"
+        tag: "v${{ steps.version.outputs.version }}"
         commit: "${{ github.sha }}"
