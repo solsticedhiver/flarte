@@ -77,7 +77,7 @@ class MyScreenState extends State<MyScreen> {
         debugPrint('Playing audio from ${widget.audioStream}');
         // escape character usedd as list seprator by mpv
         String audio = widget.audioStream;
-        if (Platform.isLinux) {
+        if (Platform.isLinux || Platform.isAndroid) {
           audio = audio.replaceAll(':', '\\:');
         } else if (Platform.isWindows) {
           audio = audio.replaceAll(';', '\\;');

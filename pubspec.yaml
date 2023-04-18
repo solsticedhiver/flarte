@@ -49,7 +49,6 @@ dependencies:
   path: ^1.8.2
   html: ^0.15.2
   flutter_hls_parser: ^2.0.1
-  video_player: ^2.6.0
   flutter_localizations:
     sdk: flutter
   intl: any

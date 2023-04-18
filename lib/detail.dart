@@ -16,7 +16,6 @@ import 'helpers.dart';
 import 'config.dart';
 import 'serie.dart';
 import 'player.dart';
-import 'mobile_player.dart';
 import 'downloader.dart';
 
 class ShowDetail extends StatefulWidget {
@@ -450,7 +449,7 @@ class _ShowDetailState extends State<ShowDetail> {
     debugPrint(stream.toString());
     if (!context.mounted) return;
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      if (Platform.isLinux || Platform.isWindows) {
+      if (Platform.isLinux || Platform.isWindows || Platform.isAndroid) {
         return MyScreen(
             title: title,
             videoStream: stream.video!.toString(),
@@ -458,10 +457,7 @@ class _ShowDetailState extends State<ShowDetail> {
             subtitle: subFilename,
             video: widget.video);
       } else {
-        return MyMobileScreen(
-            title: title,
-            url: selectedVersion.url,
-            bitrate: selectedFormat.bandwidth);
+        return Center(child: Text(AppLocalizations.of(context)!.strNotImpl));
       }
     }));
   }
