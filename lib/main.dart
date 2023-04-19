@@ -226,6 +226,20 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                   lang: lang);
                             })),
                         ListTile(
+                          enabled: false,
+                          selectedTileColor: Theme.of(context).highlightColor,
+                          contentPadding: EdgeInsets.only(
+                            left: 25,
+                            top: padding,
+                          ),
+                          minLeadingWidth: 30,
+                          leading: const Icon(Icons.cloud_download),
+                          title: leftSideWidth != 64
+                              ? Text(AppLocalizations.of(context)!.strDownloads)
+                              : null,
+                          onTap: () {},
+                        ),
+                        ListTile(
                           selectedTileColor: Theme.of(context).highlightColor,
                           contentPadding: EdgeInsets.only(
                             left: 25,
