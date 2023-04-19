@@ -13,12 +13,10 @@ jobs:
       image: bilelmoussaoui/flatpak-github-actions:gnome-44
       options: --privileged
     steps:
-    - uses: actions/checkout@v3
-    - name: Fetch all history for all tags and branches
-      if: ${{ !env.ACT }}
-      run: |
-        git fetch --prune --depth=1000
-        git config --global --add safe.directory /__w/flarte/flarte
+    - name: add git safe dir ??
+      run: git config --global --add safe.directory /__w/flarte/flarte
+    - name: Checkout repo
+      uses: actions/checkout@v3
     - name: Create version
       id: version
       run: echo "version=v$(grep ^version pubspec.yaml |cut -f 2 -d ' '|cut -f 1 -d '+')" >> $GITHUB_OUTPUT

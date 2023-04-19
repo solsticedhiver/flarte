@@ -10,9 +10,6 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Fetch all history for all tags and branches
-      run: |
-        git fetch --prune --depth=1000
     - name: Create version
       id: version
       #run: |

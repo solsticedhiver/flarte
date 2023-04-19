@@ -12,9 +12,6 @@ jobs:
       output1: ${{ steps.version.outputs.version }}
     steps:
     - uses: actions/checkout@v3
-    - name: Fetch all history for all tags and branches
-      run: |
-        git fetch --prune --depth=1000
     - name: Create version
       id: version
       run: echo "version=$(grep ^version pubspec.yaml |cut -f 2 -d ' '|cut -f 1 -d '+')" >> $GITHUB_OUTPUT
