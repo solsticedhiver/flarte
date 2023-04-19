@@ -47,5 +47,6 @@
     "strItalian": "Italien",
     "strSpanish": "Espagnol",
     "strPolish": "Polonais",
-    "strNoResults": "Aucun résultat"
+    "strNoResults": "Aucun résultat",
+    "strAbout": "A propos de"
 }

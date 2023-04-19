@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flarte/helpers.dart';
 import 'package:flarte/config.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:settings_ui/settings_ui.dart';
@@ -293,6 +294,30 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                 leading: const Icon(Icons.download),
                 title: Text(AppLocalizations.of(context)!.strFolder),
                 value: Text(AppConfig.dlDirectory),
+              ),
+            ]),
+        SettingsSection(
+            title: Text(
+                '${AppLocalizations.of(context)!.strAbout}  ${AppConfig.name}'),
+            tiles: [
+              SettingsTile(
+                leading: const Icon(Icons.info),
+                title: const Text('version ${AppConfig.version}'),
+                onPressed: (context) async {
+                  String GPL3 =
+                      await PlatformAssetBundle().loadString('assets/GPL3.txt');
+                  if (!context.mounted) return;
+                  showAboutDialog(
+                    context: context,
+                    applicationIcon: Image.asset('assets/flarte.png',
+                        width: 128, height: 128),
+                    applicationName: AppConfig.name,
+                    applicationVersion: AppConfig.version,
+                    applicationLegalese:
+                        "Copyright © 2023\nsolsTiCe d'Hiver <solstice.dhiver@gmail.com>\nGPL-3+",
+                    children: [const SizedBox(height: 10), Text(GPL3)],
+                  );
+                },
               ),
             ])
       ]),
