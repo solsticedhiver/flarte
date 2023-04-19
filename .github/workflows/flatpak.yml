@@ -13,8 +13,6 @@ jobs:
       image: bilelmoussaoui/flatpak-github-actions:gnome-44
       options: --privileged
     steps:
-    - name: add git safe dir ??
-      run: git config --global --add safe.directory /__w/flarte/flarte
     - name: Checkout repo
       uses: actions/checkout@v3
     - name: Create version
