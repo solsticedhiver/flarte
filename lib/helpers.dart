@@ -287,6 +287,7 @@ class VideoCardState extends State<VideoCard> {
     }
 
     Widget bottomText;
+    const double padding = 8.0;
     if (widget.withShortDescription) {
       Color? color;
       if (Theme.of(context).brightness == Brightness.dark) {
@@ -298,7 +299,7 @@ class VideoCardState extends State<VideoCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 10),
+            const SizedBox(height: padding),
             Text(
                 widget.useSubtitle && widget.video.subtitle != null
                     ? widget.video.subtitle!
@@ -307,7 +308,7 @@ class VideoCardState extends State<VideoCard> {
                 softWrap: true,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 5),
+            const SizedBox(height: padding / 3),
             Text(
               widget.video.teaserText.toString().trim(),
               maxLines: 3,
@@ -318,7 +319,7 @@ class VideoCardState extends State<VideoCard> {
                   .bodyMedium
                   ?.copyWith(color: color),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: padding),
             if (widget.video.durationLabel != null)
               Chip(
                 backgroundColor: Theme.of(context).primaryColor,
@@ -345,7 +346,7 @@ class VideoCardState extends State<VideoCard> {
     }
     return Card(
         child: Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(padding),
             child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
