@@ -18,17 +18,16 @@ jobs:
     - name: Create version
       id: version
       run: echo "version=v$(grep ^version pubspec.yaml |cut -f 2 -d ' '|cut -f 1 -d '+')" >> $GITHUB_OUTPUT
-    - name: short sha
+    - name: Create short sha
       id: short_sha
       run: echo "short_sha=$(echo ${{ github.sha }}|head -c 7)" >> $GITHUB_OUTPUT
-    - name: install missing node
-      run: |
-        sudo dnf install -y nodejs tar zstd ninja-build meson gtk3-devel cmake clang jq curl pkgconf mpv-devel mpv-libs mpv
+    - name: Install missing package to build with flutter
+      run: sudo dnf install -y ninja-build gtk3-devel cmake clang jq curl pkgconf mpv-devel mpv-libs mpv
     - uses: subosito/flutter-action@v2
       with:
         channel : 'stable'
         cache: true
-    - name: trust flutter git repo
+    - name: Trust flutter git repo
       run: git config --global --add safe.directory /opt/hostedtoolcache/flutter/stable-*
     - run: flutter pub get
     #- run: flutter test
@@ -36,13 +35,16 @@ jobs:
     - run: flutter build linux --release
     - run: rm -rf flatpak/flarte
     - run: mv build/linux/x64/release/bundle/ flatpak/flarte
+    - name: Install missing nodejs and other packages [for act run]
+      if: ${{ env.ACT }}
+      run: sudo dnf install -y nodejs tar zstd
     - uses: flatpak/flatpak-github-actions/flatpak-builder@v6.1
       with:
         bundle: flarte-${{ steps.short_sha.outputs.short_sha }}-x86_64.flatpak
         manifest-path: flatpak/io.github.solsticedhiver.flarte.yml
         cache-key: flatpak-builder-${{ github.sha }}
     - name: Create a release in GitHub
-      if: ${{!env.ACT}}
+      if: ${{ !env.ACT }}
       uses: ncipollo/release-action@v1
       with:
         allowUpdates: true

@@ -24,7 +24,7 @@ jobs:
     #- run: flutter test
     - run: flutter config --enable-windows-desktop
     - run: flutter build windows --release
-    - name: rename main folder
+    - name: Rename main folder
       run: mv build/windows/runner/Release build/windows/runner/flarte-${{ steps.version.outputs.version }}
       shell: bash
     - name: Archive Release
