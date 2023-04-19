@@ -224,6 +224,15 @@ class _ShowDetailState extends State<ShowDetail> {
   }
 
   void _ffmpeg() async {
+    final cwd = AppConfig.dlDirectory;
+    debugPrint(cwd);
+    final outputFilename =
+        '${widget.video.programId}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat.resolution}.mp4';
+    debugPrint(outputFilename);
+    if (File(path.join(cwd, outputFilename)).existsSync()) {
+      _showMessage(context, 'File $outputFilename already exists');
+      return;
+    }
     // work-around ffmpeg bug #10149 and #10169
     // because ffmpeg can't handle vtt subtitle correctly or choke on some time_id3/sidx stream
     // we download subtitle to modify it and then stream video, audio and subtitle separatly
@@ -245,8 +254,6 @@ class _ShowDetailState extends State<ShowDetail> {
     } else if (!Platform.isLinux) {
       return;
     }
-    final cwd = AppConfig.dlDirectory;
-    debugPrint(cwd);
     String videoFilename =
         stream.video.toString().split('/').last.replaceFirst('m3u8', 'mp4');
     String audioFilename = '';
@@ -293,9 +300,6 @@ class _ShowDetailState extends State<ShowDetail> {
         throw (Exception('Error downloading audio $programId'));
       }
       // combine video/audio/subtitle together
-      final outputFilename =
-          '${widget.video.programId}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat.resolution}.mp4';
-      debugPrint(outputFilename);
       final String cmd;
       if (stream.audio == null && stream.subtitle == null) {
         await File(path.join(cwd, videoFilename))
