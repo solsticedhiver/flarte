@@ -235,7 +235,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                           minLeadingWidth: 30,
                           leading: const Icon(Icons.cloud_download),
                           title: leftSideWidth != 64
-                              ? Text(AppLocalizations.of(context)!.strDownloads)
+                              ? Text(AppLocalizations.of(context)!.strDownloads,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w500))
                               : null,
                           onTap: () {},
                         ),
@@ -248,7 +250,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                           minLeadingWidth: 30,
                           leading: const Icon(Icons.search),
                           title: leftSideWidth != 64
-                              ? Text(AppLocalizations.of(context)!.strSearch)
+                              ? Text(AppLocalizations.of(context)!.strSearch,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w500))
                               : null,
                           onTap: () {
                             Navigator.push(context,
@@ -267,7 +271,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                           minLeadingWidth: 30,
                           leading: const Icon(Icons.settings),
                           title: leftSideWidth != 64
-                              ? Text(AppLocalizations.of(context)!.strSettings)
+                              ? Text(AppLocalizations.of(context)!.strSettings,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w500))
                               : null,
                           onTap: () async {
                             final settings = await Navigator.push(context,
