@@ -16,7 +16,6 @@ import 'helpers.dart';
 import 'config.dart';
 import 'serie.dart';
 import 'player.dart';
-import 'downloader.dart';
 
 class ShowDetail extends StatefulWidget {
   final VideoData video;
