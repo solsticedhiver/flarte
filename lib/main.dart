@@ -491,9 +491,9 @@ class CarouselList extends StatelessWidget {
       thumbnails
           .add(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
-            padding: const EdgeInsets.all(15),
+            padding: const EdgeInsets.only(top: 8, bottom: 8),
             child: Text('${z['title']} (${videos.length})',
-                style: Theme.of(context).textTheme.headlineSmall)),
+                style: Theme.of(context).textTheme.titleLarge)),
         Carousel(
             size: size,
             children: videos.map((v) {
@@ -559,9 +559,9 @@ class _CategoriesListState extends State<CategoriesList> {
 
   @override
   Widget build(BuildContext context) {
-    double padding = 10;
+    double padding = 8;
     if (MediaQuery.of(context).size.height < 720) {
-      padding = 5;
+      padding = 4;
       if (MediaQuery.of(context).size.height < 640) {
         padding = 0;
       }
