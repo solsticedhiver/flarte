@@ -366,6 +366,7 @@ class _CarouselState extends State<Carousel> {
         isChevronLeftVisible = false;
         isChevronRightVisible = false;
       }
+      const double chevronSize = 16.0;
       return Stack(children: [
         SizedBox(
             height: widget._height,
@@ -405,7 +406,7 @@ class _CarouselState extends State<Carousel> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.onSecondary,
                     shape: const CircleBorder(),
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(chevronSize),
                   ),
                   child: Icon(
                     Icons.chevron_left,
@@ -442,7 +443,7 @@ class _CarouselState extends State<Carousel> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.onSecondary,
                     shape: const CircleBorder(),
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(chevronSize),
                   ),
                   child: Icon(
                     Icons.chevron_right,
