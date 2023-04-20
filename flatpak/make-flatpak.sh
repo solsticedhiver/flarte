@@ -6,7 +6,7 @@ pushd ..
 flutter build linux --${buildtype}
 popd
 
-rm -rf flarte
+rm -f flarte
 ln -s ../build/linux/x64/${buildtype}/bundle flarte
 
 # build flatpak
@@ -22,3 +22,5 @@ flatpak build-export repo.d build-dir
 flatpak build-bundle repo.d flarte-${sha}-x86_64.flatpak io.github.solsticedhiver.flarte
 
 rm -rf repo.d
+rm -rf build-dir
+rm -f flarte
