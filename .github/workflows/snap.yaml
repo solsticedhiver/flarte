@@ -1,0 +1,27 @@
+name: Snap build
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  snap:
+    name: Build and create snap
+    runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.version.outputs.version }}
+    steps:
+    - uses: actions/checkout@v3
+    - name: Create version
+      id: version
+      run: echo "version=$(grep ^version pubspec.yaml |cut -f 2 -d ' '|cut -f 1 -d '+')" >> $GITHUB_OUTPUT
+    - uses: snapcore/action-build@v1
+      id: snapcraft
+    - name: Create a release in GitHub
+      uses: ncipollo/release-action@v1
+      with:
+        allowUpdates: true
+        artifacts: ${{ steps.snapcraft.outputs.snap }}
+        token: "${{ secrets.GH_TOKEN }}"
+        tag: "v${{ steps.version.outputs.version }}"
+        commit: "${{ github.sha }}"

@@ -1,7 +1,7 @@
 on:
   push:
     branches: [main]
-  pull_request:
+
 name: flatpak CI
 jobs:
   flatpak:

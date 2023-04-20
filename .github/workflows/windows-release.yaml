@@ -5,7 +5,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  windows:
     name: Build and create windows release
     runs-on: windows-latest
     steps:

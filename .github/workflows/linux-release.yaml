@@ -5,7 +5,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  linux:
     name: Build and create linux release
     runs-on: ubuntu-latest
     outputs:

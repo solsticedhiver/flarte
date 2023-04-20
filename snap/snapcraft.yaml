@@ -1,0 +1,46 @@
+name: flarte
+base: core22
+version: '0.2.1'
+icon: assets/flarte.png
+summary: View and download video from arte.tv catch up TV site
+description: |
+  An alternative GUI to browse arte.tv website that allows you, not only
+  to watch every video but to download them too
+
+contact: solstice.dhiver@gmail.com
+issues: https://github.com/solsticedhiver/flarte/issues
+source-code: https://github.com/solsticedhiver/flarte
+license: GPL-3.0-or-later
+grade: devel
+confinement: strict
+architectures:
+  - build-on: [ amd64 ]
+
+parts:
+  flarte:
+    source: .
+    plugin: flutter
+    flutter-target: lib/main.dart
+    flutter-channel: stable
+    build-packages: [pkg-config, ninja-build, cmake, libgtk-3-dev, libmpv-dev, mpv]
+    stage-packages: [libmpv1, libblas3, liblapack3, ffmpeg]
+  cleanup:
+    after:
+      - flarte
+    plugin: nil
+    override-prime: |
+      find $SNAPCRAFT_PRIME/usr/lib -type f,l -name 'libLLVM-*.so*' -delete
+apps:
+  flarte:
+    command: flarte
+    extensions: [gnome]
+    plugs:
+      - network
+      - desktop
+      - wayland
+      - x11
+      - home
+      - audio-playback
+      - opengl
+    environment:
+      LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/x86_64-linux-gnu/blas:$SNAP/usr/lib/x86_64-linux-gnu/lapack
