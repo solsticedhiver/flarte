@@ -22,7 +22,7 @@ There are currently 2 archives with precompiled binaries:
 
 There is also a *flatpak* and a *snap* available.
 
-To be able to install the *snap* as a *local file*, you will need to use the `--dangerous` switch:
+To be able to install the *snap* as a *local file*, you will need to use the `--dangerous` switch, otherwise you will get the error message `error: cannot find signatures with metadata for snap "flarte_x.y.z_amd64.snap"`
 
     sudo snap install flarte_x.y.z_amd64.snap --dangerous
 
