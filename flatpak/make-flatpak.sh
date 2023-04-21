@@ -1,6 +1,8 @@
 #!/bin/bash
 buildtype=${1:-release}
 
+set -e
+
 CWD=`pwd`
 pushd ..
 flutter build linux --${buildtype}
