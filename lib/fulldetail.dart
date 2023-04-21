@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flarte/controls.dart';
@@ -138,212 +139,292 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
 
     return Scaffold(
         appBar: AppBar(title: Text(AppLocalizations.of(context)!.strDetails)),
-        body: GestureDetector(
-            onPanUpdate: (details) {
-              swipeDirection = details.delta.dx > 0 ? 'left' : 'right';
-            },
-            onPanEnd: (details) {
-              int index = widget.index, wi;
-              if (swipeDirection == null) {
-                return;
-              } else if (swipeDirection == 'left') {
-                wi = widget.index - 1;
-                if (wi >= 0) {
-                  index = wi;
+        body: Stack(children: [
+          GestureDetector(
+              supportedDevices: const {
+                PointerDeviceKind.stylus,
+                PointerDeviceKind.touch,
+                PointerDeviceKind.trackpad
+              },
+              onPanUpdate: (details) {
+                swipeDirection = details.delta.dx > 0 ? 'left' : 'right';
+              },
+              onPanEnd: (details) {
+                int index = widget.index, wi;
+                if (swipeDirection == null) {
+                  return;
+                } else if (swipeDirection == 'left') {
+                  wi = widget.index - 1;
+                  if (wi >= 0) {
+                    index = wi;
+                  }
+                } else if (swipeDirection == 'right') {
+                  wi = widget.index + 1;
+                  if (wi < widget.videos.length) {
+                    index = wi;
+                  }
                 }
-              } else if (swipeDirection == 'right') {
-                wi = widget.index + 1;
-                if (wi < widget.videos.length) {
-                  index = wi;
+                if (index != widget.index) {
+                  widget.index = index;
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => FullDetailScreen(
+                          videos: widget.videos, index: widget.index)));
                 }
-              }
-              if (index != widget.index) {
-                widget.index = index;
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => FullDetailScreen(
-                        videos: widget.videos, index: widget.index)));
-              }
-            },
-            child: Container(
-                padding: const EdgeInsets.all(15),
-                child: Center(
-                    child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                      if (showImage)
+              },
+              child: Container(
+                  padding: const EdgeInsets.all(15),
+                  child: Center(
+                      child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                        if (showImage)
+                          Expanded(
+                              flex: 1,
+                              child: Center(
+                                  child: SizedBox.expand(
+                                      child: Image(
+                                errorBuilder: (context, error, stackTrace) =>
+                                    const SizedBox.shrink(),
+                                image: CachedNetworkImageProvider(imageUrl,
+                                    headers: {
+                                      'User-Agent': AppConfig.userAgent
+                                    }),
+                                fit: BoxFit.fitWidth,
+                              )))),
                         Expanded(
-                            flex: 1,
-                            child: Center(
-                                child: SizedBox.expand(
-                                    child: Image(
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const SizedBox.shrink(),
-                              image: CachedNetworkImageProvider(imageUrl,
-                                  headers: {'User-Agent': AppConfig.userAgent}),
-                              fit: BoxFit.fitWidth,
-                            )))),
-                      Expanded(
-                          flex: 2,
-                          child: Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 16),
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(data['title'],
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headlineLarge),
-                                    const SizedBox(height: 10),
-                                    Row(children: [
-                                      Chip(
-                                        backgroundColor:
-                                            Theme.of(context).primaryColor,
-                                        label: Text(data['kind']['label']),
-                                      ),
-                                      const SizedBox(width: 10),
-                                      if (!data['kind']['isCollection'] &&
-                                          data['durationLabel'] != null)
+                            flex: 2,
+                            child: Container(
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 16),
+                                child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(data['title'],
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headlineLarge),
+                                      const SizedBox(height: 10),
+                                      Row(children: [
                                         Chip(
                                           backgroundColor:
                                               Theme.of(context).primaryColor,
-                                          label: Text(data['durationLabel']),
+                                          label: Text(data['kind']['label']),
                                         ),
-                                    ]),
-                                    const SizedBox(height: 10),
-                                    !video.isCollection
-                                        ? VideoButtons(
-                                            videos: widget.videos,
-                                            index: widget.index,
-                                            oneLine: true,
-                                            withFullDetailButton: false)
-                                        : TextButton(
-                                            onPressed: () {
-                                              //Navigator.pop(context);
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          SerieScreen(
-                                                              title:
-                                                                  video.title,
-                                                              url: video.url)));
-                                            },
-                                            child: Text(
-                                                AppLocalizations.of(context)!
-                                                    .strEpisodes),
+                                        const SizedBox(width: 10),
+                                        if (!data['kind']['isCollection'] &&
+                                            data['durationLabel'] != null)
+                                          Chip(
+                                            backgroundColor:
+                                                Theme.of(context).primaryColor,
+                                            label: Text(data['durationLabel']),
                                           ),
-                                    Flexible(
-                                        child: SingleChildScrollView(
-                                            child: Column(children: [
-                                      if (data['subtile'] != null) ...[
-                                        const SizedBox(height: 10),
-                                        Text(data['subtitle'],
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headlineMedium)
-                                      ],
-                                      if (shortDescription.isNotEmpty) ...[
-                                        const SizedBox(height: 10),
-                                        Text(shortDescription,
-                                            textAlign: TextAlign.justify,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleLarge)
-                                      ],
-                                      Html(
-                                          data: description,
-                                          tagsList: Html.tags,
-                                          style: {
-                                            'p': Style(
-                                                letterSpacing: 1.0,
-                                                fontWeight: FontWeight.w400,
-                                                textAlign: TextAlign.justify,
-                                                wordSpacing: 1.0,
-                                                fontSize: FontSize.medium),
-                                            'strong': Style(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: FontSize.larger),
-                                          })
+                                      ]),
+                                      const SizedBox(height: 10),
+                                      !video.isCollection
+                                          ? VideoButtons(
+                                              videos: widget.videos,
+                                              index: widget.index,
+                                              oneLine: true,
+                                              withFullDetailButton: false)
+                                          : TextButton(
+                                              onPressed: () {
+                                                //Navigator.pop(context);
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            SerieScreen(
+                                                                title:
+                                                                    video.title,
+                                                                url: video
+                                                                    .url)));
+                                              },
+                                              child: Text(
+                                                  AppLocalizations.of(context)!
+                                                      .strEpisodes),
+                                            ),
+                                      Flexible(
+                                          child: SingleChildScrollView(
+                                              child: Column(children: [
+                                        if (data['subtile'] != null) ...[
+                                          const SizedBox(height: 10),
+                                          Text(data['subtitle'],
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headlineMedium)
+                                        ],
+                                        if (shortDescription.isNotEmpty) ...[
+                                          const SizedBox(height: 10),
+                                          Text(shortDescription,
+                                              textAlign: TextAlign.justify,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleLarge)
+                                        ],
+                                        Html(
+                                            data: description,
+                                            tagsList: Html.tags,
+                                            style: {
+                                              'p': Style(
+                                                  letterSpacing: 1.0,
+                                                  fontWeight: FontWeight.w400,
+                                                  textAlign: TextAlign.justify,
+                                                  wordSpacing: 1.0,
+                                                  fontSize: FontSize.medium),
+                                              'strong': Style(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: FontSize.larger),
+                                            })
+                                      ]))),
                                     ]))),
-                                  ]))),
-                      Expanded(
-                          flex: 1,
-                          child: Center(
-                              child: SingleChildScrollView(
-                                  child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(children: [
-                                const Expanded(flex: 1, child: Text('ID')),
-                                Expanded(
-                                    flex: 1,
-                                    child: Text('${data['programId']}'))
-                              ]),
-                              const SizedBox(height: 10),
-                              Row(children: [
-                                Expanded(
-                                    flex: 1,
-                                    child: Text(AppLocalizations.of(context)!
-                                        .strDuration)),
-                                Expanded(
-                                    flex: 1,
-                                    child: Text('${data['durationLabel']}'))
-                              ]),
-                              if (firstBroadcastDate.isNotEmpty) ...[
-                                const SizedBox(height: 10),
+                        Expanded(
+                            flex: 1,
+                            child: Center(
+                                child: SingleChildScrollView(
+                                    child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
                                 Row(children: [
+                                  const Expanded(flex: 1, child: Text('ID')),
                                   Expanded(
                                       flex: 1,
-                                      child: Text(AppLocalizations.of(context)!
-                                          .strFirstBroadcastDate)),
-                                  Expanded(
-                                      flex: 1, child: Text(firstBroadcastDate))
-                                ])
-                              ],
-                              if (availabilityStart.isNotEmpty) ...[
-                                const SizedBox(height: 10),
-                                Row(children: [
-                                  Expanded(
-                                      flex: 1,
-                                      child: Text(AppLocalizations.of(context)!
-                                          .strAvailability)),
-                                  Expanded(
-                                      flex: 1,
-                                      child: Text(
-                                          '${AppLocalizations.of(context)!.strFrom} $availabilityStart\n${AppLocalizations.of(context)!.strTo} $availabilityEnd'))
-                                ])
-                              ],
-                              const SizedBox(height: 10),
-                              if (data['genre'] != null)
-                                Row(children: [
-                                  Expanded(
-                                      flex: 1,
-                                      child: Text(AppLocalizations.of(context)!
-                                          .strGenre)),
-                                  Expanded(
-                                      flex: 1,
-                                      child: Text('${data['genre']['label']}'))
+                                      child: Text('${data['programId']}'))
                                 ]),
-                              if (data['geoblocking'] != null) ...[
                                 const SizedBox(height: 10),
                                 Row(children: [
-                                  const Expanded(
-                                      flex: 1, child: Text('GeoBlocking')),
                                   Expanded(
                                       flex: 1,
-                                      child: Text(
-                                          '${data['geoblocking']['code']}'))
-                                ])
+                                      child: Text(AppLocalizations.of(context)!
+                                          .strDuration)),
+                                  Expanded(
+                                      flex: 1,
+                                      child: Text('${data['durationLabel']}'))
+                                ]),
+                                if (firstBroadcastDate.isNotEmpty) ...[
+                                  const SizedBox(height: 10),
+                                  Row(children: [
+                                    Expanded(
+                                        flex: 1,
+                                        child: Text(
+                                            AppLocalizations.of(context)!
+                                                .strFirstBroadcastDate)),
+                                    Expanded(
+                                        flex: 1,
+                                        child: Text(firstBroadcastDate))
+                                  ])
+                                ],
+                                if (availabilityStart.isNotEmpty) ...[
+                                  const SizedBox(height: 10),
+                                  Row(children: [
+                                    Expanded(
+                                        flex: 1,
+                                        child: Text(
+                                            AppLocalizations.of(context)!
+                                                .strAvailability)),
+                                    Expanded(
+                                        flex: 1,
+                                        child: Text(
+                                            '${AppLocalizations.of(context)!.strFrom} $availabilityStart\n${AppLocalizations.of(context)!.strTo} $availabilityEnd'))
+                                  ])
+                                ],
+                                const SizedBox(height: 10),
+                                if (data['genre'] != null)
+                                  Row(children: [
+                                    Expanded(
+                                        flex: 1,
+                                        child: Text(
+                                            AppLocalizations.of(context)!
+                                                .strGenre)),
+                                    Expanded(
+                                        flex: 1,
+                                        child:
+                                            Text('${data['genre']['label']}'))
+                                  ]),
+                                if (data['geoblocking'] != null) ...[
+                                  const SizedBox(height: 10),
+                                  Row(children: [
+                                    const Expanded(
+                                        flex: 1, child: Text('GeoBlocking')),
+                                    Expanded(
+                                        flex: 1,
+                                        child: Text(
+                                            '${data['geoblocking']['code']}'))
+                                  ])
+                                ],
+                                const SizedBox(height: 10),
+                                ...credits,
                               ],
-                              const SizedBox(height: 10),
-                              ...credits,
-                            ],
-                          )))),
-                    ])))));
+                            )))),
+                      ])))),
+          Builder(builder: (context) {
+            return Positioned(
+                left: 10,
+                top: (MediaQuery.of(context).size.height -
+                        Scaffold.of(context).appBarMaxHeight!) /
+                    2,
+                child: ElevatedButton(
+                  onPressed: widget.index == 0
+                      ? null
+                      : () {
+                          final wi = widget.index - 1;
+                          if (wi >= 0) {
+                            widget.index = wi;
+                          }
+
+                          Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                  builder: (context) => FullDetailScreen(
+                                      videos: widget.videos,
+                                      index: widget.index)));
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.onSecondary,
+                    shape: const CircleBorder(),
+                    padding: const EdgeInsets.all(16),
+                  ),
+                  child: Icon(
+                    Icons.keyboard_double_arrow_left,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ));
+          }),
+          Builder(builder: (context) {
+            return Positioned(
+                right: 10,
+                top: (MediaQuery.of(context).size.height -
+                        Scaffold.of(context).appBarMaxHeight!) /
+                    2,
+                child: ElevatedButton(
+                  onPressed: widget.index == widget.videos.length - 1
+                      ? null
+                      : () {
+                          final wi = widget.index + 1;
+                          if (wi < widget.videos.length) {
+                            widget.index = wi;
+                          }
+
+                          Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                  builder: (context) => FullDetailScreen(
+                                      videos: widget.videos,
+                                      index: widget.index)));
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.onSecondary,
+                    shape: const CircleBorder(),
+                    padding: const EdgeInsets.all(16),
+                  ),
+                  child: Icon(
+                    Icons.keyboard_double_arrow_right,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ));
+          }),
+        ]));
   }
 }
