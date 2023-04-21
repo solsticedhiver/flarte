@@ -39,6 +39,10 @@ class _VideoButtonsState extends State<VideoButtons> {
 
   @override
   void initState() {
+    super.initState();
+
+    if (versions.isNotEmpty) return;
+
     Future.microtask(() async {
       final programId = widget.video.programId;
 
@@ -491,6 +495,7 @@ class _VideoButtonsState extends State<VideoButtons> {
         IconButton(
             icon: const Icon(Icons.read_more),
             onPressed: () {
+              Navigator.pop(context);
               Navigator.push(
                   context,
                   MaterialPageRoute(
