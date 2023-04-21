@@ -167,21 +167,6 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                     style: Theme.of(context)
                                         .textTheme
                                         .headlineLarge),
-                                if (data['subtile'] != null)
-                                  const SizedBox(height: 10),
-                                if (data['subtile'] != null)
-                                  Text(data['subtitle'],
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headlineMedium),
-                                if (shortDescription.isNotEmpty)
-                                  const SizedBox(height: 10),
-                                if (shortDescription.isNotEmpty)
-                                  Text(shortDescription,
-                                      textAlign: TextAlign.justify,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleLarge),
                                 const SizedBox(height: 10),
                                 Row(children: [
                                   Chip(
@@ -205,20 +190,37 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                     withFullDetailButton: false),
                                 Flexible(
                                     child: SingleChildScrollView(
-                                        child: Html(
-                                            data: description,
-                                            tagsList: Html.tags,
-                                            style: {
-                                      'p': Style(
-                                          letterSpacing: 1.0,
-                                          fontWeight: FontWeight.w400,
-                                          textAlign: TextAlign.justify,
-                                          wordSpacing: 1.0,
-                                          fontSize: FontSize.medium),
-                                      'strong': Style(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: FontSize.larger),
-                                    }))),
+                                        child: Column(children: [
+                                  if (data['subtile'] != null) ...[
+                                    const SizedBox(height: 10),
+                                    Text(data['subtitle'],
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headlineMedium)
+                                  ],
+                                  if (shortDescription.isNotEmpty) ...[
+                                    const SizedBox(height: 10),
+                                    Text(shortDescription,
+                                        textAlign: TextAlign.justify,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge)
+                                  ],
+                                  Html(
+                                      data: description,
+                                      tagsList: Html.tags,
+                                      style: {
+                                        'p': Style(
+                                            letterSpacing: 1.0,
+                                            fontWeight: FontWeight.w400,
+                                            textAlign: TextAlign.justify,
+                                            wordSpacing: 1.0,
+                                            fontSize: FontSize.medium),
+                                        'strong': Style(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: FontSize.larger),
+                                      })
+                                ]))),
                               ]))),
                   Expanded(
                       flex: 1,
