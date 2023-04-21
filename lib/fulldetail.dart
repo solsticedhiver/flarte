@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flarte/controls.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -12,10 +13,10 @@ import 'helpers.dart';
 import 'config.dart';
 
 class FullDetailScreen extends StatefulWidget {
-  final String programId;
+  final VideoData video;
   const FullDetailScreen({
     super.key,
-    required this.programId,
+    required this.video,
   });
 
   @override
@@ -66,7 +67,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context)!.strDetails)),
       body: FutureBuilder(
-        future: _getProgramDetail(widget.programId, context),
+        future: _getProgramDetail(widget.video.programId, context),
         builder: (context, snapshot) {
           if (snapshot.hasData && snapshot.data != null) {
             final content =
@@ -181,25 +182,10 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                         ),
                                     ]),
                                     const SizedBox(height: 10),
-                                    content['kind']['isCollection']
-                                        ? const SizedBox.shrink()
-                                        : Row(children: [
-                                            IconButton(
-                                              icon:
-                                                  const Icon(Icons.play_arrow),
-                                              onPressed: null,
-                                            ),
-                                            const SizedBox(width: 24),
-                                            IconButton(
-                                              icon: const Icon(Icons.download),
-                                              onPressed: null,
-                                            ),
-                                            const SizedBox(width: 24),
-                                            IconButton(
-                                              icon: const Icon(Icons.copy),
-                                              onPressed: null,
-                                            ),
-                                          ]),
+                                    VideoButtons(
+                                        video: widget.video,
+                                        oneLine: true,
+                                        withFullDetailButton: false),
                                     Flexible(
                                         child: SingleChildScrollView(
                                             child: Html(

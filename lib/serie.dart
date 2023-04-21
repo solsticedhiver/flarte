@@ -125,7 +125,7 @@ class _SerieScreenState extends State<SerieScreen> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => FullDetailScreen(
-                                      programId: t.programId)));
+                                      video: VideoData.fromJson(t))));
                         },
                         child: VideoCard(
                             video: v,

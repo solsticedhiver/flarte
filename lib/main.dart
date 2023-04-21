@@ -506,13 +506,15 @@ class CarouselList extends StatelessWidget {
             size: size,
             children: videos.map((v) {
               return InkWell(
+                onDoubleTap: () {
+                  _showDialogProgram(context, v);
+                },
                 onTap: () {
-                  //_showDialogProgram(context, v);
                   StatefulWidget screen;
                   if (v.isCollection) {
                     screen = SerieScreen(title: v.title, url: v.url);
                   } else {
-                    screen = FullDetailScreen(programId: v.programId);
+                    screen = FullDetailScreen(video: v);
                   }
                   Navigator.push(
                       context, MaterialPageRoute(builder: (context) => screen));
