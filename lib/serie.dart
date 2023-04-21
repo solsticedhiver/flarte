@@ -73,7 +73,8 @@ class _SerieScreenState extends State<SerieScreen> {
     super.dispose();
   }
 
-  void _showDialogProgram(BuildContext context, VideoData v) {
+  void _showDialogProgram(
+      BuildContext context, List<VideoData> videos, int index) {
     showDialog(
         context: context,
         builder: (context) {
@@ -81,9 +82,7 @@ class _SerieScreenState extends State<SerieScreen> {
               elevation: 8.0,
               child: SizedBox(
                   width: min(MediaQuery.of(context).size.width - 100, 600),
-                  child: ShowDetail(
-                    video: v,
-                  )));
+                  child: ShowDetail(videos: videos, index: index)));
         });
   }
 
@@ -110,22 +109,32 @@ class _SerieScreenState extends State<SerieScreen> {
           size: CarouselListSize.normal,
         );
       } else if (zoneCount > 0) {
+        List<VideoData> videos =
+            teasers.map((t) => VideoData.fromJson(t)).toList();
         body = Center(
             child: Container(
                 width: width,
                 child: GridView.count(
                   childAspectRatio: 0.85,
                   crossAxisCount: count,
-                  children: teasers.map((t) {
-                    VideoData v = VideoData.fromJson(t);
+                  children: videos.map((v) {
                     return InkWell(
+                        onLongPress: () {
+                          _showDialogProgram(
+                              context, videos, videos.indexOf(v));
+                        },
+                        onDoubleTap: () {
+                          _showDialogProgram(
+                              context, videos, videos.indexOf(v));
+                        },
                         onTap: () {
                           //_showDialogProgram(context, Video.fromJson(t));
                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => FullDetailScreen(
-                                      video: VideoData.fromJson(t))));
+                                      videos: videos,
+                                      index: videos.indexOf(v))));
                         },
                         child: VideoCard(
                             video: v,

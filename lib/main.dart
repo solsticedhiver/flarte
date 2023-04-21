@@ -470,7 +470,8 @@ class CarouselList extends StatelessWidget {
   const CarouselList(
       {super.key, required this.data, this.size = CarouselListSize.normal});
 
-  void _showDialogProgram(BuildContext context, VideoData v) {
+  void _showDialogProgram(
+      BuildContext context, List<VideoData> videos, int index) {
     showDialog(
         context: context,
         builder: (context) {
@@ -478,14 +479,13 @@ class CarouselList extends StatelessWidget {
               elevation: 8.0,
               child: SizedBox(
                   width: min(MediaQuery.of(context).size.width, 650),
-                  child: ShowDetail(video: v)));
+                  child: ShowDetail(videos: videos, index: index)));
         });
   }
 
   @override
   Widget build(BuildContext context) {
     List<Widget> thumbnails = [];
-    List<VideoData> videos = [];
 
     //debugPrint('in CarouselList.build()');
     final List<dynamic> zones;
@@ -495,7 +495,7 @@ class CarouselList extends StatelessWidget {
       zones = data;
     }
     for (var z in zones) {
-      videos = z['videos'];
+      List<VideoData> videos = z['videos'];
       thumbnails
           .add(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
@@ -506,15 +506,19 @@ class CarouselList extends StatelessWidget {
             size: size,
             children: videos.map((v) {
               return InkWell(
+                onLongPress: () {
+                  _showDialogProgram(context, videos, videos.indexOf(v));
+                },
                 onDoubleTap: () {
-                  _showDialogProgram(context, v);
+                  _showDialogProgram(context, videos, videos.indexOf(v));
                 },
                 onTap: () {
                   StatefulWidget screen;
                   if (v.isCollection) {
                     screen = SerieScreen(title: v.title, url: v.url);
                   } else {
-                    screen = FullDetailScreen(video: v);
+                    screen = FullDetailScreen(
+                        videos: videos, index: videos.indexOf(v));
                   }
                   Navigator.push(
                       context, MaterialPageRoute(builder: (context) => screen));
@@ -800,7 +804,9 @@ class _ShowListState extends State<ShowList> {
       Expanded(
           child: selectedShowIndex != -1
               ? ShowDetail(
-                  video: widget.videos[selectedShowIndex], imageTop: true)
+                  videos: widget.videos,
+                  index: selectedShowIndex,
+                  imageTop: true)
               : const SizedBox.shrink())
     ]);
   }

@@ -31,7 +31,8 @@ class _SearchScreenState extends State<SearchScreen> {
     super.dispose();
   }
 
-  void _showDialogProgram(BuildContext context, VideoData v) {
+  void _showDialogProgram(
+      BuildContext context, List<VideoData> videos, int index) {
     showDialog(
         context: context,
         builder: (context) {
@@ -39,9 +40,7 @@ class _SearchScreenState extends State<SearchScreen> {
               elevation: 8.0,
               child: SizedBox(
                   width: min(MediaQuery.of(context).size.width - 100, 600),
-                  child: ShowDetail(
-                    video: v,
-                  )));
+                  child: ShowDetail(videos: videos, index: index)));
         });
   }
 
@@ -81,7 +80,7 @@ class _SearchScreenState extends State<SearchScreen> {
             children: data.map((v) {
               return InkWell(
                   onTap: () {
-                    _showDialogProgram(context, v);
+                    _showDialogProgram(context, data, data.indexOf(v));
                   },
                   child: VideoCard(
                     video: v,

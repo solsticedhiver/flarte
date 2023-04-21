@@ -232,6 +232,11 @@ class VideoData {
       srcJson: !kReleaseMode ? json.encode(video) : null,
     );
   }
+
+  @override
+  String toString() {
+    return 'VideoData($programId, $title)';
+  }
 }
 
 class VideoCard extends StatefulWidget {
@@ -311,7 +316,9 @@ class VideoCardState extends State<VideoCard> {
                 style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: padding / 3),
             Text(
-              widget.video.teaserText.toString().trim(),
+              widget.video.teaserText != null
+                  ? widget.video.teaserText!.trim()
+                  : '',
               maxLines: 3,
               softWrap: true,
               overflow: TextOverflow.ellipsis,
@@ -328,6 +335,7 @@ class VideoCardState extends State<VideoCard> {
               ),
           ]);
     } else {
+      debugPrint(widget.video.subtitle);
       bottomText = ListTile(
         contentPadding: EdgeInsets.zero,
         title: Text(

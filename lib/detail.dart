@@ -1,34 +1,31 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flarte/controls.dart';
-import 'package:flarte/fulldetail.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:process/process.dart';
-import 'package:provider/provider.dart';
-import 'package:path/path.dart' as path;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'helpers.dart';
 import 'config.dart';
 import 'serie.dart';
-import 'player.dart';
 
 class ShowDetail extends StatefulWidget {
-  final VideoData video;
+  final List<VideoData> videos;
+  final int index;
   final bool imageTop;
 
   @override
   State<ShowDetail> createState() => _ShowDetailState();
 
-  const ShowDetail({super.key, required this.video, this.imageTop = false});
+  const ShowDetail(
+      {super.key,
+      required this.videos,
+      required this.index,
+      this.imageTop = false});
 }
 
 class _ShowDetailState extends State<ShowDetail> {
+  late VideoData video = widget.videos[widget.index];
+
   @override
   void initState() {
     super.initState();
@@ -36,9 +33,9 @@ class _ShowDetailState extends State<ShowDetail> {
 
   @override
   Widget build(BuildContext context) {
-    //debugPrint(widget.video.srcJson);
+    //debugPrint(video.srcJson);
 
-    final imageUrl = widget.video.imageUrl ?? '';
+    final imageUrl = video.imageUrl ?? '';
     return Container(
         padding: const EdgeInsets.all(15),
         child: Column(
@@ -46,13 +43,13 @@ class _ShowDetailState extends State<ShowDetail> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                widget.video.title,
+                video.title,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
-              widget.video.subtitle != null
+              video.subtitle != null
                   ? Text(
-                      widget.video.subtitle!,
+                      video.subtitle!,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.titleMedium,
                     )
@@ -90,9 +87,9 @@ class _ShowDetailState extends State<ShowDetail> {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          widget.video.shortDescription != null
+                          video.shortDescription != null
                               ? Text(
-                                  widget.video.shortDescription!.replaceAll(
+                                  video.shortDescription!.replaceAll(
                                       RegExp('\u{00a0}+'), '\u{00a0}'),
                                   maxLines: 16,
                                   overflow: TextOverflow.ellipsis,
@@ -100,28 +97,29 @@ class _ShowDetailState extends State<ShowDetail> {
                               : const SizedBox.shrink(),
                           const SizedBox(height: 10),
                           Row(children: [
-                            if (widget.video.label != null) ...[
+                            if (video.label != null) ...[
                               Chip(
                                 backgroundColor: Theme.of(context).primaryColor,
-                                label: Text(widget.video.label!),
+                                label: Text(video.label!),
                               )
                             ],
                             const SizedBox(width: 10),
-                            if (!widget.video.isCollection &&
-                                widget.video.durationLabel != null)
+                            if (!video.isCollection &&
+                                video.durationLabel != null)
                               Chip(
                                 backgroundColor: Theme.of(context).primaryColor,
-                                label: Text(widget.video.durationLabel!),
+                                label: Text(video.durationLabel!),
                               ),
                           ]),
                           const SizedBox(height: 10),
-                          widget.video.isCollection
+                          video.isCollection
                               ? const SizedBox.shrink()
                               : VideoButtons(
-                                  video: widget.video,
+                                  videos: widget.videos,
+                                  index: widget.index,
                                   oneLine: false,
                                   withFullDetailButton: true),
-                          widget.video.isCollection
+                          video.isCollection
                               ? TextButton(
                                   onPressed: () {
                                     if (!widget.imageTop) {
@@ -131,8 +129,8 @@ class _ShowDetailState extends State<ShowDetail> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) => SerieScreen(
-                                                title: widget.video.title,
-                                                url: widget.video.url)));
+                                                title: video.title,
+                                                url: video.url)));
                                   },
                                   child: Text(AppLocalizations.of(context)!
                                       .strEpisodes),

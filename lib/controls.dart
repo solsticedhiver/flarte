@@ -16,12 +16,14 @@ import 'helpers.dart';
 import 'player.dart';
 
 class VideoButtons extends StatefulWidget {
-  final VideoData video;
+  final List<VideoData> videos;
+  final int index;
   final bool oneLine;
   final bool withFullDetailButton;
   const VideoButtons(
       {super.key,
-      required this.video,
+      required this.videos,
+      required this.index,
       required this.oneLine,
       required this.withFullDetailButton});
 
@@ -36,6 +38,7 @@ class _VideoButtonsState extends State<VideoButtons> {
   List<DropdownMenuItem<Version>> versionItems = [];
   List<DropdownMenuItem<Format>> formatItems = [];
   List<Format> formats = [];
+  late VideoData video = widget.videos[widget.index];
 
   @override
   void initState() {
@@ -44,7 +47,7 @@ class _VideoButtonsState extends State<VideoButtons> {
     if (versions.isNotEmpty) return;
 
     Future.microtask(() async {
-      final programId = widget.video.programId;
+      final programId = video.programId;
 
       debugPrint('programId: $programId');
       final lang = Provider.of<LocaleModel>(context, listen: false)
@@ -81,7 +84,7 @@ class _VideoButtonsState extends State<VideoButtons> {
                   DropdownMenuItem<Version>(value: e, child: Text(e.label)))
               .toList();
         });
-        widget.video.versions = versions;
+        video.versions = versions;
         _getFormats();
       }
     });
@@ -143,7 +146,7 @@ class _VideoButtonsState extends State<VideoButtons> {
   }
 
   String _outputFilename() {
-    return "${widget.video.programId}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat.resolution}.mp4";
+    return "${video.programId}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat.resolution}.mp4";
   }
 
   void _ytdlp() async {
@@ -194,8 +197,8 @@ class _VideoButtonsState extends State<VideoButtons> {
     if (result.exitCode != 0) {
       debugPrint(result.stderr);
       if (!context.mounted) return;
-      _showMessage(context,
-          'Error downloading video ${widget.video.programId} with yt-dlp');
+      _showMessage(
+          context, 'Error downloading video ${video.programId} with yt-dlp');
       return;
     }
   }
@@ -222,7 +225,7 @@ class _VideoButtonsState extends State<VideoButtons> {
     final cwd = AppConfig.dlDirectory;
     debugPrint(cwd);
     final outputFilename =
-        '${widget.video.programId}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat.resolution}.mp4';
+        '${video.programId}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat.resolution}.mp4';
     debugPrint(outputFilename);
     if (File(path.join(cwd, outputFilename)).existsSync()) {
       _showMessage(context, 'File $outputFilename already exists');
@@ -281,7 +284,7 @@ class _VideoButtonsState extends State<VideoButtons> {
       tasks.add(dlAudio);
     }
     String message;
-    String programId = widget.video.programId;
+    String programId = video.programId;
     try {
       List responses = await Future.wait(tasks, eagerError: true);
       if (responses[0].exitCode != 0) {
@@ -312,17 +315,17 @@ class _VideoButtonsState extends State<VideoButtons> {
         cmd =
             '$ffmpeg -i $videoFilename -i $audioFilename -i $subFilename -map 0:v -map 1:a -map 2:s -c:v copy -c:a copy -c:s mov_text $outputFilename';
       }
-      message = 'Download of video ${widget.video.programId} finished';
+      message = 'Download of video ${video.programId} finished';
       if (cmd.isNotEmpty) {
         final result = await mgr.run(cmd.split(' '), workingDirectory: cwd);
         if (result.exitCode != 0) {
           debugPrint(
-              'Failed to combine video/audio/subtitle for ${widget.video.programId}\n${result.stderr}');
-          message = 'Error downloading video ${widget.video.programId}';
+              'Failed to combine video/audio/subtitle for ${video.programId}\n${result.stderr}');
+          message = 'Error downloading video ${video.programId}';
         } else {
           debugPrint(
-              'Finished combining video/audio/subtitle for ${widget.video.programId}');
-          message = 'Download of video ${widget.video.programId} finished';
+              'Finished combining video/audio/subtitle for ${video.programId}');
+          message = 'Download of video ${video.programId} finished';
         }
       }
       if (stream.audio != null && audioFilename.isNotEmpty) {
@@ -336,7 +339,7 @@ class _VideoButtonsState extends State<VideoButtons> {
       }
     } catch (e) {
       debugPrint(e.toString());
-      message = 'Error downloading video ${widget.video.programId} with ffmpeg';
+      message = 'Error downloading video ${video.programId} with ffmpeg';
     }
     if (mounted) {
       _showMessage(context, message);
@@ -405,7 +408,7 @@ class _VideoButtonsState extends State<VideoButtons> {
     */
     try {
       _showMessage(context,
-          'Launching external [c]vlc instance to read video ${widget.video.programId}');
+          'Launching external [c]vlc instance to read video ${video.programId}');
       ProcessResult result = await mgr.run(cmd);
       if (result.exitCode != 0) {
         //debugPrint(result.stderr);
@@ -421,11 +424,11 @@ class _VideoButtonsState extends State<VideoButtons> {
 
   void _libmpv() async {
     String title = '';
-    String? subtitle = widget.video.subtitle;
+    String? subtitle = video.subtitle;
     if (subtitle != null && subtitle.isNotEmpty) {
-      title = '${widget.video.title} / $subtitle';
+      title = '${video.title} / $subtitle';
     } else {
-      title = widget.video.title;
+      title = video.title;
     }
 
     MediaStream stream;
@@ -454,7 +457,7 @@ class _VideoButtonsState extends State<VideoButtons> {
             videoStream: stream.video!.toString(),
             audioStream: stream.audio != null ? stream.audio.toString() : '',
             subtitle: subFilename,
-            video: widget.video);
+            video: video);
       } else {
         return Center(child: Text(AppLocalizations.of(context)!.strNotImpl));
       }
@@ -499,8 +502,8 @@ class _VideoButtonsState extends State<VideoButtons> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          FullDetailScreen(video: widget.video)));
+                      builder: (context) => FullDetailScreen(
+                          videos: widget.videos, index: widget.index)));
             })
       ],
     ];
