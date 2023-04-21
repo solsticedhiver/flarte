@@ -112,15 +112,13 @@ class _ShowDetailState extends State<ShowDetail> {
                               ),
                           ]),
                           const SizedBox(height: 10),
-                          video.isCollection
-                              ? const SizedBox.shrink()
-                              : VideoButtons(
+                          !video.isCollection
+                              ? VideoButtons(
                                   videos: widget.videos,
                                   index: widget.index,
                                   oneLine: false,
-                                  withFullDetailButton: true),
-                          video.isCollection
-                              ? TextButton(
+                                  withFullDetailButton: true)
+                              : TextButton(
                                   onPressed: () {
                                     if (!widget.imageTop) {
                                       Navigator.pop(context);
@@ -134,8 +132,7 @@ class _ShowDetailState extends State<ShowDetail> {
                                   },
                                   child: Text(AppLocalizations.of(context)!
                                       .strEpisodes),
-                                )
-                              : const SizedBox.shrink(),
+                                ),
                           if (!widget.imageTop) ...[
                             const SizedBox(height: 10),
                             Row(children: [

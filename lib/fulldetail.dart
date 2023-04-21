@@ -11,6 +11,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'helpers.dart';
 import 'config.dart';
+import 'serie.dart';
 
 class FullDetailScreen extends StatefulWidget {
   final List<VideoData> videos;
@@ -213,11 +214,28 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                         ),
                                     ]),
                                     const SizedBox(height: 10),
-                                    VideoButtons(
-                                        videos: widget.videos,
-                                        index: widget.index,
-                                        oneLine: true,
-                                        withFullDetailButton: false),
+                                    !video.isCollection
+                                        ? VideoButtons(
+                                            videos: widget.videos,
+                                            index: widget.index,
+                                            oneLine: true,
+                                            withFullDetailButton: false)
+                                        : TextButton(
+                                            onPressed: () {
+                                              //Navigator.pop(context);
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          SerieScreen(
+                                                              title:
+                                                                  video.title,
+                                                              url: video.url)));
+                                            },
+                                            child: Text(
+                                                AppLocalizations.of(context)!
+                                                    .strEpisodes),
+                                          ),
                                     Flexible(
                                         child: SingleChildScrollView(
                                             child: Column(children: [
