@@ -51,7 +51,10 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
           options: Options(headers: {'User-Agent': AppConfig.userAgent}));
       final Map<String, dynamic> jr = resp.data;
       setState(() {
+        final imageUrl = data['mainImage']['url'];
         data = jr['value']['zones'][0]['content']['data'][0];
+        // keep the old url to avoid redownloading the same image at a new url
+        data['mainImage']['url'] = imageUrl;
       });
     });
   }
@@ -81,6 +84,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
     //debugPrint(json.encode(data).toString());
     if (data.isEmpty) {
       data = {
+        'programId': video.programId,
         'title': video.title,
         'subtitle': video.subtitle,
         'mainImage': {
@@ -108,6 +112,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
     shortDescription = _removeTag(shortDescription).trim();
     final imageUrl =
         '${data['mainImage']['url'].replaceFirst('__SIZE__', '300x450')}?type=TEXT';
+    debugPrint(imageUrl);
     bool showImage = MediaQuery.of(context).size.width > 1280;
     Locale locale = Provider.of<LocaleModel>(context, listen: false)
         .getCurrentLocale(context);
