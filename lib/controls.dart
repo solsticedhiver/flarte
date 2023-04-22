@@ -224,7 +224,7 @@ class _VideoButtonsState extends State<VideoButtons> {
         DioCacheManager(CacheConfig(defaultMaxAge: const Duration(hours: 1)))
             .interceptor);
     final req = await dio.get(url.toString());
-    String resp = utf8.decode(req.data);
+    String resp = req.data;
     StringBuffer webvtt = StringBuffer('');
     bool addLine = true;
     for (var line in resp.split('\n')) {

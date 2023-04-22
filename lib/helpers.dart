@@ -343,7 +343,6 @@ class VideoCardState extends State<VideoCard> {
               ),
           ]);
     } else {
-      debugPrint(widget.video.subtitle);
       bottomText = ListTile(
         contentPadding: EdgeInsets.zero,
         title: Text(
