@@ -518,7 +518,9 @@ class CarouselList extends StatelessWidget {
                     screen = SerieScreen(title: v.title, url: v.url);
                   } else {
                     screen = FullDetailScreen(
-                        videos: videos, index: videos.indexOf(v));
+                        videos: videos,
+                        index: videos.indexOf(v),
+                        title: z['title']);
                   }
                   Navigator.push(
                       context, MaterialPageRoute(builder: (context) => screen));

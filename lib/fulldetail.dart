@@ -16,10 +16,12 @@ import 'serie.dart';
 
 class FullDetailScreen extends StatefulWidget {
   final List<VideoData> videos;
+  final String title;
   int index;
   FullDetailScreen({
     super.key,
     required this.videos,
+    required this.title,
     required this.index,
   });
 
@@ -136,9 +138,16 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
     }
     //debugPrint(json.encode(data).toString());
     String? swipeDirection;
+    String appBarTitle;
+    if (widget.title.isNotEmpty) {
+      appBarTitle =
+          '${AppLocalizations.of(context)!.strDetails} / ${widget.title} (${widget.index}/${widget.videos.length})';
+    } else {
+      appBarTitle = AppLocalizations.of(context)!.strDetails;
+    }
 
     return Scaffold(
-        appBar: AppBar(title: Text(AppLocalizations.of(context)!.strDetails)),
+        appBar: AppBar(title: Text(appBarTitle)),
         body: Stack(children: [
           GestureDetector(
               supportedDevices: const {
@@ -168,7 +177,9 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                   widget.index = index;
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
                       builder: (context) => FullDetailScreen(
-                          videos: widget.videos, index: widget.index)));
+                          videos: widget.videos,
+                          index: widget.index,
+                          title: widget.title)));
                 }
               },
               child: Container(
@@ -406,7 +417,8 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                               MaterialPageRoute(
                                   builder: (context) => FullDetailScreen(
                                       videos: widget.videos,
-                                      index: widget.index)));
+                                      index: widget.index,
+                                      title: widget.title)));
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.onSecondary,
@@ -438,7 +450,8 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                               MaterialPageRoute(
                                   builder: (context) => FullDetailScreen(
                                       videos: widget.videos,
-                                      index: widget.index)));
+                                      index: widget.index,
+                                      title: widget.title)));
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.onSecondary,

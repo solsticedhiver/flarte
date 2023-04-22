@@ -503,7 +503,9 @@ class _VideoButtonsState extends State<VideoButtons> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => FullDetailScreen(
-                          videos: widget.videos, index: widget.index)));
+                          videos: widget.videos,
+                          index: widget.index,
+                          title: '')));
             })
       ],
     ];

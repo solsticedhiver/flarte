@@ -133,8 +133,10 @@ class _SerieScreenState extends State<SerieScreen> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => FullDetailScreen(
-                                      videos: videos,
-                                      index: videos.indexOf(v))));
+                                        videos: videos,
+                                        index: videos.indexOf(v),
+                                        title: widget.title,
+                                      )));
                         },
                         child: VideoCard(
                             video: v,
