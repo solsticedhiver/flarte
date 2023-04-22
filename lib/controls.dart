@@ -160,6 +160,11 @@ class _VideoButtonsState extends State<VideoButtons> {
     } else {
       return;
     }
+    if (!mgr.canRun(binary, workingDirectory: AppConfig.dlDirectory)) {
+      if (!context.mounted) return;
+      _showMessage(context, 'yt-dlp has not been found');
+      return;
+    }
     List<String> cmd = [
       binary,
       '--user-agent',
@@ -378,6 +383,11 @@ class _VideoButtonsState extends State<VideoButtons> {
         }
       }
     } else {
+      return;
+    }
+    if (!mgr.canRun(binary)) {
+      if (!context.mounted) return;
+      _showMessage(context, '[c]vlc has not been found');
       return;
     }
     List<String> cmd;
