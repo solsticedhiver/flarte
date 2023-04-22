@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:dio/dio.dart';
+import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:flarte/config.dart';
 import 'package:flarte/detail.dart';
 import 'package:flarte/helpers.dart';
@@ -49,7 +50,11 @@ class _SearchScreenState extends State<SearchScreen> {
     String lang = Provider.of<LocaleModel>(context, listen: false)
         .getCurrentLocale(context)
         .languageCode;
-    final resp = await Dio().get(
+    final Dio dio = Dio();
+    dio.interceptors.add(
+        DioCacheManager(CacheConfig(defaultMaxAge: const Duration(hours: 1)))
+            .interceptor);
+    final resp = await dio.get(
         'https://www.arte.tv/api/rproxy/emac/v4/${lang}/web/pages/SEARCH/?page=1&query=${Uri.encodeComponent(search)}',
         options: Options(headers: {'User-Agent': AppConfig.url}));
     final List<dynamic> zones = resp.data['value']['zones'];

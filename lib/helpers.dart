@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:flarte/config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,11 @@ class Cache extends ChangeNotifier {
 
   Future<List<dynamic>> _testFranceTv() async {
     List<dynamic> result = [];
-    final resp = await Dio().get('https://www.france.tv');
+    final Dio dio = Dio();
+    dio.interceptors.add(
+        DioCacheManager(CacheConfig(defaultMaxAge: const Duration(hours: 1)))
+            .interceptor);
+    final resp = await dio.get('https://www.france.tv');
     if (resp.statusCode != 200) {
       return result;
     }
@@ -91,7 +96,11 @@ class Cache extends ChangeNotifier {
 
     final String url =
         "https://www.arte.tv/api/rproxy/emac/v4/$lang/web/pages/$key/";
-    final Response resp = await Dio().get(url);
+    final Dio dio = Dio();
+    dio.interceptors.add(
+        DioCacheManager(CacheConfig(defaultMaxAge: const Duration(hours: 1)))
+            .interceptor);
+    final Response resp = await dio.get(url);
     if (resp.statusCode == 200) {
       //debugPrint(jr);
       data[cacheKey] = parseJson(resp.data);
@@ -488,7 +497,11 @@ class MediaStream {
       String url, String resolution) async {
     // get m3u8 playlist for each video, audio and subtitle stream
     Uri playlistUri = Uri.parse(url);
-    final resp = await Dio().get(url);
+    final Dio dio = Dio();
+    dio.interceptors.add(
+        DioCacheManager(CacheConfig(defaultMaxAge: const Duration(hours: 1)))
+            .interceptor);
+    final resp = await dio.get(url);
     String contentString = resp.data;
     int height = int.parse(resolution.split('x')[1]);
 
@@ -527,7 +540,10 @@ class MediaStream {
       String url, String resolution) async {
     // get real stream for video, audio, subtitle
     MediaStream playlists = await MediaStream.getMediaPlaylist(url, resolution);
-    final dio = Dio();
+    final Dio dio = Dio();
+    dio.interceptors.add(
+        DioCacheManager(CacheConfig(defaultMaxAge: const Duration(hours: 1)))
+            .interceptor);
 
     Uri? video, audio, subtitle;
     int videoSize = 0;

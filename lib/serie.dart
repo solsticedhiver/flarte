@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:dio/dio.dart';
+import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:flarte/config.dart';
 import 'package:flarte/helpers.dart';
 import 'package:flarte/main.dart';
@@ -34,7 +35,11 @@ class _SerieScreenState extends State<SerieScreen> {
   void initState() {
     super.initState();
     Future.microtask(() async {
-      final resp = await Dio().get('https://www.arte.tv${widget.url}',
+      final Dio dio = Dio();
+      dio.interceptors.add(
+          DioCacheManager(CacheConfig(defaultMaxAge: const Duration(hours: 1)))
+              .interceptor);
+      final resp = await dio.get('https://www.arte.tv${widget.url}',
           options: Options(headers: {'User-Agent': AppConfig.userAgent}));
       final document = parser.parse(resp.data);
       final script = document.querySelector('script#__NEXT_DATA__');

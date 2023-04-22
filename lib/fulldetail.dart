@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
+import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:flarte/controls.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -43,7 +44,11 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
           .languageCode;
       final url =
           'https://www.arte.tv/api/rproxy/emac/v4/$lang/web/programs/${video.programId}';
-      final resp = await Dio().get(url,
+      final Dio dio = Dio();
+      dio.interceptors.add(
+          DioCacheManager(CacheConfig(defaultMaxAge: const Duration(hours: 1)))
+              .interceptor);
+      final resp = await dio.get(url,
           options: Options(headers: {'User-Agent': AppConfig.userAgent}));
       final Map<String, dynamic> jr = resp.data;
       setState(() {

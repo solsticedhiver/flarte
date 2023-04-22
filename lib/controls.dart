@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
@@ -54,7 +55,11 @@ class _VideoButtonsState extends State<VideoButtons> {
           .getCurrentLocale(context)
           .languageCode;
 
-      final resp = await Dio().get(
+      final Dio dio = Dio();
+      dio.interceptors.add(
+          DioCacheManager(CacheConfig(defaultMaxAge: const Duration(hours: 1)))
+              .interceptor);
+      final resp = await dio.get(
           'https://api.arte.tv/api/player/v2/config/$lang/$programId',
           options: Options(headers: {'User-Agent': AppConfig.userAgent}));
       Map<String, dynamic> jr = resp.data;
@@ -93,7 +98,11 @@ class _VideoButtonsState extends State<VideoButtons> {
 
   void _getFormats() async {
     // directly parse the .m3u8 to get the bandwidth value to pass to libmpv backend
-    final resp = await Dio().get(selectedVersion.url,
+    final Dio dio = Dio();
+    dio.interceptors.add(
+        DioCacheManager(CacheConfig(defaultMaxAge: const Duration(hours: 1)))
+            .interceptor);
+    final resp = await dio.get(selectedVersion.url,
         options: Options(headers: {'User-Agent': AppConfig.userAgent}));
     final lines = resp.data.split('\n');
     List<Format> tf = [];
@@ -210,7 +219,11 @@ class _VideoButtonsState extends State<VideoButtons> {
   }
 
   Future<void> _webvtt(Uri url, String subFilename) async {
-    final req = await Dio().get(url.toString());
+    final Dio dio = Dio();
+    dio.interceptors.add(
+        DioCacheManager(CacheConfig(defaultMaxAge: const Duration(hours: 1)))
+            .interceptor);
+    final req = await dio.get(url.toString());
     String resp = utf8.decode(req.data);
     StringBuffer webvtt = StringBuffer('');
     bool addLine = true;
