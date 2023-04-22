@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:dio/dio.dart';
+import 'package:flarte/config.dart';
 import 'package:flarte/helpers.dart';
 import 'package:flarte/main.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as parser;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -33,9 +34,9 @@ class _SerieScreenState extends State<SerieScreen> {
   void initState() {
     super.initState();
     Future.microtask(() async {
-      final resp =
-          await http.get(Uri.parse('https://www.arte.tv${widget.url}'));
-      final document = parser.parse(resp.body);
+      final resp = await Dio().get('https://www.arte.tv${widget.url}',
+          options: Options(headers: {'User-Agent': AppConfig.userAgent}));
+      final document = parser.parse(resp.data);
       final script = document.querySelector('script#__NEXT_DATA__');
       if (script != null) {
         final Map<String, dynamic> jd = json.decode(script.text);

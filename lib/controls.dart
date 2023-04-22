@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:process/process.dart';
 import 'package:path/path.dart' as path;
@@ -54,9 +54,10 @@ class _VideoButtonsState extends State<VideoButtons> {
           .getCurrentLocale(context)
           .languageCode;
 
-      final resp = await http.get(Uri.parse(
-          'https://api.arte.tv/api/player/v2/config/$lang/$programId'));
-      Map<String, dynamic> jr = json.decode(resp.body);
+      final resp = await Dio().get(
+          'https://api.arte.tv/api/player/v2/config/$lang/$programId',
+          options: Options(headers: {'User-Agent': AppConfig.userAgent}));
+      Map<String, dynamic> jr = resp.data;
       if (jr['data'] == null ||
           jr['data']['attributes'] == null ||
           jr['data']['attributes']['streams'] == null) {
@@ -92,9 +93,9 @@ class _VideoButtonsState extends State<VideoButtons> {
 
   void _getFormats() async {
     // directly parse the .m3u8 to get the bandwidth value to pass to libmpv backend
-    final resp = await http.get(Uri.parse(selectedVersion.url),
-        headers: {'User-Agent': AppConfig.userAgent});
-    final lines = resp.body.split('\n');
+    final resp = await Dio().get(selectedVersion.url,
+        options: Options(headers: {'User-Agent': AppConfig.userAgent}));
+    final lines = resp.data.split('\n');
     List<Format> tf = [];
     // #EXT-X-STREAM-INF:BANDWIDTH=xxx,AVERAGE-BANDWIDTH=yyyy,VIDEO-RANGE=SDR,CODECS="avc1.4d401e,mp4a.40.2",RESOLUTION=zzzxzzz,FRAME-RATE=25.000,AUDIO="program_audio_0",SUBTITLES="subs"
     for (var line in lines) {
@@ -209,8 +210,8 @@ class _VideoButtonsState extends State<VideoButtons> {
   }
 
   Future<void> _webvtt(Uri url, String subFilename) async {
-    final req = await http.get(url);
-    String resp = utf8.decode(req.bodyBytes);
+    final req = await Dio().get(url.toString());
+    String resp = utf8.decode(req.data);
     StringBuffer webvtt = StringBuffer('');
     bool addLine = true;
     for (var line in resp.split('\n')) {
