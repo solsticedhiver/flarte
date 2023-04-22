@@ -56,9 +56,9 @@ class _VideoButtonsState extends State<VideoButtons> {
           .languageCode;
 
       final Dio dio = Dio();
-      dio.interceptors.add(
-          DioCacheManager(CacheConfig(defaultMaxAge: const Duration(hours: 1)))
-              .interceptor);
+      dio.interceptors.add(DioCacheManager(
+              CacheConfig(defaultMaxAge: AppConfig.dioDefaultMaxAge))
+          .interceptor);
       final resp = await dio.get(
           'https://api.arte.tv/api/player/v2/config/$lang/$programId',
           options: Options(headers: {'User-Agent': AppConfig.userAgent}));
@@ -100,7 +100,7 @@ class _VideoButtonsState extends State<VideoButtons> {
     // directly parse the .m3u8 to get the bandwidth value to pass to libmpv backend
     final Dio dio = Dio();
     dio.interceptors.add(
-        DioCacheManager(CacheConfig(defaultMaxAge: const Duration(hours: 1)))
+        DioCacheManager(CacheConfig(defaultMaxAge: AppConfig.dioDefaultMaxAge))
             .interceptor);
     final resp = await dio.get(selectedVersion.url,
         options: Options(headers: {'User-Agent': AppConfig.userAgent}));
@@ -221,7 +221,7 @@ class _VideoButtonsState extends State<VideoButtons> {
   Future<void> _webvtt(Uri url, String subFilename) async {
     final Dio dio = Dio();
     dio.interceptors.add(
-        DioCacheManager(CacheConfig(defaultMaxAge: const Duration(hours: 1)))
+        DioCacheManager(CacheConfig(defaultMaxAge: AppConfig.dioDefaultMaxAge))
             .interceptor);
     final req = await dio.get(url.toString());
     String resp = req.data;

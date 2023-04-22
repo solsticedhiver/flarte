@@ -19,7 +19,7 @@ class Cache extends ChangeNotifier {
     List<dynamic> result = [];
     final Dio dio = Dio();
     dio.interceptors.add(
-        DioCacheManager(CacheConfig(defaultMaxAge: const Duration(hours: 1)))
+        DioCacheManager(CacheConfig(defaultMaxAge: AppConfig.dioDefaultMaxAge))
             .interceptor);
     final resp = await dio.get('https://www.france.tv');
     if (resp.statusCode != 200) {
@@ -98,7 +98,7 @@ class Cache extends ChangeNotifier {
         "https://www.arte.tv/api/rproxy/emac/v4/$lang/web/pages/$key/";
     final Dio dio = Dio();
     dio.interceptors.add(
-        DioCacheManager(CacheConfig(defaultMaxAge: const Duration(hours: 1)))
+        DioCacheManager(CacheConfig(defaultMaxAge: AppConfig.dioDefaultMaxAge))
             .interceptor);
     final Response resp = await dio.get(url);
     if (resp.statusCode == 200) {
@@ -498,7 +498,7 @@ class MediaStream {
     Uri playlistUri = Uri.parse(url);
     final Dio dio = Dio();
     dio.interceptors.add(
-        DioCacheManager(CacheConfig(defaultMaxAge: const Duration(hours: 1)))
+        DioCacheManager(CacheConfig(defaultMaxAge: AppConfig.dioDefaultMaxAge))
             .interceptor);
     final resp = await dio.get(url);
     String contentString = resp.data;
@@ -541,7 +541,7 @@ class MediaStream {
     MediaStream playlists = await MediaStream.getMediaPlaylist(url, resolution);
     final Dio dio = Dio();
     dio.interceptors.add(
-        DioCacheManager(CacheConfig(defaultMaxAge: const Duration(hours: 1)))
+        DioCacheManager(CacheConfig(defaultMaxAge: AppConfig.dioDefaultMaxAge))
             .interceptor);
 
     Uri? video, audio, subtitle;

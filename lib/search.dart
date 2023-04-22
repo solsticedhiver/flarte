@@ -52,7 +52,7 @@ class _SearchScreenState extends State<SearchScreen> {
         .languageCode;
     final Dio dio = Dio();
     dio.interceptors.add(
-        DioCacheManager(CacheConfig(defaultMaxAge: const Duration(hours: 1)))
+        DioCacheManager(CacheConfig(defaultMaxAge: AppConfig.dioDefaultMaxAge))
             .interceptor);
     final resp = await dio.get(
         'https://www.arte.tv/api/rproxy/emac/v4/${lang}/web/pages/SEARCH/?page=1&query=${Uri.encodeComponent(search)}',
