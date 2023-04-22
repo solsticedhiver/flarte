@@ -262,6 +262,9 @@ class _VideoButtonsState extends State<VideoButtons> {
       _showMessage(context, 'ffmpeg has not been found');
       return;
     }
+    if (!context.mounted) return;
+    _showMessage(context, 'Downloading video ${video.programId}');
+
     String videoFilename =
         stream.video.toString().split('/').last.replaceFirst('m3u8', 'mp4');
     String audioFilename = '';
@@ -325,7 +328,7 @@ class _VideoButtonsState extends State<VideoButtons> {
         cmd =
             '$ffmpeg -i $videoFilename -i $audioFilename -i $subFilename -map 0:v -map 1:a -map 2:s -c:v copy -c:a copy -c:s mov_text $outputFilename';
       }
-      message = 'Download of video ${video.programId} finished';
+      message = 'Finished downloading video ${video.programId}';
       if (cmd.isNotEmpty) {
         final result = await mgr.run(cmd.split(' '), workingDirectory: cwd);
         if (result.exitCode != 0) {
