@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flarte/controls.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -152,15 +151,5 @@ class _ShowDetailState extends State<ShowDetail> {
                 ],
               ),
             ]));
-  }
-
-  Future<void> _copyToClipboard(BuildContext context, String text) async {
-    Clipboard.setData(ClipboardData(text: text));
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(AppLocalizations.of(context)!.strCopiedClipboard,
-          style: const TextStyle(color: Colors.white)),
-      backgroundColor: Colors.black87,
-      behavior: SnackBarBehavior.floating,
-    ));
   }
 }
