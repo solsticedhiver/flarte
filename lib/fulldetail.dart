@@ -82,8 +82,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
         'title': video.title,
         'subtitle': video.subtitle,
         'mainImage': {
-          'url':
-              '${video.imageUrl!.replaceFirst('400x225', '300x450')}?type=TEXT'
+          'url': video.imageUrl!.replaceFirst('400x225', '300x450')
         },
         'fullDescription': '',
         'shortDescription': video.shortDescription,
