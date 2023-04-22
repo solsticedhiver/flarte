@@ -68,9 +68,9 @@ class _VideoButtonsState extends State<VideoButtons> {
           jr['data']['attributes']['streams'] == null) {
         return;
       }
-      //debugPrint(json.encode(jr).toString());
+      //debugPrint(jr.toString());
       final streams = jr['data']['attributes']['streams'];
-      //debugPrint(json.encode(streams).toString());
+      //debugPrint(streams.toString());
       List<Version> cv = [];
       for (var s in streams) {
         final v = s['versions'][0];

@@ -49,7 +49,7 @@ class _SerieScreenState extends State<SerieScreen> {
           data = jd['props']['pageProps']['props']['page'];
         });
         final zones = data['value']['zones'];
-        //debugPrint(json.encode(zones));
+        //debugPrint(zones);
         for (var z in zones) {
           if (z['code'].startsWith('collection_videos')) {
             setState(() {
@@ -58,7 +58,7 @@ class _SerieScreenState extends State<SerieScreen> {
             });
             break;
           }
-          //debugPrint(json.encode(teasers));
+          //debugPrint(teasers);
         }
         if (teasers.isEmpty) {
           // use the collection_subcollection instead
@@ -108,7 +108,6 @@ class _SerieScreenState extends State<SerieScreen> {
           zoneCount++;
         }
       }
-      debugPrint(zoneCount.toString());
       if (zoneCount > 1) {
         body = CarouselList(
           data: Cache.parseJson(data),

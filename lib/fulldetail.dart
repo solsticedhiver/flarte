@@ -50,12 +50,18 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
       final resp = await dio.get(url,
           options: Options(headers: {'User-Agent': AppConfig.userAgent}));
       final Map<String, dynamic> jr = resp.data;
-      setState(() {
-        final imageUrl = data['mainImage']['url'];
-        data = jr['value']['zones'][0]['content']['data'][0];
-        // keep the old url to avoid redownloading the same image at a new url
-        data['mainImage']['url'] = imageUrl;
-      });
+      if (mounted) {
+        setState(() {
+          final imageUrl = data['mainImage']['url'];
+          final title = data['title'];
+          final subtitle = data['subtitle'];
+          data = jr['value']['zones'][0]['content']['data'][0];
+          // keep the old url to avoid redownloading the same image at a new url
+          data['mainImage']['url'] = imageUrl;
+          data['title'] = title;
+          data['subtitle'] = subtitle;
+        });
+      }
     });
   }
 
@@ -81,7 +87,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    //debugPrint(json.encode(data).toString());
+    //debugPrint(data.toString());
     if (data.isEmpty) {
       data = {
         'programId': video.programId,
@@ -101,10 +107,6 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
     }
     String description = data['fullDescription'] ?? '';
     String shortDescription = data['shortDescription'] ?? '';
-    if (description.isEmpty) {
-      description = shortDescription;
-      shortDescription = '';
-    }
     description = description.trim();
     if (!description.startsWith('<p>')) {
       description = '<p>$description</p>';
@@ -112,7 +114,6 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
     shortDescription = _removeTag(shortDescription).trim();
     final imageUrl =
         '${data['mainImage']['url'].replaceFirst('__SIZE__', '300x450')}?type=TEXT';
-    debugPrint(imageUrl);
     bool showImage = MediaQuery.of(context).size.width > 1280;
     Locale locale = Provider.of<LocaleModel>(context, listen: false)
         .getCurrentLocale(context);
@@ -142,7 +143,6 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
         ],
       );
     }
-    //debugPrint(json.encode(data).toString());
     String? swipeDirection;
     String appBarTitle;
     if (widget.title.isNotEmpty) {
@@ -224,6 +224,14 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                           style: Theme.of(context)
                                               .textTheme
                                               .headlineLarge),
+                                      if (data['subtitle'] != null &&
+                                          data['subtitle'].isNotEmpty) ...[
+                                        const SizedBox(height: 5),
+                                        Text(data['subtitle'],
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headlineSmall),
+                                      ],
                                       const SizedBox(height: 10),
                                       Row(children: [
                                         Chip(
