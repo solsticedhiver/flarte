@@ -252,6 +252,11 @@ class _VideoButtonsState extends State<VideoButtons> {
     } else if (!Platform.isLinux) {
       return;
     }
+    if (!mgr.canRun(ffmpeg, workingDirectory: cwd)) {
+      if (!context.mounted) return;
+      _showMessage(context, 'ffmpeg has not been found');
+      return;
+    }
     String videoFilename =
         stream.video.toString().split('/').last.replaceFirst('m3u8', 'mp4');
     String audioFilename = '';
