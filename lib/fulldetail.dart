@@ -143,7 +143,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
     String appBarTitle;
     if (widget.title.isNotEmpty) {
       appBarTitle =
-          '${AppLocalizations.of(context)!.strDetails} / ${widget.title} (${widget.index}/${widget.videos.length})';
+          '${AppLocalizations.of(context)!.strDetails} / ${widget.title} (${widget.index + 1}/${widget.videos.length})';
     } else {
       appBarTitle = AppLocalizations.of(context)!.strDetails;
     }
