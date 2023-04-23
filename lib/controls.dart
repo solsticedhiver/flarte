@@ -269,6 +269,8 @@ class _VideoButtonsState extends State<VideoButtons> {
     if (Platform.isWindows) {
       ffmpeg = 'ffmpeg.exe';
     } else if (!Platform.isLinux) {
+      if (!context.mounted) return;
+      _showMessage(context, 'not implemented');
       return;
     }
     if (!mgr.canRun(ffmpeg, workingDirectory: cwd)) {
@@ -514,7 +516,11 @@ class _VideoButtonsState extends State<VideoButtons> {
       const SizedBox(width: 24),
       IconButton(
         icon: const Icon(Icons.download),
-        onPressed: versions.isNotEmpty && formats.isNotEmpty ? _ffmpeg : null,
+        onPressed: versions.isNotEmpty &&
+                formats.isNotEmpty &&
+                (Platform.isWindows || Platform.isLinux)
+            ? _ffmpeg
+            : null,
       ),
       const SizedBox(width: 24),
       IconButton(
