@@ -1,12 +1,11 @@
+import 'dart:convert';
 import 'dart:math';
 
-import 'package:dio/dio.dart';
-import 'package:dio_http_cache/dio_http_cache.dart';
-import 'package:flarte/config.dart';
 import 'package:flarte/detail.dart';
 import 'package:flarte/helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -49,14 +48,10 @@ class _SearchScreenState extends State<SearchScreen> {
     String lang = Provider.of<LocaleModel>(context, listen: false)
         .getCurrentLocale(context)
         .languageCode;
-    final Dio dio = Dio();
-    dio.interceptors.add(
-        DioCacheManager(CacheConfig(defaultMaxAge: AppConfig.dioDefaultMaxAge))
-            .interceptor);
-    final resp = await dio.get(
-        'https://www.arte.tv/api/rproxy/emac/v4/${lang}/web/pages/SEARCH/?page=1&query=${Uri.encodeComponent(search)}',
-        options: Options(headers: {'User-Agent': AppConfig.url}));
-    final List<dynamic> zones = resp.data['value']['zones'];
+    final resp = await http.get(Uri.parse(
+        'https://www.arte.tv/api/rproxy/emac/v4/${lang}/web/pages/SEARCH/?page=1&query=${Uri.encodeComponent(search)}'));
+    final Map<String, dynamic> jr = json.decode(resp.body);
+    final List<dynamic> zones = jr['value']['zones'];
     for (var z in zones) {
       if (z['code'] == 'listing_SEARCH') {
         setState(() {

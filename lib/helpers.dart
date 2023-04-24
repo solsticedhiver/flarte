@@ -1,11 +1,10 @@
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:flarte/config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hls_parser/flutter_hls_parser.dart';
-import 'package:dio/dio.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:html/parser.dart' as parser;
 import 'package:provider/provider.dart';
@@ -17,15 +16,11 @@ class Cache extends ChangeNotifier {
 
   Future<List<dynamic>> _testFranceTv() async {
     List<dynamic> result = [];
-    final Dio dio = Dio();
-    dio.interceptors.add(
-        DioCacheManager(CacheConfig(defaultMaxAge: AppConfig.dioDefaultMaxAge))
-            .interceptor);
-    final resp = await dio.get('https://www.france.tv');
+    final resp = await http.get(Uri.parse('https://www.france.tv'));
     if (resp.statusCode != 200) {
       return result;
     }
-    final document = parser.parse(resp.data);
+    final document = parser.parse(resp.body);
     final sliders = document.getElementsByClassName('c-section-slider');
     for (var s in sliders) {
       final zoneTitle =
@@ -96,14 +91,11 @@ class Cache extends ChangeNotifier {
 
     final String url =
         "https://www.arte.tv/api/rproxy/emac/v4/$lang/web/pages/$key/";
-    final Dio dio = Dio();
-    dio.interceptors.add(
-        DioCacheManager(CacheConfig(defaultMaxAge: AppConfig.dioDefaultMaxAge))
-            .interceptor);
-    final Response resp = await dio.get(url);
+    final http.Response resp = await http
+        .get(Uri.parse(url), headers: {'User-Agent': AppConfig.userAgent});
     if (resp.statusCode == 200) {
-      //debugPrint(jr);
-      data[cacheKey] = parseJson(resp.data);
+      final jr = json.decode(resp.body);
+      data[cacheKey] = parseJson(jr);
       notifyListeners();
     }
   }
@@ -343,6 +335,7 @@ class VideoCardState extends State<VideoCard> {
               ),
           ]);
     } else {
+      debugPrint(widget.video.subtitle);
       bottomText = ListTile(
         contentPadding: EdgeInsets.zero,
         title: Text(
@@ -496,12 +489,8 @@ class MediaStream {
       String url, String resolution) async {
     // get m3u8 playlist for each video, audio and subtitle stream
     Uri playlistUri = Uri.parse(url);
-    final Dio dio = Dio();
-    dio.interceptors.add(
-        DioCacheManager(CacheConfig(defaultMaxAge: AppConfig.dioDefaultMaxAge))
-            .interceptor);
-    final resp = await dio.get(url);
-    String contentString = resp.data;
+    final resp = await http.get(playlistUri);
+    String contentString = resp.body;
     int height = int.parse(resolution.split('x')[1]);
 
     try {
@@ -539,16 +528,12 @@ class MediaStream {
       String url, String resolution) async {
     // get real stream for video, audio, subtitle
     MediaStream playlists = await MediaStream.getMediaPlaylist(url, resolution);
-    final Dio dio = Dio();
-    dio.interceptors.add(
-        DioCacheManager(CacheConfig(defaultMaxAge: AppConfig.dioDefaultMaxAge))
-            .interceptor);
 
     Uri? video, audio, subtitle;
     int videoSize = 0;
     if (playlists.video != null) {
-      final resp = await dio.get(playlists.video.toString());
-      String contentString = resp.data;
+      final resp = await http.get(playlists.video!);
+      String contentString = resp.body;
 
       try {
         final playlist = await HlsPlaylistParser.create()
@@ -578,8 +563,8 @@ class MediaStream {
     }
     int audioSize = 0;
     if (playlists.audio != null) {
-      final resp = await dio.get(playlists.audio.toString());
-      String contentString = resp.data;
+      final resp = await http.get(playlists.audio!);
+      String contentString = resp.body;
 
       try {
         final playlist = await HlsPlaylistParser.create()
@@ -608,8 +593,8 @@ class MediaStream {
       return Future.error(Exception('MediaStream audio Uri is null'));
     }
     if (playlists.subtitle != null) {
-      final resp = await dio.get(playlists.subtitle.toString());
-      String contentString = resp.data;
+      final resp = await http.get(playlists.subtitle!);
+      String contentString = resp.body;
 
       try {
         final playlist = await HlsPlaylistParser.create()

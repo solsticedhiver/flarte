@@ -13,8 +13,6 @@ class AppConfig {
   // index of resolution, usually 0=>216p, 1=>360p, 2=>432p, 3=> 720p, 4=> 1080p
   static int playerIndexQuality = 2;
   static String userAgent = '${name.replaceAll(' ', '')}/$version +$url';
-  static Duration dioDefaultMaxAge = const Duration(hours: 1);
-
   static String _dlDirectory = '';
 
   static String get dlDirectory {
