@@ -53,10 +53,11 @@ class _VideoButtonsState extends State<VideoButtons> {
       final lang = Provider.of<LocaleModel>(context, listen: false)
           .getCurrentLocale(context)
           .languageCode;
+      final cache = Provider.of<Cache>(context, listen: false);
 
-      final resp = await http.get(Uri.parse(
-          'https://api.arte.tv/api/player/v2/config/$lang/$programId'));
-      Map<String, dynamic> jr = json.decode(resp.body);
+      final url = 'https://api.arte.tv/api/player/v2/config/$lang/$programId';
+      Map<String, dynamic>? jr;
+      jr = await cache.get(url);
       if (jr['data'] == null ||
           jr['data']['attributes'] == null ||
           jr['data']['attributes']['streams'] == null) {
@@ -92,9 +93,9 @@ class _VideoButtonsState extends State<VideoButtons> {
 
   void _getFormats() async {
     // directly parse the .m3u8 to get the bandwidth value to pass to libmpv backend
-    final resp = await http.get(Uri.parse(selectedVersion.url),
-        headers: {'User-Agent': AppConfig.userAgent});
-    final lines = resp.body.split('\n');
+    final cache = Provider.of<Cache>(context, listen: false);
+    final resp = await cache.get(selectedVersion.url, isJson: false);
+    final lines = resp['body'].split('\n');
     List<Format> tf = [];
     // #EXT-X-STREAM-INF:BANDWIDTH=xxx,AVERAGE-BANDWIDTH=yyyy,VIDEO-RANGE=SDR,CODECS="avc1.4d401e,mp4a.40.2",RESOLUTION=zzzxzzz,FRAME-RATE=25.000,AUDIO="program_audio_0",SUBTITLES="subs"
     for (var line in lines) {

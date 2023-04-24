@@ -295,23 +295,24 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   CategoriesList.codes.length,
                   (index) => Consumer2<Cache, LocaleModel>(
                           builder: (context, cache, localeModel, child) {
-                        String lang =
+                        final lang =
                             localeModel.getCurrentLocale(context).languageCode;
-                        return FutureBuilder(
-                            future: Future.microtask(() =>
-                                cache.get(CategoriesList.codes[index], lang)),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                return CarouselList(
-                                    // or ZoneList()
-                                    data: snapshot.data!,
-                                    size: carSize);
-                              } else {
-                                return Center(
-                                    child: Text(AppLocalizations.of(context)!
-                                        .strFetching));
-                              }
-                            });
+                        final key = CategoriesList.codes[index];
+                        return FutureBuilder(future: Future.microtask(() async {
+                          List<dynamic>? data = await cache.fetch(key, lang);
+                          return data;
+                        }), builder: (context, snapshot) {
+                          if (snapshot.hasData && snapshot.data != null) {
+                            return CarouselList(
+                                // or ZoneList()
+                                data: snapshot.data!,
+                                size: carSize);
+                          } else {
+                            return Center(
+                                child: Text(
+                                    AppLocalizations.of(context)!.strFetching));
+                          }
+                        });
                       })),
             ),
           ),

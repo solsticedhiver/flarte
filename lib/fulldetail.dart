@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -6,7 +5,6 @@ import 'package:flarte/controls.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -37,17 +35,17 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
   void initState() {
     super.initState();
 
-    debugPrint('in initState()');
+    //debugPrint('in _FullDetailScreeState.initState()');
 
     Future.microtask(() async {
       final lang = Provider.of<LocaleModel>(context, listen: false)
           .getCurrentLocale(context)
           .languageCode;
+      final cache = Provider.of<Cache>(context, listen: false);
+      Map<String, dynamic> jr;
       final url =
           'https://www.arte.tv/api/rproxy/emac/v4/$lang/web/programs/${video.programId}';
-      final resp = await http
-          .get(Uri.parse(url), headers: {'User-Agent': AppConfig.userAgent});
-      final Map<String, dynamic> jr = json.decode(resp.body);
+      jr = await cache.get(url);
       if (mounted) {
         setState(() {
           final imageUrl = data['mainImage']['url'];

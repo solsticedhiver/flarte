@@ -74,44 +74,48 @@ class Cache extends ChangeNotifier {
     return result;
   }
 
-  Future<void> fetch(String key, String lang) async {
-    final cacheKey = '$key-$lang';
-    if (data.keys.contains(cacheKey) && data[cacheKey].isNotEmpty) {
-      return;
+  Future<Map<String, dynamic>> get(String key, {isJson = true}) async {
+    if (!data.containsKey(key) || data[key].isEmpty) {
+      final resp = await http
+          .get(Uri.parse(key), headers: {'User-Agent': AppConfig.userAgent});
+      Map<String, dynamic> jr;
+      if (isJson) {
+        jr = json.decode(resp.body);
+        set(key, jr);
+      } else {
+        jr = {'body': resp.body};
+        set(key, jr);
+      }
+      return jr;
     }
-    /*
-    if (key == 'HOME') {
-      data[cacheKey] = await _test_france_tv();
-      notifyListeners();
-      return;
-    }
-    */
-    debugPrint(
-        '${DateTime.now().toIso8601String().substring(11, 19)}: in Cache.fetch($key, $lang)');
-
-    final String url =
-        "https://www.arte.tv/api/rproxy/emac/v4/$lang/web/pages/$key/";
-    final http.Response resp = await http
-        .get(Uri.parse(url), headers: {'User-Agent': AppConfig.userAgent});
-    if (resp.statusCode == 200) {
-      final jr = json.decode(resp.body);
-      data[cacheKey] = parseJson(jr);
-      notifyListeners();
-    }
+    return data[key];
   }
 
-  Future<List<dynamic>> get(String key, String lang) async {
-    final cacheKey = '$key-$lang';
-    if (!data.keys.contains(cacheKey) || !data[cacheKey].isEmpty) {
-      await fetch(key, lang);
+  void set(String key, dynamic dyn, {notify = false}) {
+    data[key] = dyn;
+    if (notify) {
+      notifyListeners();
     }
-    return data[cacheKey];
+    //debugPrint('data cache length:  ${data.toString().length / 1024}ko');
   }
 
-  void set(String key, String lang, Map<dynamic, dynamic> dict) {
+  Future<List<dynamic>?> fetch(String key, String lang) async {
     final cacheKey = '$key-$lang';
-    data[cacheKey] = dict;
-    notifyListeners();
+    if (!data.containsKey(cacheKey) || data[cacheKey] == null) {
+      final String url =
+          "https://www.arte.tv/api/rproxy/emac/v4/$lang/web/pages/$key/";
+      final resp = await http
+          .get(Uri.parse(url), headers: {'User-Agent': AppConfig.userAgent});
+      if (resp.statusCode == 200) {
+        final jr = json.decode(resp.body);
+        set(cacheKey, parseJson(jr), notify: true);
+        return data[cacheKey];
+      } else {
+        return null;
+      }
+    } else {
+      return data[cacheKey];
+    }
   }
 }
 
@@ -335,7 +339,6 @@ class VideoCardState extends State<VideoCard> {
               ),
           ]);
     } else {
-      debugPrint(widget.video.subtitle);
       bottomText = ListTile(
         contentPadding: EdgeInsets.zero,
         title: Text(
