@@ -250,7 +250,8 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                             'str': 'VLC',
                             // disable VLC choice when in flatpak
                             'disabled':
-                                Platform.environment['FLATPAK_ID'] != null || Platform.environment['SNAP'] != null
+                                Platform.environment['FLATPAK_ID'] != null ||
+                                    Platform.environment['SNAP'] != null
                           },
                           PlayerTypeName.custom: {
                             'str': AppLocalizations.of(context)!.strCustom,
@@ -315,7 +316,10 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                     applicationVersion: AppConfig.version,
                     applicationLegalese:
                         "Copyright © 2023\nsolsTiCe d'Hiver <solstice.dhiver@gmail.com>\nGPL-3+",
-                    children: [const SizedBox(height: 10), Text(GPL3)],
+                    children: [
+                      const SizedBox(height: 10),
+                      Container(width: 600, child: Text(GPL3))
+                    ],
                   );
                 },
               ),
