@@ -389,6 +389,7 @@ class _VideoButtonsState extends State<VideoButtons> {
         }
       }
     } else {
+      _showMessage(context, AppLocalizations.of(context)!.strNotImpl);
       return;
     }
     if (!mgr.canRun(binary)) {

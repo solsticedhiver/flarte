@@ -248,10 +248,11 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                           },
                           PlayerTypeName.vlc: {
                             'str': 'VLC',
-                            // disable VLC choice when in flatpak
+                            // disable VLC choice when in flatpak/snap or android
                             'disabled':
                                 Platform.environment['FLATPAK_ID'] != null ||
-                                    Platform.environment['SNAP'] != null
+                                    Platform.environment['SNAP'] != null ||
+                                    Platform.isAndroid
                           },
                           PlayerTypeName.custom: {
                             'str': AppLocalizations.of(context)!.strCustom,
