@@ -46,7 +46,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
       final url =
           'https://www.arte.tv/api/rproxy/emac/v4/$lang/web/programs/${video.programId}';
       jr = await cache.get(url);
-      if (mounted) {
+      if (mounted && jr.isNotEmpty) {
         setState(() {
           final imageUrl = data['mainImage']['url'];
           final title = data['title'];

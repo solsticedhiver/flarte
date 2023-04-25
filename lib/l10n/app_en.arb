@@ -48,5 +48,6 @@
     "strSpanish": "Spanish",
     "strPolish": "Polish",
     "strNoResults": "No results",
-    "strAbout": "About"
+    "strAbout": "About",
+    "strError": "An error occurred"
 }

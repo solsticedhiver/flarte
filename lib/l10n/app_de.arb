@@ -48,6 +48,6 @@
     "strSpanish": "Spanisch",
     "strPolish": "Polirien",
     "strNoResults": "Keine Ergebnisse",
-    "strAbout": "Über"
-
+    "strAbout": "Über",
+    "strError": "Ein Fehler ist aufgetreten"
 }

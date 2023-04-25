@@ -78,10 +78,17 @@ class Cache extends ChangeNotifier {
     if (!data.containsKey(key) || data[key].isEmpty) {
       final resp = await http
           .get(Uri.parse(key), headers: {'User-Agent': AppConfig.userAgent});
-      Map<String, dynamic> jr;
+      Map<String, dynamic> jr = {};
+      if (resp.statusCode != 200) {
+        return jr;
+      }
       if (isJson) {
-        jr = json.decode(resp.body);
-        set(key, jr);
+        try {
+          jr = json.decode(resp.body);
+          set(key, jr);
+        } on FormatException {
+          return jr;
+        }
       } else {
         jr = {'body': resp.body};
         set(key, jr);
