@@ -49,7 +49,7 @@ class _SearchScreenState extends State<SearchScreen> {
         .getCurrentLocale(context)
         .languageCode;
     final resp = await http.get(Uri.parse(
-        'https://www.arte.tv/api/rproxy/emac/v4/${lang}/web/pages/SEARCH/?page=1&query=${Uri.encodeComponent(search)}'));
+        'https://www.arte.tv/api/rproxy/emac/v4/$lang/web/pages/SEARCH/?page=1&query=${Uri.encodeComponent(search)}'));
     final Map<String, dynamic> jr = json.decode(resp.body);
     final List<dynamic> zones = jr['value']['zones'];
     for (var z in zones) {
@@ -72,6 +72,7 @@ class _SearchScreenState extends State<SearchScreen> {
     Widget results;
 
     if (data.isNotEmpty) {
+      // ignore: sized_box_for_whitespace
       results = Container(
           width: width,
           child: GridView.count(
@@ -97,6 +98,7 @@ class _SearchScreenState extends State<SearchScreen> {
       } else {
         text = AppLocalizations.of(context)!.strNoResults;
       }
+      // ignore: sized_box_for_whitespace
       results = Container(width: width, child: Center(child: Text(text)));
     }
 

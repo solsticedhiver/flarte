@@ -161,9 +161,9 @@ class _VideoButtonsState extends State<VideoButtons> {
     } else {
       return;
     }
+    final messengerState = ScaffoldMessenger.of(context);
     if (!mgr.canRun(binary, workingDirectory: AppConfig.dlDirectory)) {
-      if (!context.mounted) return;
-      _showMessage(context, 'yt-dlp has not been found');
+      _showMessage(messengerState, 'yt-dlp has not been found');
       return;
     }
     List<String> cmd = [
@@ -202,9 +202,8 @@ class _VideoButtonsState extends State<VideoButtons> {
     }
     if (result.exitCode != 0) {
       debugPrint(result.stderr);
-      if (!context.mounted) return;
-      _showMessage(
-          context, 'Error downloading video ${video.programId} with yt-dlp');
+      _showMessage(messengerState,
+          'Error downloading video ${video.programId} with yt-dlp');
       return;
     }
   }
@@ -233,8 +232,10 @@ class _VideoButtonsState extends State<VideoButtons> {
     final outputFilename =
         '${video.programId}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat.resolution}.mp4';
     debugPrint(outputFilename);
+    final messengerState = ScaffoldMessenger.of(context);
+
     if (File(path.join(cwd, outputFilename)).existsSync()) {
-      _showMessage(context, 'File $outputFilename already exists');
+      _showMessage(messengerState, 'File $outputFilename already exists');
       return;
     }
     // work-around ffmpeg bug #10149 and #10169
@@ -256,17 +257,14 @@ class _VideoButtonsState extends State<VideoButtons> {
     if (Platform.isWindows) {
       ffmpeg = 'ffmpeg.exe';
     } else if (!Platform.isLinux) {
-      if (!context.mounted) return;
-      _showMessage(context, 'not implemented');
+      _showMessage(messengerState, 'not implemented');
       return;
     }
     if (!mgr.canRun(ffmpeg, workingDirectory: cwd)) {
-      if (!context.mounted) return;
-      _showMessage(context, 'ffmpeg has not been found');
+      _showMessage(messengerState, 'ffmpeg has not been found');
       return;
     }
-    if (!context.mounted) return;
-    _showMessage(context, 'Downloading video ${video.programId}');
+    _showMessage(messengerState, 'Downloading video ${video.programId}');
 
     String videoFilename =
         stream.video.toString().split('/').last.replaceFirst('m3u8', 'mp4');
@@ -357,44 +355,43 @@ class _VideoButtonsState extends State<VideoButtons> {
       debugPrint(e.toString());
       message = 'Error downloading video ${video.programId} with ffmpeg';
     }
-    if (mounted) {
-      _showMessage(context, message);
-    }
+    _showMessage(messengerState, message);
   }
 
   void _vlc() async {
     ProcessManager mgr = const LocalProcessManager();
     String binary = '';
+    final messengerState = ScaffoldMessenger.of(context);
     if (Platform.isLinux) {
       binary = 'cvlc';
     } else if (Platform.isWindows) {
       String? programFiles = Platform.environment['ProgramFiles'];
       if (programFiles == null || programFiles.isEmpty) {
-        _showMessage(context, '%ProgramFiles% is empty');
+        _showMessage(messengerState, '%ProgramFiles% is empty');
         return;
       }
       binary = path.join(programFiles, 'VideoLAN', 'VLC', 'vlc.exe');
       if (!File(binary).existsSync()) {
-        _showMessage(context, '$binary not found');
+        _showMessage(messengerState, '$binary not found');
         // try in Program Files (x86)
         programFiles = Platform.environment['ProgramFiles(x86)'];
         if (programFiles == null || programFiles.isEmpty) {
-          _showMessage(context, '%ProgramFiles(x86)% is empty');
+          _showMessage(messengerState, '%ProgramFiles(x86)% is empty');
           return;
         }
         binary = path.join(programFiles, 'VideoLAN', 'VLC', 'vlc.exe');
         if (!File(binary).existsSync()) {
-          _showMessage(context, '$binary not found');
+          _showMessage(messengerState, '$binary not found');
           return;
         }
       }
     } else {
-      _showMessage(context, AppLocalizations.of(context)!.strNotImpl);
+      _showMessage(messengerState, AppLocalizations.of(context)!.strNotImpl);
       return;
     }
     if (!mgr.canRun(binary)) {
       if (!context.mounted) return;
-      _showMessage(context, '[c]vlc has not been found');
+      _showMessage(messengerState, '[c]vlc has not been found');
       return;
     }
     List<String> cmd;
@@ -429,18 +426,17 @@ class _VideoButtonsState extends State<VideoButtons> {
     }
     */
     try {
-      _showMessage(context,
+      _showMessage(messengerState,
           'Launching external [c]vlc instance to read video ${video.programId}');
       ProcessResult result = await mgr.run(cmd);
       if (result.exitCode != 0) {
         //debugPrint(result.stderr);
-        if (!context.mounted) return;
-        _showMessage(context, 'Error: ${result.stderr}');
+        _showMessage(messengerState, 'Error: ${result.stderr}');
         return;
       }
     } on ProcessException catch (e) {
       //debugPrint('ProcessException: ${e.message}');
-      _showMessage(context, 'Error: ${e.message}');
+      _showMessage(messengerState, 'Error: ${e.message}');
     }
   }
 
@@ -598,8 +594,8 @@ class _VideoButtonsState extends State<VideoButtons> {
     }
   }
 
-  void _showMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  void _showMessage(ScaffoldMessengerState messengerState, String message) {
+    messengerState.showSnackBar(SnackBar(
       content: Text(message, style: const TextStyle(color: Colors.white)),
       backgroundColor: Colors.black87,
       behavior: SnackBarBehavior.floating,

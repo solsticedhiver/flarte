@@ -112,6 +112,7 @@ class _SerieScreenState extends State<SerieScreen> {
         List<VideoData> videos =
             teasers.map((t) => VideoData.fromJson(t)).toList();
         body = Center(
+            // ignore: sized_box_for_whitespace
             child: Container(
                 width: width,
                 child: GridView.count(

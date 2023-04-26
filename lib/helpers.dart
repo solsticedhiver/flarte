@@ -6,52 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hls_parser/flutter_hls_parser.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:html/parser.dart' as parser;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Cache extends ChangeNotifier {
   final Map<String, dynamic> data = {};
   //int index = 0;
-
-  Future<List<dynamic>> _testFranceTv() async {
-    List<dynamic> result = [];
-    final resp = await http.get(Uri.parse('https://www.france.tv'));
-    if (resp.statusCode != 200) {
-      return result;
-    }
-    final document = parser.parse(resp.body);
-    final sliders = document.getElementsByClassName('c-section-slider');
-    for (var s in sliders) {
-      final zoneTitle =
-          s.getElementsByClassName('c-headlines--title-2')[0].innerHtml;
-      List<dynamic> videos = [];
-      for (var i in s.getElementsByClassName('c-slider__item')) {
-        final t = i.getElementsByClassName('c-card-poster__cached-title');
-        String title = '';
-        if (t.isNotEmpty) title = t[0].innerHtml;
-        final desc =
-            i.getElementsByClassName('c-card-poster__cached-description');
-        String subtitle = '';
-        if (desc.isNotEmpty) subtitle = desc[0].innerHtml;
-        String? imageUrl = '';
-        final image = i.querySelector('span.c-card-poster__image-wrapper img');
-        if (image != null) imageUrl = image.attributes['data-src'];
-        videos.add(VideoData(
-            programId: 'unknown',
-            title: title.trim(),
-            subtitle: subtitle.trim(),
-            imageUrl: imageUrl,
-            shortDescription: '',
-            isCollection: false,
-            label: '',
-            durationLabel: '',
-            url: ''));
-      }
-      result.add({'title': zoneTitle, 'videos': videos});
-    }
-    return result;
-  }
 
   static List<dynamic> parseJson(Map<String, dynamic> data) {
     List<dynamic> result = [];

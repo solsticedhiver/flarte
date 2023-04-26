@@ -306,6 +306,7 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                 leading: const Icon(Icons.info),
                 title: const Text('version ${AppConfig.version}'),
                 onPressed: (context) async {
+                  // ignore: non_constant_identifier_names
                   String GPL3 =
                       await PlatformAssetBundle().loadString('assets/GPL3.txt');
                   if (!context.mounted) return;
@@ -319,6 +320,7 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                         "Copyright © 2023\nsolsTiCe d'Hiver <solstice.dhiver@gmail.com>\nGPL-3+",
                     children: [
                       const SizedBox(height: 10),
+                      // ignore: sized_box_for_whitespace
                       Container(width: 600, child: Text(GPL3))
                     ],
                   );
