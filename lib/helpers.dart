@@ -601,6 +601,6 @@ class MediaStream {
 
   @override
   String toString() {
-    return 'MediaStream(video: $video, audio: $audio, subtitle: $subtitle)';
+    return 'MediaStream(video: $video, audio: $audio, subtitle: $subtitle, videoSize: ${(videoSize / 1024 / 1024).toStringAsFixed(2)}MB, audioSize: ${(audioSize / 1024 / 1024).toStringAsFixed(2)}MB)';
   }
 }
