@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_hls_parser/flutter_hls_parser.dart' as hls;
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:process/process.dart';
@@ -48,31 +49,12 @@ class _VideoButtonsState extends State<VideoButtons> {
 
     Future.microtask(() async {
       final programId = video.programId;
-
-      debugPrint('programId: $programId');
       final lang = Provider.of<LocaleModel>(context, listen: false)
           .getCurrentLocale(context)
           .languageCode;
-      final cache = Provider.of<Cache>(context, listen: false);
 
-      final url = 'https://api.arte.tv/api/player/v2/config/$lang/$programId';
-      Map<String, dynamic>? jr;
-      jr = await cache.get(url);
-      if (jr['data'] == null ||
-          jr['data']['attributes'] == null ||
-          jr['data']['attributes']['streams'] == null) {
-        return;
-      }
-      //debugPrint(jr.toString());
-      final streams = jr['data']['attributes']['streams'];
-      //debugPrint(streams.toString());
-      List<Version> cv = [];
-      for (var s in streams) {
-        final v = s['versions'][0];
-        //debugPrint(v['shortLabel']);
-        cv.add(Version(
-            shortLabel: v['shortLabel'], label: v['label'], url: s['url']));
-      }
+      debugPrint('programId: $programId');
+      final cv = await _getVersions(lang, programId);
       debugPrint(cv.toString());
       if (cv.isNotEmpty && mounted) {
         setState(() {
@@ -86,37 +68,63 @@ class _VideoButtonsState extends State<VideoButtons> {
               .toList();
         });
         video.versions = versions;
-        _getFormats();
+        _getFormats(selectedVersion.url);
       }
     });
   }
 
-  void _getFormats() async {
+  Future<List<Version>> _getVersions(String lang, String programId) async {
+    final cache = Provider.of<Cache>(context, listen: false);
+
+    final url = 'https://api.arte.tv/api/player/v2/config/$lang/$programId';
+    Map<String, dynamic>? jr;
+    List<Version> cv = [];
+    jr = await cache.get(url);
+    if (jr['data'] == null ||
+        jr['data']['attributes'] == null ||
+        jr['data']['attributes']['streams'] == null) {
+      return cv;
+    }
+    //debugPrint(jr.toString());
+    final streams = jr['data']['attributes']['streams'];
+    //debugPrint(streams.toString());
+    for (var s in streams) {
+      final v = s['versions'][0];
+      //debugPrint(v['shortLabel']);
+      cv.add(Version(
+          shortLabel: v['shortLabel'], label: v['label'], url: s['url']));
+    }
+    return cv;
+  }
+
+  void _getFormats(String url) async {
     // directly parse the .m3u8 to get the bandwidth value to pass to libmpv backend
     final cache = Provider.of<Cache>(context, listen: false);
-    final resp = await cache.get(selectedVersion.url, isJson: false);
-    final lines = resp['body'].split('\n');
+    final resp = await cache.get(url, isJson: false);
+
+    Uri playlistUri = Uri.parse(url);
     List<Format> tf = [];
-    // #EXT-X-STREAM-INF:BANDWIDTH=xxx,AVERAGE-BANDWIDTH=yyyy,VIDEO-RANGE=SDR,CODECS="avc1.4d401e,mp4a.40.2",RESOLUTION=zzzxzzz,FRAME-RATE=25.000,AUDIO="program_audio_0",SUBTITLES="subs"
-    for (var line in lines) {
-      if (line.startsWith('#EXT-X-STREAM-INF')) {
-        final info = line.split(':').last;
-        String resolution = '', bandwidth = '';
-        for (var i in info.split(',')) {
-          if (i.startsWith('RESOLUTION')) {
-            resolution = i.split('=').last;
-          } else if (i.startsWith('BANDWIDTH')) {
-            bandwidth = i.split('=').last;
-          }
+    try {
+      final playlist = await hls.HlsPlaylistParser.create()
+          .parseString(playlistUri, resp['body']);
+      if (playlist is hls.HlsMasterPlaylist) {
+        for (var v in playlist.variants) {
+          tf.add(Format(
+              resolution: '${v.format.width}x${v.format.height}',
+              bandwidth: v.format.bitrate.toString()));
         }
-        tf.add(Format(resolution: resolution, bandwidth: bandwidth));
-        tf.sort((a, b) {
-          int aa = int.parse(a.bandwidth.replaceFirst('p', ''));
-          int bb = int.parse(b.bandwidth.replaceFirst('p', ''));
-          return aa.compareTo(bb);
-        });
+        // master m3u8 file
+      } else if (playlist is hls.HlsMediaPlaylist) {
+        // media m3u8 file
       }
+    } on hls.ParserException catch (e) {
+      debugPrint(e.toString());
     }
+    tf.sort((a, b) {
+      int aa = int.parse(a.bandwidth);
+      int bb = int.parse(b.bandwidth);
+      return aa.compareTo(bb);
+    });
     debugPrint(tf.toString());
     if (tf.isNotEmpty && mounted) {
       setState(() {
@@ -556,7 +564,7 @@ class _VideoButtonsState extends State<VideoButtons> {
               onChanged: (value) {
                 setState(() {
                   selectedVersion = value!;
-                  _getFormats();
+                  _getFormats(selectedVersion.url);
                 });
               })
           : const SizedBox(height: 24),

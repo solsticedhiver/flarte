@@ -113,6 +113,18 @@ class Format {
   String toString() {
     return 'Format($resolution, $bandwidth)';
   }
+
+  @override
+  int get hashCode {
+    return resolution.hashCode + bandwidth.hashCode;
+  }
+
+  @override
+  bool operator ==(other) {
+    return other is Format &&
+        other.resolution == resolution &&
+        other.bandwidth == bandwidth;
+  }
 }
 
 class LocaleModel with ChangeNotifier {
