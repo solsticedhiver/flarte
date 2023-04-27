@@ -32,6 +32,7 @@ void main() async {
 
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   AppConfig.textMode = prefs.getBool('textMode') ?? AppConfig.textMode;
+  AppConfig.dlDirectory = prefs.getString('dlDirectory') ?? '';
   String? loc = prefs.getString('locale');
   Locale? locale;
   if (loc != null) {
@@ -342,6 +343,7 @@ void _saveSettings(Map<String, dynamic>? settings) async {
   prefs.setInt('quality', settings['quality']);
   prefs.setString('player', settings['player'].toString().split('.').last);
   prefs.setBool('textMode', AppConfig.textMode);
+  prefs.setString('dlDirectory', AppConfig.dlDirectory);
 }
 
 class Carousel extends StatefulWidget {

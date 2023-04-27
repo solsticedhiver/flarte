@@ -11,7 +11,7 @@ On *Windows*, excepts the binary *ffmpeg.exe* to be in flarte directory. Downloa
 
 On *Linux*, downloads to `$XDG_DOWNLOAD_DIR` if set else to `$HOME`.
 
-Will be configurable, once Settings dialog is finished.
+Downloading is not implemented on Android.
 
 ## Release archives
 
@@ -28,7 +28,7 @@ To be able to install the *snap* as a *local file*, you will need to use the `--
 
 To install the *flatpak*, use:
 
-    flatpak install --user flatpak-deadbeef-x86_64.flatpak
+    flatpak install --user flatpak-x.y.z-x86_64.flatpak
 
 When running, either the snap or the flatpak, you will not be able to use an external player like VLC.
 

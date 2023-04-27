@@ -16,6 +16,10 @@ class AppConfig {
   static String _dlDirectory = '';
   static bool textMode = false;
 
+  static set dlDirectory(String dl) {
+    _dlDirectory = dl;
+  }
+
   static String get dlDirectory {
     if (_dlDirectory.isNotEmpty) {
       return _dlDirectory;

@@ -1,12 +1,15 @@
 import 'dart:io';
 
+import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flarte/helpers.dart';
 import 'package:flarte/config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:settings_ui/settings_ui.dart';
+import 'package:path/path.dart' as path;
 
 class FlarteSettings extends StatefulWidget {
   const FlarteSettings({
@@ -318,6 +321,40 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                 leading: const Icon(Icons.download),
                 title: Text(AppLocalizations.of(context)!.strFolder),
                 value: Text(AppConfig.dlDirectory),
+                enabled: Platform.isLinux || Platform.isWindows,
+                onPressed: (context) async {
+                  String home = '';
+                  if (Platform.isLinux) {
+                    home = Platform.environment['HOME'] ??
+                        Platform.environment['TMP']!;
+                  } else if (Platform.isWindows) {
+                    home = Platform.environment['USERPROFILE'] ??
+                        path.join(Platform.environment['SYSTEMDRIVE']!,
+                            'Windows', 'Temp');
+                  }
+                  if (!mounted) return;
+                  String? dlDir = await FilesystemPicker.open(
+                      title: 'Downloads folder',
+                      context: context,
+                      rootName: home,
+                      requestPermission: () async {
+                        return true;
+                      },
+                      // buggy on Linux, can't find home/user ??
+                      showGoUp: false,
+                      rootDirectory: Directory(home),
+                      fsType: FilesystemType.folder,
+                      pickText: 'Save videos to this folder',
+                      itemFilter: (fsEntity, path, name) {
+                        return !name.startsWith('.');
+                      },
+                      theme: const FilesystemPickerAutoSystemTheme());
+                  if (dlDir != null) {
+                    setState(() {
+                      AppConfig.dlDirectory = dlDir;
+                    });
+                  }
+                },
               ),
             ]),
         SettingsSection(
