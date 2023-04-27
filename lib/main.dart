@@ -725,34 +725,35 @@ class _ZoneListState extends State<ZoneList> {
       return Center(child: Text(AppLocalizations.of(context)!.strFetching));
     }
     return Row(mainAxisSize: MainAxisSize.max, children: [
-      SizedBox(
-          height: MediaQuery.of(context).size.height,
-          width: widget.size == CategoriesListSize.small ? 300 : 350,
-          child: ListView.builder(
-            //padding: const EdgeInsets.symmetric(vertical: 10),
-            semanticChildCount: widget._zones.length,
-            itemCount: widget._zones.length,
-            itemBuilder: (context, index) {
-              if (widget._zones.isNotEmpty) {
-                return ListTile(
-                    selectedTileColor: Theme.of(context).highlightColor,
-                    selected: index == selectedZoneIndex,
-                    onTap: () {
-                      setState(() {
-                        selectedZoneIndex = index;
-                      });
-                    },
-                    title: Text(
-                      '${widget._zones[index]['title']} (${widget._zones[index]['videos'].length})',
-                      softWrap: true,
-                    ));
-              } else {
-                return null;
-              }
-            },
-          )),
       Expanded(
           flex: 1,
+          child: Container(
+              height: MediaQuery.of(context).size.height,
+              child: ListView.builder(
+                //padding: const EdgeInsets.symmetric(vertical: 10),
+                semanticChildCount: widget._zones.length,
+                itemCount: widget._zones.length,
+                itemBuilder: (context, index) {
+                  if (widget._zones.isNotEmpty) {
+                    return ListTile(
+                        selectedTileColor: Theme.of(context).highlightColor,
+                        selected: index == selectedZoneIndex,
+                        onTap: () {
+                          setState(() {
+                            selectedZoneIndex = index;
+                          });
+                        },
+                        title: Text(
+                          '${widget._zones[index]['title']} (${widget._zones[index]['videos'].length})',
+                          softWrap: true,
+                        ));
+                  } else {
+                    return null;
+                  }
+                },
+              ))),
+      Expanded(
+          flex: 2,
           child: ShowList(
               key: Key('$selectedZoneIndex'),
               videos: widget._zones.isNotEmpty
@@ -777,7 +778,6 @@ class _ShowListState extends State<ShowList> {
   @override
   void initState() {
     super.initState();
-    selectedShowIndex = -1;
   }
 
   @override
@@ -789,8 +789,8 @@ class _ShowListState extends State<ShowList> {
   @override
   Widget build(BuildContext context) {
     return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      SizedBox(
-          width: 450,
+      Expanded(
+          flex: 1,
           child: ListView.builder(
               itemCount: widget.videos.length,
               itemBuilder: (context, index) {
@@ -809,8 +809,10 @@ class _ShowListState extends State<ShowList> {
                 );
               })),
       Expanded(
+          flex: 1,
           child: selectedShowIndex != -1
               ? ShowDetail(
+                  key: ValueKey(selectedShowIndex),
                   videos: widget.videos,
                   index: selectedShowIndex,
                   imageTop: true)
