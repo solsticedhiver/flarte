@@ -15,7 +15,6 @@ Ceci sera configurable, une fois la fenêtre des "Paramètres" finie.
 
 ## Bientot ?
 
-- la fenêtre pour les Paramètres à finir
 - des meilleurs controls pour le lecteur intégré
 - cast to chromecast
 - ajouter france.tv ?

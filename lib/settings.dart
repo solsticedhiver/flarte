@@ -195,7 +195,29 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                     _themeMode = themeMode;
                   });
                 },
-              )
+              ),
+              SettingsTile.switchTile(
+                initialValue: AppConfig.textMode,
+                activeSwitchColor: Colors.deepOrange,
+                leading: const Icon(Icons.text_fields),
+                title: Text(AppLocalizations.of(context)!.strTextMode),
+                onToggle: (value) {
+                  setState(() {
+                    AppConfig.textMode = value;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(
+                        AppLocalizations.of(context)!
+                            .strYouNeedToChangeCategory,
+                        style: const TextStyle(color: Colors.white)),
+                    // showCloseIcon: true,
+                    duration: const Duration(seconds: 30),
+                    behavior: SnackBarBehavior.floating,
+                    backgroundColor: Colors.black87,
+                    showCloseIcon: true,
+                  ));
+                },
+              ),
             ]),
         SettingsSection(
             title: Text(AppLocalizations.of(context)!.strPlayback),

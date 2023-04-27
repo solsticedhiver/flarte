@@ -49,6 +49,7 @@
     "strPolish": "Polonais",
     "strNoResults": "Aucun résultat",
     "strAbout": "A propos de",
-    "strError": "Une erreur s'est produite"
-
+    "strError": "Une erreur s'est produite",
+    "strTextMode": "Mode texte",
+    "strYouNeedToChangeCategory": "Vous devrez naviguer à une nouvelle catégorie pour que le changement soit visible" 
 }

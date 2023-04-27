@@ -528,7 +528,10 @@ class _VideoButtonsState extends State<VideoButtons> {
         IconButton(
             icon: const Icon(Icons.read_more),
             onPressed: () {
-              Navigator.pop(context);
+              if (widget.oneLine) {
+                // this will mean in dialog else in text mode
+                Navigator.pop(context);
+              }
               Navigator.push(
                   context,
                   MaterialPageRoute(

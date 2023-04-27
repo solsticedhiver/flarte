@@ -49,5 +49,7 @@
     "strPolish": "Polirien",
     "strNoResults": "Keine Ergebnisse",
     "strAbout": "Über",
-    "strError": "Ein Fehler ist aufgetreten"
+    "strError": "Ein Fehler ist aufgetreten",
+    "strTextMode": "Textmodus",
+    "strYouNeedToChangeCategory": "Sie müssen zu einer neuen Kategorie navigieren, damit die Änderung sichtbar wird" 
 }

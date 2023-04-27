@@ -14,6 +14,7 @@ class AppConfig {
   static int playerIndexQuality = 2;
   static String userAgent = '${name.replaceAll(' ', '')}/$version +$url';
   static String _dlDirectory = '';
+  static bool textMode = false;
 
   static String get dlDirectory {
     if (_dlDirectory.isNotEmpty) {

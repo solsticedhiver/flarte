@@ -49,5 +49,7 @@
     "strPolish": "Polish",
     "strNoResults": "No results",
     "strAbout": "About",
-    "strError": "An error occurred"
+    "strError": "An error occurred",
+    "strTextMode": "Text Mode",
+    "strYouNeedToChangeCategory": "You will need to navigate to a new category for the change to be visible" 
 }

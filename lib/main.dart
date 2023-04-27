@@ -31,6 +31,7 @@ void main() async {
   }
 
   final SharedPreferences prefs = await SharedPreferences.getInstance();
+  AppConfig.textMode = prefs.getBool('textMode') ?? AppConfig.textMode;
   String? loc = prefs.getString('locale');
   Locale? locale;
   if (loc != null) {
@@ -303,10 +304,17 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                           return data;
                         }), builder: (context, snapshot) {
                           if (snapshot.hasData && snapshot.data != null) {
-                            return CarouselList(
-                                // or ZoneList()
-                                data: snapshot.data!,
-                                size: carSize);
+                            if (AppConfig.textMode) {
+                              return ZoneList(
+                                  // or ZoneList()
+                                  data: snapshot.data!,
+                                  size: carSize);
+                            } else {
+                              return CarouselList(
+                                  // or ZoneList()
+                                  data: snapshot.data!,
+                                  size: carSize);
+                            }
                           } else if (snapshot.data == null) {
                             return Center(
                                 child: Text(
@@ -333,6 +341,7 @@ void _saveSettings(Map<String, dynamic>? settings) async {
   prefs.setString('theme', settings['theme'].toString().split('.').last);
   prefs.setInt('quality', settings['quality']);
   prefs.setString('player', settings['player'].toString().split('.').last);
+  prefs.setBool('textMode', AppConfig.textMode);
 }
 
 class Carousel extends StatefulWidget {

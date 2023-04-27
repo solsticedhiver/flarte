@@ -40,5 +40,4 @@ To build and run yourself the app, once the flutter SDK is installed, you simply
 
 - better control for embedded player (sound ?)
 - cast to chromecast on android
-- text only mode
 - add france.tv and other network?
