@@ -333,10 +333,11 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                             'Windows', 'Temp');
                   }
                   if (!mounted) return;
-                  String? dlDir = await FilesystemPicker.open(
+                  String? dlDir = await FilesystemPicker.openDialog(
                       title: 'Downloads folder',
                       context: context,
                       rootName: home,
+                      folderIconColor: Colors.deepOrange,
                       requestPermission: () async {
                         return true;
                       },
