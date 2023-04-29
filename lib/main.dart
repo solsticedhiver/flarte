@@ -316,11 +316,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                   data: snapshot.data!,
                                   size: carSize);
                             }
-                          } else if (snapshot.data == null) {
+                          } else if (snapshot.hasData &&
+                              snapshot.data == null) {
                             return Center(
                                 child: Text(
                                     AppLocalizations.of(context)!.strError));
-                          } else {
+                          } else /*if (!snapshot.hasData) */ {
                             return Center(
                                 child: Text(
                                     AppLocalizations.of(context)!.strFetching));
