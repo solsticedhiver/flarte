@@ -21,12 +21,14 @@ class VideoButtons extends StatefulWidget {
   final int index;
   final bool oneLine;
   final bool withFullDetailButton;
+  final bool doPop;
   const VideoButtons(
       {super.key,
       required this.videos,
       required this.index,
       required this.oneLine,
-      required this.withFullDetailButton});
+      required this.withFullDetailButton,
+      this.doPop = false});
 
   @override
   State<VideoButtons> createState() => _VideoButtonsState();
@@ -528,7 +530,7 @@ class _VideoButtonsState extends State<VideoButtons> {
         IconButton(
             icon: const Icon(Icons.read_more),
             onPressed: () {
-              if (widget.oneLine) {
+              if (widget.doPop) {
                 // this will mean in dialog else in text mode
                 Navigator.pop(context);
               }

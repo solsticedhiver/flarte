@@ -116,6 +116,7 @@ class _ShowDetailState extends State<ShowDetail> {
                                   videos: widget.videos,
                                   index: widget.index,
                                   oneLine: false,
+                                  doPop: !widget.imageTop,
                                   withFullDetailButton: true)
                               : TextButton(
                                   onPressed: () {
