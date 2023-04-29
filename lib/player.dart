@@ -7,6 +7,7 @@ import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:wakelock/wakelock.dart';
 
 import 'config.dart';
 import 'helpers.dart';
@@ -58,6 +59,9 @@ class MyScreenState extends State<MyScreen> {
       await controller?.dispose();
       await player.dispose();
     });
+    if (Platform.isWindows || Platform.isAndroid) {
+      Wakelock.disable();
+    }
     super.dispose();
   }
 
@@ -86,6 +90,9 @@ class MyScreenState extends State<MyScreen> {
       }
       player.setVolume(100);
       player.open(Playlist([Media(widget.videoStream)]));
+      if (Platform.isWindows || Platform.isAndroid) {
+        Wakelock.enable();
+      }
       debugPrint('Playing ${widget.video}');
     }
 
@@ -208,12 +215,15 @@ class _SeekBarState extends State<SeekBar> {
     duration = widget.player.state.duration;
     subscriptions.addAll(
       [
-        widget.player.streams.playing.listen((event) {
+        widget.player.streams.playing.listen((event) async {
           setState(() {
             if (mounted) {
               playing = event;
             }
           });
+          if (Platform.isWindows || Platform.isAndroid) {
+            await Wakelock.toggle(enable: playing);
+          }
         }),
         widget.player.streams.completed.listen((event) {
           setState(() {

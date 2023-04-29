@@ -58,6 +58,7 @@ dependencies:
   window_manager: ^0.3.1
   shared_preferences: ^2.1.0
   filesystem_picker: ^3.1.0
+  wakelock: ^0.6.2
 
 dev_dependencies:
   flutter_test:
