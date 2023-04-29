@@ -8,6 +8,9 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
+import 'fulldetail.dart';
+import 'serie.dart';
+
 class SearchScreen extends StatefulWidget {
   const SearchScreen({
     super.key,
@@ -80,8 +83,22 @@ class _SearchScreenState extends State<SearchScreen> {
             crossAxisCount: count,
             children: data.map((v) {
               return InkWell(
-                  onTap: () {
+                  onDoubleTap: () {
                     _showDialogProgram(context, data, data.indexOf(v));
+                  },
+                  onLongPress: () {
+                    _showDialogProgram(context, data, data.indexOf(v));
+                  },
+                  onTap: () {
+                    StatefulWidget screen;
+                    if (v.isCollection) {
+                      screen = SerieScreen(title: v.title, url: v.url);
+                    } else {
+                      screen = FullDetailScreen(
+                          videos: data, index: data.indexOf(v), title: v.title);
+                    }
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => screen));
                   },
                   child: VideoCard(
                     video: v,
