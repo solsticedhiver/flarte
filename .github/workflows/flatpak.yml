@@ -37,7 +37,7 @@ jobs:
       run: sudo dnf install -y nodejs tar zstd
     - uses: flatpak/flatpak-github-actions/flatpak-builder@v6.1
       with:
-        bundle: flarte-${{ steps.short_sha.outputs.short_sha }}-x86_64.flatpak
+        bundle: flarte-${{ steps.version.outputs.version }}-x86_64.flatpak
         manifest-path: flatpak/io.github.solsticedhiver.flarte.yml
         cache-key: flatpak-builder-${{ github.sha }}
     - name: Create a release in GitHub
