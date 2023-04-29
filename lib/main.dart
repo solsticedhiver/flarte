@@ -748,7 +748,8 @@ class _ZoneListState extends State<ZoneList> {
                 itemBuilder: (context, index) {
                   if (widget._zones.isNotEmpty) {
                     return ListTile(
-                        selectedTileColor: Theme.of(context).highlightColor,
+                        selectedTileColor:
+                            Theme.of(context).listTileTheme.selectedTileColor,
                         selected: index == selectedZoneIndex,
                         onTap: () {
                           setState(() {
@@ -807,7 +808,8 @@ class _ShowListState extends State<ShowList> {
               itemCount: widget.videos.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  selectedTileColor: Theme.of(context).highlightColor,
+                  selectedTileColor:
+                      Theme.of(context).listTileTheme.selectedTileColor,
                   selected: index == selectedShowIndex,
                   title: Text(widget.videos[index].title),
                   subtitle: (widget.videos[index].subtitle != null)
