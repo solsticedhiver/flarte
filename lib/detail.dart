@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flarte/controls.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
 
 import 'helpers.dart';
 import 'config.dart';
@@ -109,6 +110,27 @@ class _ShowDetailState extends State<ShowDetail> {
                                 backgroundColor: Theme.of(context).primaryColor,
                                 label: Text(video.durationLabel!),
                               ),
+                            Consumer<AppData>(
+                                builder: (context, appData, child) {
+                              if (appData.favorites.contains(video.programId)) {
+                                return Container(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: const Icon(Icons.favorite));
+                              } else {
+                                return const SizedBox.shrink();
+                              }
+                            }),
+                            Consumer<AppData>(
+                                builder: (context, appData, child) {
+                              if (appData.watched.contains(video.programId)) {
+                                return Container(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child:
+                                        const Icon(Icons.check_circle_outline));
+                              } else {
+                                return const SizedBox.shrink();
+                              }
+                            }),
                           ]),
                           const SizedBox(height: 10),
                           !video.isCollection
