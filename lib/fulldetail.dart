@@ -71,14 +71,16 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
       return '';
     }
     return text
-        .replaceAll('<p>', '')
-        .replaceAll('</p>', '\n')
+        //.replaceAll('<p>', '')
+        //.replaceAll('</p>', '\n')
         .replaceAll(RegExp('<br ?/?>'), '\n')
         .replaceAll(RegExp('\n{2,}'), '\n\n')
         .replaceFirst(RegExp(r'\n$'), '')
-        .replaceAll(RegExp('</?strong>'), '')
-        .replaceAll(RegExp('</?b>'), '')
-        .replaceAll(RegExp('</?em>'), '');
+        //.replaceAll(RegExp('</?strong>'), '')
+        //.replaceAll(RegExp('</?b>'), '')
+        //.replaceAll(RegExp('</?em>'), '')
+        //.replaceAll(RegExp('</?i>'), '')
+        .replaceAll(RegExp('\u{00a0}+'), '\u{00a0}');
   }
 
   @override
@@ -108,6 +110,9 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
       description = '<p>$description</p>';
     }
     shortDescription = _removeTag(shortDescription).trim();
+    if (!shortDescription.startsWith('<p>')) {
+      shortDescription = '<p>$shortDescription</p>';
+    }
     final imageUrl =
         '${data['mainImage']['url'].replaceFirst('__SIZE__', '300x450')}?type=TEXT';
     bool showImage = MediaQuery.of(context).size.width > 1280;
@@ -305,12 +310,19 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                                   .headlineMedium)
                                         ],
                                         if (shortDescription.isNotEmpty) ...[
-                                          const SizedBox(height: 10),
-                                          Text(shortDescription,
-                                              textAlign: TextAlign.justify,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleLarge)
+                                          //const SizedBox(height: 10),
+                                          Html(
+                                              data: shortDescription,
+                                              tagsList: Html.tags,
+                                              style: {
+                                                'p': Style(
+                                                    fontSize: FontSize.xLarge,
+                                                    margin:
+                                                        const EdgeInsets.all(0),
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            0)),
+                                              })
                                         ],
                                         Html(
                                             data: description,
@@ -321,8 +333,13 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                                   fontWeight: FontWeight.w400,
                                                   textAlign: TextAlign.justify,
                                                   wordSpacing: 1.0,
-                                                  fontSize: FontSize.medium),
+                                                  fontSize: FontSize.medium,
+                                                  margin:
+                                                      const EdgeInsets.all(0)),
                                               'strong': Style(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: FontSize.larger),
+                                              'b': Style(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: FontSize.larger),
                                             })
