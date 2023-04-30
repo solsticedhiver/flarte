@@ -692,6 +692,10 @@ class _CategoriesListState extends State<CategoriesList> {
         return ListTile(
           selected: index == selectedIndex,
           leading: leading,
+          trailing:
+              widget.size == CategoriesListSize.tiny && index == selectedIndex
+                  ? const Text('|')
+                  : null,
           onTap: () async {
             setState(() {
               selectedIndex = index;
