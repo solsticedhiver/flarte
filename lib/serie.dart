@@ -116,7 +116,7 @@ class _SerieScreenState extends State<SerieScreen> {
             child: Container(
                 width: width,
                 child: GridView.count(
-                  childAspectRatio: 0.85,
+                  childAspectRatio: 0.95,
                   crossAxisCount: count,
                   children: videos.map((v) {
                     return InkWell(

@@ -227,6 +227,7 @@ class VideoCard extends StatefulWidget {
   final CarouselListSize size;
   final bool withShortDescription;
   final bool useSubtitle;
+  final bool withDurationLabel;
 
   const VideoCard({
     super.key,
@@ -234,6 +235,7 @@ class VideoCard extends StatefulWidget {
     required this.size,
     this.withShortDescription = false,
     this.useSubtitle = false,
+    this.withDurationLabel = false,
   });
 
   @override
@@ -310,12 +312,6 @@ class VideoCardState extends State<VideoCard> {
                   .bodyMedium
                   ?.copyWith(color: color),
             ),
-            const SizedBox(height: padding),
-            if (widget.video.durationLabel != null)
-              Chip(
-                backgroundColor: Theme.of(context).primaryColor,
-                label: Text(widget.video.durationLabel!),
-              ),
           ]);
     } else {
       bottomText = ListTile(
@@ -352,6 +348,17 @@ class VideoCardState extends State<VideoCard> {
                       height: imageHeight,
                       width: imageWidth,
                     ),
+                    if ((widget.withDurationLabel ||
+                            widget.withShortDescription) &&
+                        widget.video.durationLabel != null &&
+                        !widget.video.isCollection)
+                      Positioned(
+                          bottom: 5,
+                          left: 5,
+                          child: Chip(
+                            backgroundColor: Theme.of(context).primaryColor,
+                            label: Text(widget.video.durationLabel!),
+                          )),
                     Consumer<AppData>(builder: (context, appData, child) {
                       isFavorite =
                           appData.favorites.contains(widget.video.programId);
