@@ -236,17 +236,27 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                       const SizedBox(height: 10),
                                       Row(children: [
                                         Chip(
-                                          backgroundColor:
-                                              Theme.of(context).primaryColor,
-                                          label: Text(data['kind']['label']),
+                                          backgroundColor: Theme.of(context)
+                                              .colorScheme
+                                              .inverseSurface,
+                                          label: Text(data['kind']['label'],
+                                              style: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onInverseSurface)),
                                         ),
                                         const SizedBox(width: 10),
                                         if (!data['kind']['isCollection'] &&
                                             data['durationLabel'] != null)
                                           Chip(
-                                            backgroundColor:
-                                                Theme.of(context).primaryColor,
-                                            label: Text(data['durationLabel']),
+                                            backgroundColor: Theme.of(context)
+                                                .colorScheme
+                                                .inverseSurface,
+                                            label: Text(data['durationLabel'],
+                                                style: TextStyle(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .onInverseSurface)),
                                           ),
                                         Consumer<AppData>(
                                             builder: (context, appData, child) {

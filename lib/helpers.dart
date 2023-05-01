@@ -356,8 +356,13 @@ class VideoCardState extends State<VideoCard> {
                           bottom: 5,
                           left: 5,
                           child: Chip(
-                            backgroundColor: Theme.of(context).primaryColor,
-                            label: Text(widget.video.durationLabel!),
+                            backgroundColor:
+                                Theme.of(context).colorScheme.surface,
+                            label: Text(widget.video.durationLabel!,
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface)),
                           )),
                     Consumer<AppData>(builder: (context, appData, child) {
                       isFavorite =

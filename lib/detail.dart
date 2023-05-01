@@ -99,16 +99,28 @@ class _ShowDetailState extends State<ShowDetail> {
                           Row(children: [
                             if (video.label != null) ...[
                               Chip(
-                                backgroundColor: Theme.of(context).primaryColor,
-                                label: Text(video.label!),
+                                backgroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .inverseSurface,
+                                label: Text(video.label!,
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onInverseSurface)),
                               )
                             ],
                             const SizedBox(width: 10),
                             if (!video.isCollection &&
                                 video.durationLabel != null)
                               Chip(
-                                backgroundColor: Theme.of(context).primaryColor,
-                                label: Text(video.durationLabel!),
+                                backgroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .inverseSurface,
+                                label: Text(video.durationLabel!,
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onInverseSurface)),
                               ),
                             Consumer<AppData>(
                                 builder: (context, appData, child) {
