@@ -642,9 +642,10 @@ class _VideoButtonsState extends State<VideoButtons> {
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(AppLocalizations.of(context)!.strCopiedClipboard,
-          style: const TextStyle(color: Colors.white)),
-      backgroundColor: Colors.black87,
+          style:
+              TextStyle(color: Theme.of(context).colorScheme.onInverseSurface)),
       behavior: SnackBarBehavior.floating,
+      backgroundColor: Theme.of(context).colorScheme.inverseSurface,
     ));
   }
 }
