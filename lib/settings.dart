@@ -373,7 +373,8 @@ class _FlarteSettingsState extends State<FlarteSettings> {
             tiles: [
               SettingsTile(
                 leading: const Icon(Icons.info),
-                title: const Text('version ${AppConfig.version}'),
+                title: const Text(
+                    'version ${AppConfig.version} / ${AppConfig.commit}'),
                 onPressed: (context) async {
                   // ignore: non_constant_identifier_names
                   String GPL3 =
@@ -384,7 +385,8 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                     applicationIcon: Image.asset('assets/flarte.png',
                         width: 128, height: 128),
                     applicationName: AppConfig.name,
-                    applicationVersion: AppConfig.version,
+                    applicationVersion:
+                        '${AppConfig.version} / ${AppConfig.commit}',
                     applicationLegalese:
                         "Copyright © 2023\nsolsTiCe d'Hiver <solstice.dhiver@gmail.com>\nGPL-3+",
                     children: [
