@@ -631,6 +631,10 @@ class _VideoButtonsState extends State<VideoButtons> {
           ? themeData.colorScheme.error
           : themeData.colorScheme.inverseSurface,
       behavior: SnackBarBehavior.floating,
+      duration:
+          isError ? const Duration(seconds: 20) : const Duration(seconds: 5),
+      showCloseIcon: isError,
+      closeIconColor: themeData.colorScheme.onError,
     ));
   }
 
