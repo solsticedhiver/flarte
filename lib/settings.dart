@@ -333,6 +333,9 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                   if (Platform.isLinux) {
                     home = Platform.environment['HOME'] ??
                         Platform.environment['TMP']!;
+                    if (Platform.environment['SNAP'] != null) {
+                      home = Platform.environment['SNAP_REAL_HOME']!;
+                    }
                   } else if (Platform.isWindows) {
                     home = Platform.environment['USERPROFILE'] ??
                         path.join(Platform.environment['SYSTEMDRIVE']!,
