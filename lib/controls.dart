@@ -172,8 +172,9 @@ class _VideoButtonsState extends State<VideoButtons> {
       return;
     }
     final messengerState = ScaffoldMessenger.of(context);
+    final themeData = Theme.of(context);
     if (!mgr.canRun(binary, workingDirectory: AppConfig.dlDirectory)) {
-      _showMessage(messengerState, 'yt-dlp has not been found');
+      _showMessage(messengerState, themeData, 'yt-dlp has not been found');
       return;
     }
     List<String> cmd = [
@@ -212,7 +213,7 @@ class _VideoButtonsState extends State<VideoButtons> {
     }
     if (result.exitCode != 0) {
       debugPrint(result.stderr);
-      _showMessage(messengerState,
+      _showMessage(messengerState, themeData,
           'Error downloading video ${video.programId} with yt-dlp');
       return;
     }
@@ -243,9 +244,11 @@ class _VideoButtonsState extends State<VideoButtons> {
         '${video.programId}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat.resolution}.mp4';
     debugPrint(outputFilename);
     final messengerState = ScaffoldMessenger.of(context);
+    final themeData = Theme.of(context);
 
     if (File(path.join(cwd, outputFilename)).existsSync()) {
-      _showMessage(messengerState, 'File $outputFilename already exists');
+      _showMessage(
+          messengerState, themeData, 'File $outputFilename already exists');
       return;
     }
     // work-around ffmpeg bug #10149 and #10169
@@ -267,14 +270,16 @@ class _VideoButtonsState extends State<VideoButtons> {
     if (Platform.isWindows) {
       ffmpeg = 'ffmpeg.exe';
     } else if (!Platform.isLinux) {
-      _showMessage(messengerState, 'not implemented');
+      _showMessage(messengerState, themeData, 'not implemented');
       return;
     }
     if (!mgr.canRun(ffmpeg, workingDirectory: cwd)) {
-      _showMessage(messengerState, 'ffmpeg has not been found');
+      _showMessage(messengerState, themeData, 'ffmpeg has not been found');
       return;
     }
-    _showMessage(messengerState, 'Downloading video ${video.programId}');
+    _showMessage(
+        messengerState, themeData, 'Downloading video ${video.programId}',
+        isError: false);
 
     String videoFilename =
         stream.video.toString().split('/').last.replaceFirst('m3u8', 'mp4');
@@ -308,6 +313,7 @@ class _VideoButtonsState extends State<VideoButtons> {
       tasks.add(dlAudio);
     }
     String message;
+    bool isError;
     String programId = video.programId;
     try {
       List responses = await Future.wait(tasks, eagerError: true);
@@ -340,6 +346,7 @@ class _VideoButtonsState extends State<VideoButtons> {
             '$ffmpeg -i $videoFilename -i $audioFilename -i $subFilename -map 0:v -map 1:a -map 2:s -c:v copy -c:a copy -c:s mov_text $outputFilename';
       }
       message = 'Finished downloading video ${video.programId}';
+      isError = false;
       if (cmd.isNotEmpty) {
         final result = await mgr.run(cmd.split(' '), workingDirectory: cwd);
         if (result.exitCode != 0) {
@@ -364,44 +371,48 @@ class _VideoButtonsState extends State<VideoButtons> {
     } catch (e) {
       debugPrint(e.toString());
       message = 'Error downloading video ${video.programId} with ffmpeg';
+      isError = true;
     }
-    _showMessage(messengerState, message);
+    _showMessage(messengerState, themeData, message, isError: isError);
   }
 
   void _vlc() async {
     ProcessManager mgr = const LocalProcessManager();
     String binary = '';
     final messengerState = ScaffoldMessenger.of(context);
+    final themeData = Theme.of(context);
     if (Platform.isLinux) {
       binary = 'cvlc';
     } else if (Platform.isWindows) {
       String? programFiles = Platform.environment['ProgramFiles'];
       if (programFiles == null || programFiles.isEmpty) {
-        _showMessage(messengerState, '%ProgramFiles% is empty');
+        _showMessage(messengerState, themeData, '%ProgramFiles% is empty');
         return;
       }
       binary = path.join(programFiles, 'VideoLAN', 'VLC', 'vlc.exe');
       if (!File(binary).existsSync()) {
-        _showMessage(messengerState, '$binary not found');
+        _showMessage(messengerState, themeData, '$binary not found');
         // try in Program Files (x86)
         programFiles = Platform.environment['ProgramFiles(x86)'];
         if (programFiles == null || programFiles.isEmpty) {
-          _showMessage(messengerState, '%ProgramFiles(x86)% is empty');
+          _showMessage(
+              messengerState, themeData, '%ProgramFiles(x86)% is empty');
           return;
         }
         binary = path.join(programFiles, 'VideoLAN', 'VLC', 'vlc.exe');
         if (!File(binary).existsSync()) {
-          _showMessage(messengerState, '$binary not found');
+          _showMessage(messengerState, themeData, '$binary not found');
           return;
         }
       }
     } else {
-      _showMessage(messengerState, AppLocalizations.of(context)!.strNotImpl);
+      _showMessage(
+          messengerState, themeData, AppLocalizations.of(context)!.strNotImpl);
       return;
     }
     if (!mgr.canRun(binary)) {
       if (!context.mounted) return;
-      _showMessage(messengerState, '[c]vlc has not been found');
+      _showMessage(messengerState, themeData, '[c]vlc has not been found');
       return;
     }
     List<String> cmd;
@@ -436,17 +447,17 @@ class _VideoButtonsState extends State<VideoButtons> {
     }
     */
     try {
-      _showMessage(messengerState,
+      _showMessage(messengerState, themeData,
           'Launching external [c]vlc instance to read video ${video.programId}');
       ProcessResult result = await mgr.run(cmd);
       if (result.exitCode != 0) {
         //debugPrint(result.stderr);
-        _showMessage(messengerState, 'Error: ${result.stderr}');
+        _showMessage(messengerState, themeData, 'Error: ${result.stderr}');
         return;
       }
     } on ProcessException catch (e) {
       //debugPrint('ProcessException: ${e.message}');
-      _showMessage(messengerState, 'Error: ${e.message}');
+      _showMessage(messengerState, themeData, 'Error: ${e.message}');
     }
   }
 
@@ -607,10 +618,18 @@ class _VideoButtonsState extends State<VideoButtons> {
     }
   }
 
-  void _showMessage(ScaffoldMessengerState messengerState, String message) {
+  void _showMessage(ScaffoldMessengerState messengerState, ThemeData themeData,
+      String message,
+      {bool isError = true}) {
     messengerState.showSnackBar(SnackBar(
-      content: Text(message, style: const TextStyle(color: Colors.white)),
-      backgroundColor: Colors.black87,
+      content: Text(message,
+          style: TextStyle(
+              color: isError
+                  ? themeData.colorScheme.onError
+                  : themeData.colorScheme.onInverseSurface)),
+      backgroundColor: isError
+          ? themeData.colorScheme.error
+          : themeData.colorScheme.inverseSurface,
       behavior: SnackBarBehavior.floating,
     ));
   }

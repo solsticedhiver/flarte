@@ -212,12 +212,18 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                     content: Text(
                         AppLocalizations.of(context)!
                             .strYouNeedToChangeCategory,
-                        style: const TextStyle(color: Colors.white)),
+                        style: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onInverseSurface)),
                     // showCloseIcon: true,
                     duration: const Duration(seconds: 30),
                     behavior: SnackBarBehavior.floating,
-                    backgroundColor: Colors.black87,
+                    backgroundColor:
+                        Theme.of(context).colorScheme.inverseSurface,
                     showCloseIcon: true,
+                    closeIconColor:
+                        Theme.of(context).colorScheme.onInverseSurface,
                   ));
                 },
               ),
