@@ -292,6 +292,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           Expanded(
             flex: 1,
             child: TabBarView(
+              physics: const NeverScrollableScrollPhysics(),
               controller: _tabController,
               children: List.generate(
                   CategoriesList.codes.length,
