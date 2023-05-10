@@ -846,11 +846,12 @@ class _ShowListState extends State<ShowList> {
       Expanded(
           flex: 1,
           child: selectedShowIndex != -1
-              ? ShowDetail(
-                  key: ValueKey(selectedShowIndex),
-                  videos: widget.videos,
-                  index: selectedShowIndex,
-                  imageTop: true)
+              ? SingleChildScrollView(
+                  child: ShowDetail(
+                      key: ValueKey(selectedShowIndex),
+                      videos: widget.videos,
+                      index: selectedShowIndex,
+                      imageTop: true))
               : const SizedBox.shrink())
     ]);
   }

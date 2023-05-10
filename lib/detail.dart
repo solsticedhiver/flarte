@@ -36,8 +36,12 @@ class _ShowDetailState extends State<ShowDetail> {
     //debugPrint(video.srcJson);
 
     final imageUrl = video.imageUrl ?? '';
+    double padding = 15;
+    if (widget.imageTop) {
+      padding = 10;
+    }
     return Container(
-        padding: const EdgeInsets.all(15),
+        padding: EdgeInsets.all(padding),
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -55,17 +59,18 @@ class _ShowDetailState extends State<ShowDetail> {
                     )
                   : const SizedBox.shrink(),
               if (widget.imageTop) ...[
-                const SizedBox(height: 15),
-                Image(
+                SizedBox(height: padding),
+                FittedBox(
+                    child: Image(
                   width: 400,
                   height: 225,
                   errorBuilder: (context, error, stackTrace) =>
                       const SizedBox(width: 400, height: 225),
                   image: CachedNetworkImageProvider(imageUrl,
                       headers: {'User-Agent': AppConfig.userAgent}),
-                )
+                ))
               ],
-              const SizedBox(height: 15),
+              SizedBox(height: padding),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,7 +87,7 @@ class _ShowDetailState extends State<ShowDetail> {
                           headers: {'User-Agent': AppConfig.userAgent}),
                     )
                   ],
-                  const SizedBox(width: 15),
+                  SizedBox(width: padding),
                   Flexible(
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
