@@ -229,7 +229,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                   controller: _tabController,
                                   lang: lang);
                             })),
-                        ListTile(
+                        Material(
+                            child: ListTile(
                           enabled: false,
                           selectedTileColor: Theme.of(context).highlightColor,
                           contentPadding: EdgeInsets.only(
@@ -244,8 +245,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                       fontWeight: FontWeight.w500))
                               : null,
                           onTap: () {},
-                        ),
-                        ListTile(
+                        )),
+                        Material(
+                            child: ListTile(
                           selectedTileColor: Theme.of(context).highlightColor,
                           contentPadding: EdgeInsets.only(
                             left: 25,
@@ -264,8 +266,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                               return const SearchScreen();
                             }));
                           },
-                        ),
-                        ListTile(
+                        )),
+                        Material(
+                            child: ListTile(
                           selectedTileColor: Theme.of(context).highlightColor,
                           contentPadding: EdgeInsets.only(
                             left: 25,
@@ -287,7 +290,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                             }));
                             _saveSettings(settings);
                           },
-                        ),
+                        )),
                       ]))),
           Expanded(
             flex: 1,
@@ -699,7 +702,8 @@ class _CategoriesListState extends State<CategoriesList> {
           title =
               Text(text, style: const TextStyle(fontWeight: FontWeight.w500));
         }
-        return ListTile(
+        return Material(
+            child: ListTile(
           selected: index == selectedIndex,
           leading: leading,
           onTap: () async {
@@ -713,7 +717,7 @@ class _CategoriesListState extends State<CategoriesList> {
           contentPadding:
               EdgeInsets.only(left: 15, top: padding, bottom: padding),
           title: title,
-        );
+        ));
       },
     );
   }
