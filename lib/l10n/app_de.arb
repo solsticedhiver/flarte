@@ -51,5 +51,9 @@
     "strAbout": "Über",
     "strError": "Ein Fehler ist aufgetreten",
     "strTextMode": "Textmodus",
-    "strYouNeedToChangeCategory": "Sie müssen zu einer neuen Kategorie navigieren, damit die Änderung sichtbar wird" 
+    "strYouNeedToChangeCategory": "Sie müssen zu einer neuen Kategorie navigieren, damit die Änderung sichtbar wird",
+    "strDownload": "Herunterladen",
+    "strPlay": "Spielen",
+    "strURL": "URL",
+    "strMore": "Mehr Details"
 }

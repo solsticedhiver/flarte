@@ -51,5 +51,9 @@
     "strAbout": "About",
     "strError": "An error occurred",
     "strTextMode": "Text Mode",
-    "strYouNeedToChangeCategory": "You will need to navigate to a new category for the change to be visible" 
+    "strYouNeedToChangeCategory": "You will need to navigate to a new category for the change to be visible",
+    "strDownload": "Download",
+    "strPlay": "Play",
+    "strURL": "URL",
+    "strMore": "More details"
 }

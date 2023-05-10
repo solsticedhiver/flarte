@@ -508,6 +508,7 @@ class _VideoButtonsState extends State<VideoButtons> {
     List<Widget> top = [
       IconButton(
         icon: const Icon(Icons.play_arrow),
+        tooltip: AppLocalizations.of(context)!.strPlay,
         onPressed: versions.isNotEmpty && formats.isNotEmpty
             ? () {
                 if (AppConfig.player == PlayerTypeName.embedded) {
@@ -521,6 +522,7 @@ class _VideoButtonsState extends State<VideoButtons> {
       const SizedBox(width: 24),
       IconButton(
         icon: const Icon(Icons.download),
+        tooltip: AppLocalizations.of(context)!.strDownload,
         onPressed: versions.isNotEmpty &&
                 formats.isNotEmpty &&
                 (Platform.isWindows || Platform.isLinux)
@@ -530,6 +532,7 @@ class _VideoButtonsState extends State<VideoButtons> {
       const SizedBox(width: 24),
       IconButton(
         icon: const Icon(Icons.copy),
+        tooltip: AppLocalizations.of(context)!.strURL,
         onPressed: versions.isNotEmpty
             ? () {
                 _copyToClipboard(context, selectedVersion.url);
@@ -540,6 +543,7 @@ class _VideoButtonsState extends State<VideoButtons> {
         const SizedBox(width: 24),
         IconButton(
             icon: const Icon(Icons.read_more),
+            tooltip: AppLocalizations.of(context)!.strMore,
             onPressed: () {
               if (widget.doPop) {
                 // this will mean in dialog else in text mode
