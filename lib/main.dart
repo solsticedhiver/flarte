@@ -234,7 +234,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                           enabled: false,
                           selectedTileColor: Theme.of(context).highlightColor,
                           contentPadding: EdgeInsets.only(
-                            left: 25,
+                            left: 20,
                             top: padding,
                           ),
                           minLeadingWidth: 30,
@@ -250,7 +250,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                             child: ListTile(
                           selectedTileColor: Theme.of(context).highlightColor,
                           contentPadding: EdgeInsets.only(
-                            left: 25,
+                            left: 20,
                             top: padding,
                           ),
                           minLeadingWidth: 30,
@@ -271,7 +271,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                             child: ListTile(
                           selectedTileColor: Theme.of(context).highlightColor,
                           contentPadding: EdgeInsets.only(
-                            left: 25,
+                            left: 20,
                             top: padding,
                             bottom: padding,
                           ),
@@ -673,22 +673,28 @@ class _CategoriesListState extends State<CategoriesList> {
       itemBuilder: (context, index) {
         final c = categories[index];
         String text = c['text'];
-        Widget avatar = Container(
-            decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                    width: widget.size == CategoriesListSize.tiny ? 4 : 2,
-                    strokeAlign: BorderSide.strokeAlignInside,
-                    color: index == selectedIndex
-                        ? Colors.deepOrange
-                        : Theme.of(context).canvasColor)),
-            child: CircleAvatar(
-                backgroundColor: Color.fromARGB(
-                    255, c['color'][0], c['color'][1], c['color'][2]),
-                child: Text(text.substring(0, 1),
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.inversePrimary))));
+        Widget avatar = SizedBox(
+            child: Container(
+                width: 32,
+                padding: const EdgeInsets.all(0),
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                        width: widget.size == CategoriesListSize.tiny ? 4 : 2,
+                        strokeAlign: BorderSide.strokeAlignOutside,
+                        color: index == selectedIndex
+                            ? Colors.deepOrange
+                            : Theme.of(context).canvasColor)),
+                child: CircleAvatar(
+                    radius: 22,
+                    backgroundColor: Color.fromARGB(
+                        255, c['color'][0], c['color'][1], c['color'][2]),
+                    child: Text(text.substring(0, 1),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .inversePrimary)))));
         Widget leading;
         if (widget.size != CategoriesListSize.normal) {
           text = c['text'].split(' ').first;
@@ -714,8 +720,9 @@ class _CategoriesListState extends State<CategoriesList> {
             final cache = Provider.of<Cache>(context, listen: false);
             cache.fetch(c['code'], widget.lang);
           },
+          minLeadingWidth: 30,
           contentPadding:
-              EdgeInsets.only(left: 15, top: padding, bottom: padding),
+              EdgeInsets.only(left: 20, top: padding, bottom: padding),
           title: title,
         ));
       },
