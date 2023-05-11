@@ -263,6 +263,8 @@ class _SeekBarState extends State<SeekBar> {
 
   @override
   Widget build(BuildContext context) {
+    final List<double> availableSpeed = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -335,6 +337,41 @@ class _SeekBarState extends State<SeekBar> {
               Icons.volume_up,
               color: Theme.of(context).colorScheme.primary,
             )),
+        Stack(alignment: AlignmentDirectional.center, children: [
+          // used to get the shadow and background color of the button
+          ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.onSecondary,
+                shape: const CircleBorder(),
+                padding: EdgeInsets.all(widget.buttonSize),
+              ),
+              // can't be null, just duplicate icon of PopUpMenuButton
+              child: Icon(
+                Icons.speed,
+                color: Theme.of(context).colorScheme.primary,
+              )),
+          PopupMenuButton<double>(
+              onSelected: (value) {
+                widget.player.setRate(value);
+              },
+              padding: EdgeInsets.all(widget.buttonSize),
+              initialValue: widget.player.state.rate,
+              // no tooltip because other button don't have one for now
+              tooltip: '',
+              itemBuilder: (context) {
+                return List.generate(
+                    availableSpeed.length,
+                    (i) => PopupMenuItem<double>(
+                        value: availableSpeed[i],
+                        child: Text('x${availableSpeed[i]}')));
+              },
+              splashRadius: 20,
+              icon: Icon(
+                Icons.speed,
+                color: Theme.of(context).colorScheme.primary,
+              ))
+        ]),
         ElevatedButton(
             onPressed: () {
               bool ifs = MyScreen.of(context).isFullScreen;
