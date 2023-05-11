@@ -14,8 +14,8 @@ import 'serie.dart';
 class FullDetailScreen extends StatefulWidget {
   final List<VideoData> videos;
   final String title;
-  int index;
-  FullDetailScreen({
+  final int index;
+  const FullDetailScreen({
     super.key,
     required this.videos,
     required this.title,
@@ -149,7 +149,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
     String appBarTitle;
     if (widget.title.isNotEmpty) {
       appBarTitle =
-          '${AppLocalizations.of(context)!.strDetails} / ${widget.title} (${widget.index + 1}/${widget.videos.length})';
+          '${widget.title} (${widget.index + 1}/${widget.videos.length})';
     } else {
       appBarTitle = AppLocalizations.of(context)!.strDetails;
     }
@@ -182,11 +182,10 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                   }
                 }
                 if (index != widget.index) {
-                  widget.index = index;
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
                       builder: (context) => FullDetailScreen(
                           videos: widget.videos,
-                          index: widget.index,
+                          index: index,
                           title: widget.title)));
                 }
               },
@@ -427,15 +426,13 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                       : () {
                           final wi = widget.index - 1;
                           if (wi >= 0) {
-                            widget.index = wi;
+                            Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                    builder: (context) => FullDetailScreen(
+                                        videos: widget.videos,
+                                        index: wi,
+                                        title: widget.title)));
                           }
-
-                          Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                  builder: (context) => FullDetailScreen(
-                                      videos: widget.videos,
-                                      index: widget.index,
-                                      title: widget.title)));
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.onSecondary,
@@ -460,15 +457,13 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                       : () {
                           final wi = widget.index + 1;
                           if (wi < widget.videos.length) {
-                            widget.index = wi;
+                            Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                    builder: (context) => FullDetailScreen(
+                                        videos: widget.videos,
+                                        index: wi,
+                                        title: widget.title)));
                           }
-
-                          Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                  builder: (context) => FullDetailScreen(
-                                      videos: widget.videos,
-                                      index: widget.index,
-                                      title: widget.title)));
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.onSecondary,
