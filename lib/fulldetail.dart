@@ -5,7 +5,6 @@ import 'package:flarte/controls.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'helpers.dart';
@@ -71,16 +70,16 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
       return '';
     }
     return text
-        //.replaceAll('<p>', '')
-        //.replaceAll('</p>', '\n')
         .replaceAll(RegExp('<br ?/?>'), '\n')
         .replaceAll(RegExp('\n{2,}'), '\n\n')
-        .replaceFirst(RegExp(r'\n$'), '')
-        //.replaceAll(RegExp('</?strong>'), '')
-        //.replaceAll(RegExp('</?b>'), '')
-        //.replaceAll(RegExp('</?em>'), '')
-        //.replaceAll(RegExp('</?i>'), '')
-        .replaceAll(RegExp('\u{00a0}+'), '\u{00a0}');
+        //.replaceFirst(RegExp(r'^\n$'), '')
+        .replaceAll(RegExp('\u{00a0}+'), '\u{00a0}')
+        .replaceAll('<p>', '')
+        .replaceAll('</p>', '\n')
+        .replaceAll(RegExp('</?strong>'), '')
+        .replaceAll(RegExp('</?b>'), '')
+        .replaceAll(RegExp('</?em>'), '')
+        .replaceAll(RegExp('</?i>'), '');
   }
 
   @override
@@ -105,14 +104,16 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
     }
     String description = data['fullDescription'] ?? '';
     String shortDescription = data['shortDescription'] ?? '';
-    description = description.trim();
+    description = _removeTag(description.trim());
+    shortDescription = _removeTag(shortDescription).trim();
+    /*
     if (!description.startsWith('<p>')) {
       description = '<p>$description</p>';
     }
-    shortDescription = _removeTag(shortDescription).trim();
     if (!shortDescription.startsWith('<p>')) {
       shortDescription = '<p>$shortDescription</p>';
     }
+    */
     final imageUrl =
         '${data['mainImage']['url'].replaceFirst('__SIZE__', '300x450')}?type=TEXT';
     bool showImage = MediaQuery.of(context).size.width > 1280;
@@ -320,39 +321,18 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                                   .headlineMedium)
                                         ],
                                         if (shortDescription.isNotEmpty) ...[
-                                          //const SizedBox(height: 10),
-                                          Html(
-                                              data: shortDescription,
-                                              tagsList: Html.tags,
-                                              style: {
-                                                'p': Style(
-                                                    fontSize: FontSize.xLarge,
-                                                    margin:
-                                                        const EdgeInsets.all(0),
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            0)),
-                                              })
+                                          const SizedBox(height: 10),
+                                          Text(shortDescription,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headlineSmall!
+                                                  .copyWith(fontSize: 17.5))
                                         ],
-                                        Html(
-                                            data: description,
-                                            tagsList: Html.tags,
-                                            style: {
-                                              'p': Style(
-                                                  letterSpacing: 1.0,
-                                                  fontWeight: FontWeight.w400,
-                                                  textAlign: TextAlign.justify,
-                                                  wordSpacing: 1.0,
-                                                  fontSize: FontSize.medium,
-                                                  margin:
-                                                      const EdgeInsets.all(0)),
-                                              'strong': Style(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: FontSize.larger),
-                                              'b': Style(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: FontSize.larger),
-                                            })
+                                        const SizedBox(height: 10),
+                                        Text(description,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium)
                                       ]))),
                                     ]))),
                         Expanded(
