@@ -56,21 +56,29 @@ class _VideoButtonsState extends State<VideoButtons> {
           .languageCode;
 
       debugPrint('programId: $programId');
-      final cv = await _getVersions(lang, programId);
-      debugPrint(cv.toString());
-      if (cv.isNotEmpty && mounted) {
-        setState(() {
-          versions.clear();
-          versions.addAll(cv);
-          selectedVersion = versions.first;
-          debugPrint(selectedVersion.url);
-          versionItems = versions
-              .map((e) =>
-                  DropdownMenuItem<Version>(value: e, child: Text(e.label)))
-              .toList();
-        });
-        video.versions = versions;
-        _getFormats(selectedVersion.url);
+      try {
+        final cv = await _getVersions(lang, programId);
+        debugPrint(cv.toString());
+        if (cv.isNotEmpty && mounted) {
+          setState(() {
+            versions.clear();
+            versions.addAll(cv);
+            selectedVersion = versions.first;
+            debugPrint(selectedVersion.url);
+            versionItems = versions
+                .map((e) =>
+                    DropdownMenuItem<Version>(value: e, child: Text(e.label)))
+                .toList();
+          });
+          video.versions = versions;
+          _getFormats(selectedVersion.url);
+        }
+      } catch (e) {
+        final error = e as Map<String, dynamic>;
+        final messengerState = ScaffoldMessenger.of(context);
+        final themeData = Theme.of(context);
+        _showMessage(messengerState, themeData,
+            '${error['title']} / ${error['message']}');
       }
     });
   }
@@ -79,6 +87,7 @@ class _VideoButtonsState extends State<VideoButtons> {
     final cache = Provider.of<Cache>(context, listen: false);
 
     final url = 'https://api.arte.tv/api/player/v2/config/$lang/$programId';
+    //debugPrint(url);
     Map<String, dynamic>? jr;
     List<Version> cv = [];
     jr = await cache.get(url);
@@ -87,14 +96,17 @@ class _VideoButtonsState extends State<VideoButtons> {
         jr['data']['attributes']['streams'] == null) {
       return cv;
     }
-    //debugPrint(jr.toString());
+    //debugPrint(json.encode(jr).toString());
     final streams = jr['data']['attributes']['streams'];
-    //debugPrint(streams.toString());
+    //debugPrint(json.encode(streams).toString());
     for (var s in streams) {
       final v = s['versions'][0];
       //debugPrint(v['shortLabel']);
       cv.add(Version(
           shortLabel: v['shortLabel'], label: v['label'], url: s['url']));
+    }
+    if (cv.isEmpty && jr['data']['attributes']['error'] != null) {
+      throw jr['data']['attributes']['error'];
     }
     return cv;
   }
