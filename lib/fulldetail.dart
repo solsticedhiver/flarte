@@ -65,23 +65,6 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
     super.dispose();
   }
 
-  String _removeTag(String? text) {
-    if (text == null) {
-      return '';
-    }
-    return text
-        .replaceAll(RegExp('<br ?/?>'), '\n')
-        .replaceAll(RegExp('\n{2,}'), '\n\n')
-        //.replaceFirst(RegExp(r'^\n$'), '')
-        .replaceAll(RegExp('\u{00a0}+'), '\u{00a0}')
-        .replaceAll('<p>', '')
-        .replaceAll('</p>', '\n')
-        .replaceAll(RegExp('</?strong>'), '')
-        .replaceAll(RegExp('</?b>'), '')
-        .replaceAll(RegExp('</?em>'), '')
-        .replaceAll(RegExp('</?i>'), '');
-  }
-
   @override
   Widget build(BuildContext context) {
     //debugPrint(data.toString());
@@ -104,16 +87,9 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
     }
     String description = data['fullDescription'] ?? '';
     String shortDescription = data['shortDescription'] ?? '';
-    description = _removeTag(description.trim());
-    shortDescription = _removeTag(shortDescription).trim();
-    /*
-    if (!description.startsWith('<p>')) {
-      description = '<p>$description</p>';
-    }
-    if (!shortDescription.startsWith('<p>')) {
-      shortDescription = '<p>$shortDescription</p>';
-    }
-    */
+    description = Bidi.stripHtmlIfNeeded(description.trim());
+    shortDescription = Bidi.stripHtmlIfNeeded(shortDescription).trim();
+
     final imageUrl =
         '${data['mainImage']['url'].replaceFirst('__SIZE__', '300x450')}?type=TEXT';
     bool showImage = MediaQuery.of(context).size.width > 1280;
