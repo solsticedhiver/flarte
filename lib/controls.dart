@@ -160,65 +160,6 @@ class _VideoButtonsState extends State<VideoButtons> {
     return "${video.programId}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat.resolution}.mp4";
   }
 
-  void _ytdlp() async {
-    ProcessManager mgr = const LocalProcessManager();
-    // look for the format id that matches our resolution
-    String binary = '';
-    if (Platform.isLinux) {
-      binary = 'yt-dlp';
-    } else if (Platform.isWindows) {
-      binary = 'yt-dlp.exe';
-    } else {
-      return;
-    }
-    final messengerState = ScaffoldMessenger.of(context);
-    final themeData = Theme.of(context);
-    if (!mgr.canRun(binary, workingDirectory: AppConfig.dlDirectory)) {
-      _showMessage(messengerState, themeData, 'yt-dlp has not been found');
-      return;
-    }
-    List<String> cmd = [
-      binary,
-      '--user-agent',
-      AppConfig.userAgent,
-      '-J',
-      selectedVersion.url
-    ];
-    String formatId = '';
-    ProcessResult result = await mgr.run(cmd);
-    if (result.exitCode != 0) {
-      debugPrint(result.stderr);
-      return;
-    }
-    final jr = json.decode(result.stdout);
-    for (var f in jr['formats']) {
-      if (f['resolution'] == selectedFormat.resolution) {
-        formatId = f['format_id'];
-        break;
-      }
-    }
-    debugPrint('found format_id: $formatId');
-    if (formatId.isNotEmpty) {
-      cmd = [
-        binary,
-        '--user-agent',
-        AppConfig.userAgent,
-        '-f',
-        formatId,
-        '-o',
-        _outputFilename(),
-        selectedVersion.url
-      ];
-      result = await mgr.run(cmd, workingDirectory: AppConfig.dlDirectory);
-    }
-    if (result.exitCode != 0) {
-      debugPrint(result.stderr);
-      _showMessage(messengerState, themeData,
-          'Error downloading video ${video.programId} with yt-dlp');
-      return;
-    }
-  }
-
   Future<void> _webvtt(Uri url, String subFilename) async {
     final req = await http.get(url);
     String resp = utf8.decode(req.bodyBytes);
