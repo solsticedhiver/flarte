@@ -87,6 +87,8 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
     }
     String description = data['fullDescription'] ?? '';
     String shortDescription = data['shortDescription'] ?? '';
+    // make sure that <br> breakline become carriage return \n
+    description = description.replaceAll(RegExp(r'<br ?/?>[^\n]'), '\n');
     description = Bidi.stripHtmlIfNeeded(description.trim());
     shortDescription = Bidi.stripHtmlIfNeeded(shortDescription).trim();
 
@@ -301,13 +303,18 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .headlineSmall!
-                                                  .copyWith(fontSize: 17.5))
+                                                  .copyWith(
+                                                      fontSize: 17.5,
+                                                      letterSpacing: 0.5))
                                         ],
                                         const SizedBox(height: 10),
                                         Text(description,
                                             style: Theme.of(context)
                                                 .textTheme
-                                                .bodyMedium)
+                                                .bodyMedium!
+                                                .copyWith(
+                                                    height: 1.35,
+                                                    letterSpacing: 0.5))
                                       ]))),
                                     ]))),
                         Expanded(

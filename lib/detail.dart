@@ -98,7 +98,10 @@ class _ShowDetailState extends State<ShowDetail> {
                                       RegExp('\u{00a0}+'), '\u{00a0}'),
                                   maxLines: 16,
                                   overflow: TextOverflow.ellipsis,
-                                  style: Theme.of(context).textTheme.bodyMedium)
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(letterSpacing: 0.5))
                               : const SizedBox.shrink(),
                           const SizedBox(height: 10),
                           Row(children: [
