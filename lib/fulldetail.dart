@@ -88,8 +88,14 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
     String description = data['fullDescription'] ?? '';
     String shortDescription = data['shortDescription'] ?? '';
     // make sure that <br> breakline become carriage return \n
-    description = description.replaceAll(RegExp(r'<br ?/?>[^\n]'), '\n');
+    description = description.replaceAllMapped(
+        RegExp(r'<br ?/?>([^\n])'), (match) => '\n${match.group(1)}');
     description = Bidi.stripHtmlIfNeeded(description.trim());
+    // remove leading space on each line
+    description = description
+        .replaceAll(RegExp('^[ \u{00a0}]+', multiLine: true, unicode: true), '')
+        .replaceAll(RegExp('[ \u{00a0}]+'), ' ')
+        .replaceAll(RegExp('\n{2,}', multiLine: true), '\n\n');
     shortDescription = Bidi.stripHtmlIfNeeded(shortDescription).trim();
 
     final imageUrl =
