@@ -445,7 +445,8 @@ class _VideoButtonsState extends State<VideoButtons> {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       if (Platform.isLinux || Platform.isWindows || Platform.isAndroid) {
         return MyScreen(
-            title: title,
+            title:
+                '$title [${selectedVersion.shortLabel}, ${selectedFormat.resolution}]',
             videoStream: stream.video!.toString(),
             audioStream: stream.audio != null ? stream.audio.toString() : '',
             subtitle: subFilename,
