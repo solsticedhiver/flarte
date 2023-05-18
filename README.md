@@ -2,7 +2,7 @@
 
 A *flutter* desktop application (*Linux* and *Windows*) to browse https://www.arte.tv website.
 
-<img width="640" src="./screenshots/20230416-flarte.png" />
+<img width="640" src="./screenshots/2023-05-18T23-34-19.png" />
 
 It merely copies the website interface, but adds the possibility to download the videos, by using *ffmpeg*.
 **It should be obvious that all the videos are copyrighted by arte.tv, and not free to share as is.**
