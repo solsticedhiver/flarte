@@ -56,8 +56,8 @@ dependencies:
   path_provider: ^2.0.14
   window_manager: ^0.3.1
   shared_preferences: ^2.1.0
-  filesystem_picker: ^3.1.0
   wakelock: ^0.6.2
+  file_picker: ^5.2.10
 
 dev_dependencies:
   flutter_test:

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:filesystem_picker/filesystem_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flarte/helpers.dart';
 import 'package:flarte/config.dart';
 import 'package:flutter/material.dart';
@@ -341,23 +341,11 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                             'Windows', 'Temp');
                   }
                   if (!mounted) return;
-                  String? dlDir = await FilesystemPicker.openDialog(
-                      title: 'Downloads folder',
-                      context: context,
-                      rootName: home,
-                      folderIconColor: Colors.deepOrange,
-                      requestPermission: () async {
-                        return true;
-                      },
-                      // buggy on Linux, can't find home/user ??
-                      showGoUp: false,
-                      rootDirectory: Directory(home),
-                      fsType: FilesystemType.folder,
-                      pickText: 'Save videos to this folder',
-                      itemFilter: (fsEntity, path, name) {
-                        return !name.startsWith('.');
-                      },
-                      theme: const FilesystemPickerAutoSystemTheme());
+                  String? dlDir = await FilePicker.platform.getDirectoryPath(
+                      initialDirectory: home,
+                      dialogTitle:
+                          AppLocalizations.of(context)!.strChooseDirectory);
+
                   if (dlDir != null) {
                     setState(() {
                       AppConfig.dlDirectory = dlDir;

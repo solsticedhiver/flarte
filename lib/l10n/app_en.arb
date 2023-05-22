@@ -55,5 +55,6 @@
     "strDownload": "Download",
     "strPlay": "Play",
     "strURL": "URL",
-    "strMore": "More details"
+    "strMore": "More details",
+    "strChooseDirectory": "Choose a directory where to save videos"
 }
