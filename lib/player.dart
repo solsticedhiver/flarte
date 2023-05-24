@@ -38,6 +38,7 @@ class MyScreenState extends State<MyScreen> {
       Player(configuration: const PlayerConfiguration(title: AppConfig.name));
   VideoController? controller;
   bool _isFullScreen = false;
+  late StreamSubscription subscription;
 
   bool get isFullScreen => _isFullScreen;
   set isFullScreen(bool value) => setState(() => _isFullScreen = value);
@@ -48,6 +49,16 @@ class MyScreenState extends State<MyScreen> {
     Future.microtask(() async {
       controller = await VideoController.create(player);
       setState(() {});
+    });
+
+    subscription = player.streams.position.listen((event) {
+      if (event > player.state.duration * 0.9) {
+        final ad = Provider.of<AppData>(context, listen: false);
+        if (!ad.watched.contains(widget.video.programId)) {
+          ad.addWatched(widget.video.programId);
+          subscription.cancel();
+        }
+      }
     });
   }
 
@@ -62,6 +73,7 @@ class MyScreenState extends State<MyScreen> {
     if (Platform.isWindows || Platform.isAndroid) {
       Wakelock.disable();
     }
+    subscription.cancel();
     super.dispose();
   }
 
@@ -234,11 +246,6 @@ class _SeekBarState extends State<SeekBar> {
           setState(() {
             if (mounted) {
               if (!seeking) position = event;
-            }
-            final ad = Provider.of<AppData>(context, listen: false);
-            if (position > duration * 0.9 &&
-                !ad.watched.contains(widget.video.programId)) {
-              ad.addWatched(widget.video.programId);
             }
           });
         }),
