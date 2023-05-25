@@ -36,7 +36,7 @@ class MyScreen extends StatefulWidget {
 class MyScreenState extends State<MyScreen> {
   final Player player =
       Player(configuration: const PlayerConfiguration(title: AppConfig.name));
-  VideoController? controller;
+  late final controller = VideoController(player);
   bool _isFullScreen = false;
   late StreamSubscription subscription;
 
@@ -46,10 +46,6 @@ class MyScreenState extends State<MyScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() async {
-      controller = await VideoController.create(player);
-      setState(() {});
-    });
 
     subscription = player.streams.position.listen((event) {
       if (event > player.state.duration * 0.9) {
@@ -64,16 +60,12 @@ class MyScreenState extends State<MyScreen> {
 
   @override
   void dispose() {
-    Future.microtask(() async {
-      // Release allocated resources back to the system.
-      await player.pause();
-      await controller?.dispose();
-      await player.dispose();
-    });
+    subscription.cancel();
+    player.pause();
+    player.dispose();
     if (Platform.isWindows || Platform.isAndroid) {
       Wakelock.disable();
     }
-    subscription.cancel();
     super.dispose();
   }
 
