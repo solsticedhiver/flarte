@@ -11,9 +11,10 @@ Sur Windows, s'attend à trouver le binaire ffmpeg.exe dans le répertoire flart
 
 Sur Linux, télécharge dans `$XDG_DOWNLOAD_DIR` si défini, et sinon dans `$HOME`
 
-## Bientot ?
+## Bientôt ?
 
-- des meilleurs controls pour le lecteur intégré
+- un gestionnaire de téléchargements ?
+- des meilleurs contrôles pour le lecteur intégré
 - cast to chromecast
 - ajouter france.tv ?
 

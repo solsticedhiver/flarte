@@ -28,7 +28,7 @@ To be able to install the *snap* as a *local file*, you will need to use the `--
 
 To install the *flatpak*, use:
 
-    flatpak install --user flatpak-x.y.z-x86_64.flatpak
+    flatpak install --user flarte-vx.y.z-x86_64.flatpak
 
 When running, either the snap or the flatpak, you will not be able to use an external player like VLC.
 
@@ -38,6 +38,7 @@ To build and run yourself the app, once the flutter SDK is installed, you simply
 
 ## TODO
 
+- add a downloads manager
 - better control for embedded player (sound ?)
 - cast to chromecast on android
 - add france.tv and other network?
