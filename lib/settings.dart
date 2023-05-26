@@ -361,7 +361,7 @@ class _FlarteSettingsState extends State<FlarteSettings> {
               SettingsTile(
                 leading: const Icon(Icons.info),
                 title: const Text(
-                    'version ${AppConfig.version} / ${AppConfig.commit}'),
+                    'version ${AppConfig.version} (${AppConfig.commit})'),
                 onPressed: (context) async {
                   // ignore: non_constant_identifier_names
                   String GPL3 =

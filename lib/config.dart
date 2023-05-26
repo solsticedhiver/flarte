@@ -8,7 +8,7 @@ import 'package:path/path.dart' as path;
 class AppConfig {
   static const String name = 'Flarte';
   static const String version = '0.3.1';
-  static const String commit = '09cf2f8';
+  static const String commit = 'HEAD/main';
   static const String url = 'https://github.com/solsticedhiver/flarte';
   static PlayerTypeName player = PlayerTypeName.embedded;
   // index of resolution, usually 0=>216p, 1=>360p, 2=>432p, 3=> 720p, 4=> 1080p
