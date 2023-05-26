@@ -356,7 +356,7 @@ class _FlarteSettingsState extends State<FlarteSettings> {
             ]),
         SettingsSection(
             title: Text(
-                '${AppLocalizations.of(context)!.strAbout}  ${AppConfig.name}'),
+                '${AppLocalizations.of(context)!.strAbout} ${AppConfig.name}'),
             tiles: [
               SettingsTile(
                 leading: const Icon(Icons.info),
@@ -373,7 +373,7 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                         width: 128, height: 128),
                     applicationName: AppConfig.name,
                     applicationVersion:
-                        '${AppConfig.version} / ${AppConfig.commit}',
+                        '${AppConfig.version} (${AppConfig.commit})',
                     applicationLegalese:
                         "Copyright © 2023\nsolsTiCe d'Hiver <solstice.dhiver@gmail.com>\nGPL-3+",
                     children: [
