@@ -379,7 +379,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                           }
                         },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.onSecondary,
+                    backgroundColor: const Color.fromARGB(0, 0, 0, 0),
                     shape: const CircleBorder(),
                     padding: const EdgeInsets.all(16),
                   ),
@@ -410,7 +410,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                           }
                         },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.onSecondary,
+                    backgroundColor: const Color.fromARGB(0, 0, 0, 0),
                     shape: const CircleBorder(),
                     padding: const EdgeInsets.all(16),
                   ),
