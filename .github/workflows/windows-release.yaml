@@ -16,6 +16,13 @@ jobs:
       #  'Select-String -Path .\pubspec.yaml -Pattern "^version: (\d+.\d+.\d+)\+\d+"|%{"version=$($_.matches.groups[1].value)"}' >> $env:GITHUB_OUTPUT
       run: echo "version=$(grep ^version pubspec.yaml |cut -f 2 -d ' '|cut -f 1 -d '+')" >> $GITHUB_OUTPUT
       shell: bash
+    - name: Get HEAD short sha
+      id: short_sha
+      run: echo "short_sha=$(echo ${{ github.sha }}|head -c 7)" >> $GITHUB_OUTPUT
+      shell: bash
+    - name: set HEAD git short sha in config.dart
+      run: sed -i "/commit/s/HEAD/${{ steps.short_sha.outputs.short_sha }}/" lib/config.dart
+      shell: bash
     - uses: subosito/flutter-action@v2
       with:
         channel : 'stable'

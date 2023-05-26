@@ -15,6 +15,13 @@ jobs:
     - name: Create version
       id: version
       run: echo "version=$(grep ^version pubspec.yaml |cut -f 2 -d ' '|cut -f 1 -d '+')" >> $GITHUB_OUTPUT
+    - name: Get HEAD short sha
+      id: short_sha
+      run: echo "short_sha=$(echo ${{ github.sha }}|head -c 7)" >> $GITHUB_OUTPUT
+      shell: bash
+    - name: set HEAD git short sha in config.dart
+      run: sed -i "/commit/s/HEAD/${{ steps.short_sha.outputs.short_sha }}/" lib/config.dart
+      shell: bash
     - uses: snapcore/action-build@v1
       id: snapcraft
     - name: Create a release in GitHub

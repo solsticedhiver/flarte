@@ -18,6 +18,13 @@ jobs:
     - name: Create version
       id: version
       run: echo "version=v$(grep ^version pubspec.yaml |cut -f 2 -d ' '|cut -f 1 -d '+')" >> $GITHUB_OUTPUT
+    - name: Get HEAD short sha
+      id: short_sha
+      run: echo "short_sha=$(echo ${{ github.sha }}|head -c 7)" >> $GITHUB_OUTPUT
+      shell: bash
+    - name: set HEAD git short sha in config.dart
+      run: sed -i "/commit/s/HEAD/${{ steps.short_sha.outputs.short_sha }}/" lib/config.dart
+      shell: bash
     - name: Install missing package to build with flutter
       run: sudo dnf install -y ninja-build gtk3-devel cmake clang jq curl pkgconf mpv-devel mpv-libs mpv
     - uses: subosito/flutter-action@v2
