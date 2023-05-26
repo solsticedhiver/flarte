@@ -56,5 +56,6 @@
     "strPlay": "Lire",
     "strURL": "URL",
     "strMore": "Plus de détails",
-    "strChooseDirectory": "Choisissez un répertoire où sauver les vidéos"
+    "strChooseDirectory": "Choisissez un répertoire où sauver les vidéos",
+    "strInitStream": "Initialisation du streaming"
 }

@@ -8,6 +8,7 @@ import 'package:media_kit_video/media_kit_video.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:wakelock/wakelock.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'config.dart';
 import 'helpers.dart';
@@ -39,6 +40,7 @@ class MyScreenState extends State<MyScreen> {
   late final controller = VideoController(player);
   bool _isFullScreen = false;
   late StreamSubscription subscription;
+  bool isVideoPlayalable = false;
 
   bool get isFullScreen => _isFullScreen;
   set isFullScreen(bool value) => setState(() => _isFullScreen = value);
@@ -55,6 +57,12 @@ class MyScreenState extends State<MyScreen> {
           subscription.cancel();
         }
       }
+    });
+
+    controller.waitUntilFirstFrameRendered.then((value) {
+      setState(() {
+        isVideoPlayalable = true;
+      });
     });
   }
 
@@ -171,9 +179,16 @@ class MyScreenState extends State<MyScreen> {
                         elevation: 8.0,
                         clipBehavior: Clip.antiAlias,
                         margin: EdgeInsets.all(!isFullScreen ? margin : 0.0),
-                        child: Video(
-                          controller: controller,
-                        ),
+                        child: Stack(children: [
+                          Center(
+                              child: Text(
+                                  AppLocalizations.of(context)!.strInitStream)),
+                          Visibility(
+                              visible: isVideoPlayalable,
+                              child: Video(
+                                controller: controller,
+                              ))
+                        ]),
                       )),
                 ),
                 if (!isFullScreen) ...[

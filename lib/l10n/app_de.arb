@@ -56,5 +56,6 @@
     "strPlay": "Spielen",
     "strURL": "URL",
     "strMore": "Mehr Details",
-    "strChooseDirectory": "Wählen Sie ein Verzeichnis, in dem Videos gespeichert werden sollen"
+    "strChooseDirectory": "Wählen Sie ein Verzeichnis, in dem Videos gespeichert werden sollen",
+    "strInitStream": "Stream wird initialisiert"
 }
