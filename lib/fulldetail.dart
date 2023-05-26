@@ -141,268 +141,223 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
     return Scaffold(
         appBar: AppBar(title: Text(appBarTitle)),
         body: Stack(children: [
-          GestureDetector(
-              supportedDevices: const {
-                PointerDeviceKind.stylus,
-                PointerDeviceKind.touch,
-                PointerDeviceKind.trackpad
-              },
-              onPanUpdate: (details) {
-                swipeDirection = details.delta.dx > 0 ? 'left' : 'right';
-              },
-              onPanEnd: (details) {
-                int index = widget.index, wi;
-                if (swipeDirection == null) {
-                  return;
-                } else if (swipeDirection == 'left') {
-                  wi = widget.index - 1;
-                  if (wi >= 0) {
-                    index = wi;
-                  }
-                } else if (swipeDirection == 'right') {
-                  wi = widget.index + 1;
-                  if (wi < widget.videos.length) {
-                    index = wi;
-                  }
-                }
-                if (index != widget.index) {
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (context) => FullDetailScreen(
-                          videos: widget.videos,
-                          index: index,
-                          title: widget.title)));
-                }
-              },
-              child: Container(
-                  padding: const EdgeInsets.all(15),
-                  child: Center(
-                      child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                        if (showImage)
-                          Expanded(
-                              flex: 1,
-                              child: Center(
-                                  child: SizedBox.expand(
-                                      child: Image(
-                                errorBuilder: (context, error, stackTrace) =>
-                                    const SizedBox.shrink(),
-                                image: CachedNetworkImageProvider(imageUrl,
-                                    headers: {
-                                      'User-Agent': AppConfig.userAgent
+          Container(
+              padding: const EdgeInsets.all(15),
+              child: Center(
+                  child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                    if (showImage)
+                      Expanded(
+                          flex: 1,
+                          child: Center(
+                              child: SizedBox.expand(
+                                  child: Image(
+                            errorBuilder: (context, error, stackTrace) =>
+                                const SizedBox.shrink(),
+                            image: CachedNetworkImageProvider(imageUrl,
+                                headers: {'User-Agent': AppConfig.userAgent}),
+                            fit: BoxFit.fitWidth,
+                          )))),
+                    Expanded(
+                        flex: 2,
+                        child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(data['title'],
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineLarge),
+                                  if (data['subtitle'] != null &&
+                                      data['subtitle'].isNotEmpty) ...[
+                                    const SizedBox(height: 5),
+                                    Text(data['subtitle'],
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headlineSmall),
+                                  ],
+                                  const SizedBox(height: 10),
+                                  Row(children: [
+                                    Chip(
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .inverseSurface,
+                                      label: Text(data['kind']['label'],
+                                          style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onInverseSurface)),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    if (!data['kind']['isCollection'] &&
+                                        data['durationLabel'] != null)
+                                      Chip(
+                                        backgroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .inverseSurface,
+                                        label: Text(data['durationLabel'],
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onInverseSurface)),
+                                      ),
+                                    Consumer<AppData>(
+                                        builder: (context, appData, child) {
+                                      if (appData.favorites
+                                          .contains(video.programId)) {
+                                        return Container(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: const Icon(Icons.favorite));
+                                      } else {
+                                        return const SizedBox.shrink();
+                                      }
                                     }),
-                                fit: BoxFit.fitWidth,
-                              )))),
-                        Expanded(
-                            flex: 2,
-                            child: Container(
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 16),
-                                child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(data['title'],
+                                    Consumer<AppData>(
+                                        builder: (context, appData, child) {
+                                      if (appData.watched
+                                          .contains(video.programId)) {
+                                        return Container(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: const Icon(
+                                                Icons.check_circle_outline));
+                                      } else {
+                                        return const SizedBox.shrink();
+                                      }
+                                    }),
+                                  ]),
+                                  const SizedBox(height: 10),
+                                  !video.isCollection
+                                      ? VideoButtons(
+                                          videos: widget.videos,
+                                          index: widget.index,
+                                          oneLine: true,
+                                          withFullDetailButton: false)
+                                      : TextButton(
+                                          onPressed: () {
+                                            //Navigator.pop(context);
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        SerieScreen(
+                                                            title: video.title,
+                                                            url: video.url)));
+                                          },
+                                          child: Text(
+                                              AppLocalizations.of(context)!
+                                                  .strEpisodes),
+                                        ),
+                                  Flexible(
+                                      child: SingleChildScrollView(
+                                          child: Column(children: [
+                                    if (data['subtile'] != null) ...[
+                                      const SizedBox(height: 10),
+                                      Text(data['subtitle'],
                                           style: Theme.of(context)
                                               .textTheme
-                                              .headlineLarge),
-                                      if (data['subtitle'] != null &&
-                                          data['subtitle'].isNotEmpty) ...[
-                                        const SizedBox(height: 5),
-                                        Text(data['subtitle'],
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headlineSmall),
-                                      ],
+                                              .headlineMedium)
+                                    ],
+                                    if (shortDescription.isNotEmpty) ...[
                                       const SizedBox(height: 10),
-                                      Row(children: [
-                                        Chip(
-                                          backgroundColor: Theme.of(context)
-                                              .colorScheme
-                                              .inverseSurface,
-                                          label: Text(data['kind']['label'],
-                                              style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onInverseSurface)),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        if (!data['kind']['isCollection'] &&
-                                            data['durationLabel'] != null)
-                                          Chip(
-                                            backgroundColor: Theme.of(context)
-                                                .colorScheme
-                                                .inverseSurface,
-                                            label: Text(data['durationLabel'],
-                                                style: TextStyle(
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .onInverseSurface)),
-                                          ),
-                                        Consumer<AppData>(
-                                            builder: (context, appData, child) {
-                                          if (appData.favorites
-                                              .contains(video.programId)) {
-                                            return Container(
-                                                padding: const EdgeInsets.only(
-                                                    left: 10),
-                                                child:
-                                                    const Icon(Icons.favorite));
-                                          } else {
-                                            return const SizedBox.shrink();
-                                          }
-                                        }),
-                                        Consumer<AppData>(
-                                            builder: (context, appData, child) {
-                                          if (appData.watched
-                                              .contains(video.programId)) {
-                                            return Container(
-                                                padding: const EdgeInsets.only(
-                                                    left: 10),
-                                                child: const Icon(Icons
-                                                    .check_circle_outline));
-                                          } else {
-                                            return const SizedBox.shrink();
-                                          }
-                                        }),
-                                      ]),
-                                      const SizedBox(height: 10),
-                                      !video.isCollection
-                                          ? VideoButtons(
-                                              videos: widget.videos,
-                                              index: widget.index,
-                                              oneLine: true,
-                                              withFullDetailButton: false)
-                                          : TextButton(
-                                              onPressed: () {
-                                                //Navigator.pop(context);
-                                                Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            SerieScreen(
-                                                                title:
-                                                                    video.title,
-                                                                url: video
-                                                                    .url)));
-                                              },
-                                              child: Text(
-                                                  AppLocalizations.of(context)!
-                                                      .strEpisodes),
-                                            ),
-                                      Flexible(
-                                          child: SingleChildScrollView(
-                                              child: Column(children: [
-                                        if (data['subtile'] != null) ...[
-                                          const SizedBox(height: 10),
-                                          Text(data['subtitle'],
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .headlineMedium)
-                                        ],
-                                        if (shortDescription.isNotEmpty) ...[
-                                          const SizedBox(height: 10),
-                                          Text(shortDescription,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .headlineSmall!
-                                                  .copyWith(
-                                                      fontSize: 17.5,
-                                                      letterSpacing: 0.5))
-                                        ],
-                                        const SizedBox(height: 10),
-                                        Text(description,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyMedium!
-                                                .copyWith(
-                                                    height: 1.35,
-                                                    letterSpacing: 0.5))
-                                      ]))),
-                                    ]))),
-                        Expanded(
-                            flex: 1,
-                            child: Center(
-                                child: SingleChildScrollView(
-                                    child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Row(children: [
-                                  const Expanded(flex: 1, child: Text('ID')),
-                                  Expanded(
-                                      flex: 1,
-                                      child: Text('${data['programId']}'))
-                                ]),
-                                const SizedBox(height: 10),
-                                Row(children: [
-                                  Expanded(
-                                      flex: 1,
-                                      child: Text(AppLocalizations.of(context)!
-                                          .strDuration)),
-                                  Expanded(
-                                      flex: 1,
-                                      child: Text('${data['durationLabel']}'))
-                                ]),
-                                if (firstBroadcastDate.isNotEmpty) ...[
-                                  const SizedBox(height: 10),
-                                  Row(children: [
-                                    Expanded(
-                                        flex: 1,
-                                        child: Text(
-                                            AppLocalizations.of(context)!
-                                                .strFirstBroadcastDate)),
-                                    Expanded(
-                                        flex: 1,
-                                        child: Text(firstBroadcastDate))
-                                  ])
-                                ],
-                                if (availabilityStart.isNotEmpty) ...[
-                                  const SizedBox(height: 10),
-                                  Row(children: [
-                                    Expanded(
-                                        flex: 1,
-                                        child: Text(
-                                            AppLocalizations.of(context)!
-                                                .strAvailability)),
-                                    Expanded(
-                                        flex: 1,
-                                        child: Text(
-                                            '${AppLocalizations.of(context)!.strFrom} $availabilityStart\n${AppLocalizations.of(context)!.strTo} $availabilityEnd'))
-                                  ])
-                                ],
-                                const SizedBox(height: 10),
-                                if (data['genre'] != null)
-                                  Row(children: [
-                                    Expanded(
-                                        flex: 1,
-                                        child: Text(
-                                            AppLocalizations.of(context)!
-                                                .strGenre)),
-                                    Expanded(
-                                        flex: 1,
-                                        child:
-                                            Text('${data['genre']['label']}'))
-                                  ]),
-                                if (data['geoblocking'] != null) ...[
-                                  const SizedBox(height: 10),
-                                  Row(children: [
-                                    const Expanded(
-                                        flex: 1, child: Text('GeoBlocking')),
-                                    Expanded(
-                                        flex: 1,
-                                        child: Text(
-                                            '${data['geoblocking']['code']}'))
-                                  ])
-                                ],
-                                const SizedBox(height: 10),
-                                ...credits,
-                              ],
-                            )))),
-                      ])))),
+                                      Text(shortDescription,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headlineSmall!
+                                              .copyWith(
+                                                  fontSize: 17.5,
+                                                  letterSpacing: 0.5))
+                                    ],
+                                    const SizedBox(height: 10),
+                                    Text(description,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium!
+                                            .copyWith(
+                                                height: 1.35,
+                                                letterSpacing: 0.5))
+                                  ]))),
+                                ]))),
+                    Expanded(
+                        flex: 1,
+                        child: Center(
+                            child: SingleChildScrollView(
+                                child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(children: [
+                              const Expanded(flex: 1, child: Text('ID')),
+                              Expanded(
+                                  flex: 1, child: Text('${data['programId']}'))
+                            ]),
+                            const SizedBox(height: 10),
+                            Row(children: [
+                              Expanded(
+                                  flex: 1,
+                                  child: Text(AppLocalizations.of(context)!
+                                      .strDuration)),
+                              Expanded(
+                                  flex: 1,
+                                  child: Text('${data['durationLabel']}'))
+                            ]),
+                            if (firstBroadcastDate.isNotEmpty) ...[
+                              const SizedBox(height: 10),
+                              Row(children: [
+                                Expanded(
+                                    flex: 1,
+                                    child: Text(AppLocalizations.of(context)!
+                                        .strFirstBroadcastDate)),
+                                Expanded(
+                                    flex: 1, child: Text(firstBroadcastDate))
+                              ])
+                            ],
+                            if (availabilityStart.isNotEmpty) ...[
+                              const SizedBox(height: 10),
+                              Row(children: [
+                                Expanded(
+                                    flex: 1,
+                                    child: Text(AppLocalizations.of(context)!
+                                        .strAvailability)),
+                                Expanded(
+                                    flex: 1,
+                                    child: Text(
+                                        '${AppLocalizations.of(context)!.strFrom} $availabilityStart\n${AppLocalizations.of(context)!.strTo} $availabilityEnd'))
+                              ])
+                            ],
+                            const SizedBox(height: 10),
+                            if (data['genre'] != null)
+                              Row(children: [
+                                Expanded(
+                                    flex: 1,
+                                    child: Text(AppLocalizations.of(context)!
+                                        .strGenre)),
+                                Expanded(
+                                    flex: 1,
+                                    child: Text('${data['genre']['label']}'))
+                              ]),
+                            if (data['geoblocking'] != null) ...[
+                              const SizedBox(height: 10),
+                              Row(children: [
+                                const Expanded(
+                                    flex: 1, child: Text('GeoBlocking')),
+                                Expanded(
+                                    flex: 1,
+                                    child:
+                                        Text('${data['geoblocking']['code']}'))
+                              ])
+                            ],
+                            const SizedBox(height: 10),
+                            ...credits,
+                          ],
+                        )))),
+                  ]))),
           Builder(builder: (context) {
             return Positioned(
                 left: 10,
