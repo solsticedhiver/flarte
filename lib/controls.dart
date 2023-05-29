@@ -123,9 +123,12 @@ class _VideoButtonsState extends State<VideoButtons> {
           .parseString(playlistUri, resp['body']);
       if (playlist is hls.HlsMasterPlaylist) {
         for (var v in playlist.variants) {
-          tf.add(Format(
+          final f = Format(
               resolution: '${v.format.width}x${v.format.height}',
-              bandwidth: v.format.bitrate.toString()));
+              bandwidth: v.format.bitrate.toString());
+          if (!tf.contains(f)) {
+            tf.add(f);
+          }
         }
         // master m3u8 file
       } else if (playlist is hls.HlsMediaPlaylist) {
