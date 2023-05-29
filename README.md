@@ -4,14 +4,17 @@ A *flutter* desktop application (*Linux* and *Windows*) to browse https://www.ar
 
 <img width="640" src="./screenshots/2023-05-18T23-34-19.png" />
 
-It merely copies the website interface, but adds the possibility to download the videos, by using *ffmpeg*.
+A reinterpretation of the GUI of the website with the added possibility to download the videos, by using *ffmpeg*. A missing desktop client, if you like.
 **It should be obvious that all the videos are copyrighted by arte.tv, and not free to share as is.**
 
 On *Windows*, excepts the binary *ffmpeg.exe* to be in flarte directory. Downloads to `%USERPROFILE%\Downloads` directory.
 
 On *Linux*, downloads to `$XDG_DOWNLOAD_DIR` if set else to `$HOME`.
 
-Downloading is not implemented on Android.
+Download directory can be changed in settings.
+
+Can run on Android too. Downloading is not implemented.
+Could also run on MacOS, but no test were made.
 
 ## Release archives
 
