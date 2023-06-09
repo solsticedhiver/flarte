@@ -541,6 +541,7 @@ class _VideoButtonsState extends State<VideoButtons> {
               onChanged: (value) {
                 setState(() {
                   selectedVersion = value!;
+                  debugPrint(selectedVersion.url);
                   _getFormats(selectedVersion.url);
                 });
               })
