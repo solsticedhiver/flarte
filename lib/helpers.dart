@@ -18,12 +18,10 @@ class Cache extends ChangeNotifier {
     final List<dynamic> zones = data['value']['zones'];
     for (var z in zones) {
       List<dynamic> videos = z['content']['data'];
-      final programId = videos.where((v) => v['programId'] != null).toList();
-      if (videos.isEmpty ||
+      videos.retainWhere((v) => v['programId'] != null);
+      if (videos.length <= 1 ||
           z['displayOptions']['template'].startsWith('event') ||
-          z['displayOptions']['template'].startsWith('single') ||
-          programId.isEmpty ||
-          videos.length == 1) {
+          z['displayOptions']['template'].startsWith('single')) {
         continue;
       }
       result.add({
