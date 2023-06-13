@@ -57,5 +57,11 @@
     "strURL": "URL",
     "strMore": "Mehr Details",
     "strChooseDirectory": "Wählen Sie ein Verzeichnis, in dem Videos gespeichert werden sollen",
-    "strInitStream": "Stream wird initialisiert"
+    "strInitStream": "Stream wird initialisiert",
+    "strCache": "Cache",
+    "strClearCache": "Leeren Sie den Cache",
+    "strClearTheCacheNow": "Möchten Sie den Cache jetzt leeren?",
+    "strClearingTheCache": "Durch das Leeren des Caches wird die Aktualisierung jedes Bildschirmabschnitts (oder jeder Registerkarte) erzwungen.\nDies gilt nicht für Bilder oder Details zu einem Programm",
+    "strYes": "Ja",
+    "strNo": "Nein"
 }

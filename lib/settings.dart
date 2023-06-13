@@ -1,8 +1,10 @@
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flarte/helpers.dart';
 import 'package:flarte/config.dart';
+import 'package:flarte/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -351,6 +353,49 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                       AppConfig.dlDirectory = dlDir;
                     });
                   }
+                },
+              ),
+            ]),
+        SettingsSection(
+            title: Text(AppLocalizations.of(context)!.strCache),
+            tiles: [
+              SettingsTile.navigation(
+                leading: const Icon(Icons.cached),
+                title: Text(AppLocalizations.of(context)!.strClearCache),
+                onPressed: (context) async {
+                  await showDialog<Bool>(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text(
+                            AppLocalizations.of(context)!.strClearTheCacheNow),
+                        content: Text(
+                            AppLocalizations.of(context)!.strClearingTheCache),
+                        actions: [
+                          TextButton(
+                            child: Text(AppLocalizations.of(context)!.strYes),
+                            onPressed: () {
+                              final cache =
+                                  Provider.of<Cache>(context, listen: false);
+                              for (var key in cache.data.keys) {
+                                final k = key.split('-')[0];
+                                if (CategoriesList.codes.contains(k)) {
+                                  cache.set(key, null, notify: true);
+                                }
+                              }
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          TextButton(
+                            child: Text(AppLocalizations.of(context)!.strNo),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          )
+                        ],
+                      );
+                    },
+                  );
                 },
               ),
             ]),

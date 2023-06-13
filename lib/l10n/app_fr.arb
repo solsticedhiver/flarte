@@ -57,5 +57,11 @@
     "strURL": "URL",
     "strMore": "Plus de détails",
     "strChooseDirectory": "Choisissez un répertoire où sauver les vidéos",
-    "strInitStream": "Initialisation du streaming"
+    "strInitStream": "Initialisation du streaming",
+    "strCache": "Cache",
+    "strClearCache": "Vider le cache",
+    "strClearTheCacheNow": "Voulez-vous vider le cache maintenant ?",
+    "strClearingTheCache": "Vider le cache forcera un rafraichissement sur chaque section (ou tabulation)\nCela n'inclu pas les images, ou les détails de programmes",
+    "strYes": "Oui",
+    "strNo": "Non"
 }

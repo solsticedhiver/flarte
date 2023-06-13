@@ -57,5 +57,11 @@
     "strURL": "URL",
     "strMore": "More details",
     "strChooseDirectory": "Choose a directory where to save videos",
-    "strInitStream": "Initializing stream"
+    "strInitStream": "Initializing stream",
+    "strCache": "Cache",
+    "strClearCache": "Clear the cache",
+    "strClearTheCacheNow": "Do you want to clear the cache now?",
+    "strClearingTheCache": "Clearing the cache will force to refresh each screen section (or tab)\nThis does not include the images or the details about a program",
+    "strYes": "Yes",
+    "strNo": "No"
 }
