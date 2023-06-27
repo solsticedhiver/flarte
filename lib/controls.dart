@@ -378,7 +378,7 @@ class _VideoButtonsState extends State<VideoButtons> {
         '--play-and-exit',
         '--quiet',
         '--http-user-agent="${AppConfig.userAgent}"',
-        '--adaptive-maxheight="${selectedFormat.resolution.split('x').last}"',
+        '--adaptive-maxheight=${selectedFormat.resolution.split('x').last}',
         selectedVersion.url
       ];
     } else {
@@ -404,7 +404,8 @@ class _VideoButtonsState extends State<VideoButtons> {
     */
     try {
       _showMessage(messengerState, themeData,
-          'Launching external [c]vlc instance to read video ${video.programId}');
+          'Launching external [c]vlc instance to read video ${video.programId}',
+          isError: false);
       ProcessResult result = await mgr.run(cmd);
       if (result.exitCode != 0) {
         //debugPrint(result.stderr);
