@@ -79,7 +79,7 @@ class _SearchScreenState extends State<SearchScreen> {
       results = Container(
           width: width,
           child: GridView.count(
-            childAspectRatio: 0.85,
+            childAspectRatio: 0.95,
             crossAxisCount: count,
             children: data.map((v) {
               return InkWell(
