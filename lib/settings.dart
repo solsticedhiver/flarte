@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -363,7 +362,7 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                 leading: const Icon(Icons.cached),
                 title: Text(AppLocalizations.of(context)!.strClearCache),
                 onPressed: (context) async {
-                  await showDialog<Bool>(
+                  await showDialog<bool>(
                     context: context,
                     builder: (context) {
                       return AlertDialog(
