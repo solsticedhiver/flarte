@@ -37,6 +37,7 @@ class MyScreenState extends State<MyScreen> {
   late final controller = VideoController(player);
   late StreamSubscription subscription;
   bool isVideoPlayalable = false;
+  double playSpeed = 1.0;
 
   @override
   void initState() {
@@ -51,6 +52,8 @@ class MyScreenState extends State<MyScreen> {
         }
       }
     });
+
+    player.setRate(playSpeed);
 
     controller.waitUntilFirstFrameRendered.then((value) {
       setState(() {
@@ -100,6 +103,51 @@ class MyScreenState extends State<MyScreen> {
       }
     }
 
+    final List<double> availableSpeed = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
+    final themeData = Theme.of(context);
+    final List<PopupMenuItem<double>> availableSpeedItems = availableSpeed
+        .map((s) => PopupMenuItem<double>(
+            onTap: () {
+              setState(() {
+                playSpeed = s;
+              });
+              player.setRate(playSpeed);
+            },
+            value: s,
+            child: Text('x$s',
+                style:
+                    TextStyle(color: Theme.of(context).colorScheme.onSurface))))
+        .toList();
+    final List<Widget> bottomButtonBar = [
+      const MaterialDesktopPlayOrPauseButton(),
+      const MaterialDesktopVolumeButton(),
+      const MaterialDesktopPositionIndicator(),
+      const Spacer(),
+      Theme(
+          data: ThemeData.from(colorScheme: themeData.colorScheme),
+          child: PopupMenuButton<double>(
+              enableFeedback: false,
+              /*
+              onSelected: (value) {
+                debugPrint('rate play speed set to $value');
+                player.setRate(value);
+              },
+              */
+              color: Theme.of(context).colorScheme.surface,
+              initialValue: playSpeed,
+              // no tooltip because other buttons don't have one for now
+              splashRadius: 20,
+              tooltip: '',
+              itemBuilder: (context) {
+                return availableSpeedItems;
+              },
+              icon: Icon(
+                Icons.speed,
+                color: Theme.of(context).colorScheme.onBackground,
+              ))),
+      const MaterialDesktopFullscreenButton(),
+    ];
+
     return Scaffold(
         appBar: AppBar(title: Text(widget.title)),
         body: Card(
@@ -111,13 +159,14 @@ class MyScreenState extends State<MyScreen> {
             Visibility(
                 visible: isVideoPlayalable,
                 child: MaterialDesktopVideoControlsTheme(
-                    normal: const MaterialDesktopVideoControlsThemeData(
-                      seekBarPositionColor: Colors.deepOrange,
-                      seekBarThumbColor: Colors.deepOrange,
-                    ),
-                    fullscreen: const MaterialDesktopVideoControlsThemeData(
+                    normal: MaterialDesktopVideoControlsThemeData(
                         seekBarPositionColor: Colors.deepOrange,
-                        seekBarThumbColor: Colors.deepOrange),
+                        seekBarThumbColor: Colors.deepOrange,
+                        bottomButtonBar: bottomButtonBar),
+                    fullscreen: MaterialDesktopVideoControlsThemeData(
+                        seekBarPositionColor: Colors.deepOrange,
+                        seekBarThumbColor: Colors.deepOrange,
+                        bottomButtonBar: bottomButtonBar),
                     child: Center(
                         child: SizedBox(
                       width: MediaQuery.of(context).size.width,
