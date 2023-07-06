@@ -82,14 +82,14 @@ class _SerieScreenState extends State<SerieScreen> {
           return Dialog(
               elevation: 8.0,
               child: SizedBox(
-                  width: min(MediaQuery.of(context).size.width - 100, 600),
+                  width: min(MediaQuery.sizeOf(context).width - 100, 600),
                   child: ShowDetail(videos: videos, index: index)));
         });
   }
 
   @override
   Widget build(BuildContext context) {
-    int count = MediaQuery.of(context).size.width ~/ 285;
+    int count = MediaQuery.sizeOf(context).width ~/ 285;
     double width = 285.0 * count;
     final titles = teasers.map((t) => t['title']).toList();
     // use the subtitle if all titles are the same

@@ -98,7 +98,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
 
     final imageUrl =
         '${data['mainImage']['url'].replaceFirst('__SIZE__', '300x450')}?type=TEXT';
-    bool showImage = MediaQuery.of(context).size.width > 1280;
+    bool showImage = MediaQuery.sizeOf(context).width > 1280;
     Locale locale = Provider.of<LocaleModel>(context, listen: false)
         .getCurrentLocale(context);
     DateFormat dateFormat = DateFormat.yMd(locale.toString());
@@ -359,7 +359,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
           Builder(builder: (context) {
             return Positioned(
                 left: 10,
-                top: (MediaQuery.of(context).size.height -
+                top: (MediaQuery.sizeOf(context).height -
                         Scaffold.of(context).appBarMaxHeight!) /
                     2,
                 child: ElevatedButton(
@@ -390,7 +390,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
           Builder(builder: (context) {
             return Positioned(
                 right: 10,
-                top: (MediaQuery.of(context).size.height -
+                top: (MediaQuery.sizeOf(context).height -
                         Scaffold.of(context).appBarMaxHeight!) /
                     2,
                 child: ElevatedButton(

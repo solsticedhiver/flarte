@@ -189,19 +189,19 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     CarouselListSize carSize = CarouselListSize.normal;
     CategoriesListSize catSize = CategoriesListSize.normal;
     leftSideWidth = 300;
-    if (MediaQuery.of(context).size.width < 1600) {
+    if (MediaQuery.sizeOf(context).width < 1600) {
       catSize = CategoriesListSize.small;
       leftSideWidth = 200;
     }
-    if (MediaQuery.of(context).size.width < 1280) {
+    if (MediaQuery.sizeOf(context).width < 1280) {
       carSize = CarouselListSize.small;
       catSize = CategoriesListSize.tiny;
       leftSideWidth = 64;
     }
     double padding = 10;
-    if (MediaQuery.of(context).size.height < 720) {
+    if (MediaQuery.sizeOf(context).height < 720) {
       padding = 5;
-      if (MediaQuery.of(context).size.height < 640) {
+      if (MediaQuery.sizeOf(context).height < 640) {
         padding = 0;
       }
     }
@@ -499,7 +499,7 @@ class CarouselList extends StatelessWidget {
           return Dialog(
               elevation: 8.0,
               child: SizedBox(
-                  width: min(MediaQuery.of(context).size.width, 650),
+                  width: min(MediaQuery.sizeOf(context).width, 650),
                   child: ShowDetail(videos: videos, index: index)));
         });
   }
@@ -554,8 +554,8 @@ class CarouselList extends StatelessWidget {
     return SingleChildScrollView(
         // subtract NavigationRail width
         child: Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.sizeOf(context).width,
+            height: MediaQuery.sizeOf(context).height,
             padding: const EdgeInsets.all(10),
             child: thumbnails.isNotEmpty
                 ? ListView.builder(
@@ -605,9 +605,9 @@ class _CategoriesListState extends State<CategoriesList> {
   @override
   Widget build(BuildContext context) {
     double padding = 8;
-    if (MediaQuery.of(context).size.height < 720) {
+    if (MediaQuery.sizeOf(context).height < 720) {
       padding = 4;
-      if (MediaQuery.of(context).size.height < 640) {
+      if (MediaQuery.sizeOf(context).height < 640) {
         padding = 0;
       }
     }
@@ -761,7 +761,7 @@ class _ZoneListState extends State<ZoneList> {
       Expanded(
           flex: 1,
           child: Container(
-              height: MediaQuery.of(context).size.height,
+              height: MediaQuery.sizeOf(context).height,
               child: ListView.builder(
                 //padding: const EdgeInsets.symmetric(vertical: 10),
                 semanticChildCount: widget._zones.length,

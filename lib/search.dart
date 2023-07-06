@@ -42,7 +42,7 @@ class _SearchScreenState extends State<SearchScreen> {
           return Dialog(
               elevation: 8.0,
               child: SizedBox(
-                  width: min(MediaQuery.of(context).size.width - 100, 600),
+                  width: min(MediaQuery.sizeOf(context).width - 100, 600),
                   child: ShowDetail(videos: videos, index: index)));
         });
   }
@@ -69,7 +69,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    int count = MediaQuery.of(context).size.width ~/ 285;
+    int count = MediaQuery.sizeOf(context).width ~/ 285;
     double width = 285.0 * count;
     final controller = TextEditingController();
     Widget results;
