@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hls_parser/flutter_hls_parser.dart' as hls;
@@ -467,7 +468,7 @@ class _VideoButtonsState extends State<VideoButtons> {
       IconButton(
         icon: const Icon(Icons.play_arrow),
         tooltip: AppLocalizations.of(context)!.strPlay,
-        onPressed: versions.isNotEmpty && formats.isNotEmpty
+        onPressed: versions.isNotEmpty && formats.isNotEmpty && !kIsWeb
             ? () {
                 if (AppConfig.player == PlayerTypeName.embedded) {
                   _libmpv();
@@ -483,6 +484,7 @@ class _VideoButtonsState extends State<VideoButtons> {
         tooltip: AppLocalizations.of(context)!.strDownload,
         onPressed: versions.isNotEmpty &&
                 formats.isNotEmpty &&
+                !kIsWeb &&
                 (Platform.isWindows || Platform.isLinux)
             ? _ffmpeg
             : null,

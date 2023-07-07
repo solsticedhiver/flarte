@@ -27,6 +27,7 @@ class AppConfig {
     }
     String dlD = '';
 
+    if (kIsWeb) return '';
     if (Platform.isLinux) {
       Directory? downloadDir = getUserDirectory('DOWNLOAD');
       if (downloadDir == null) {

@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flarte/helpers.dart';
 import 'package:flarte/config.dart';
 import 'package:flarte/main.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -280,10 +281,10 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                           PlayerTypeName.vlc: {
                             'str': 'VLC',
                             // disable VLC choice when in flatpak/snap or android
-                            'disabled':
+                            'disabled': kIsWeb ||
                                 Platform.environment['FLATPAK_ID'] != null ||
-                                    Platform.environment['SNAP'] != null ||
-                                    Platform.isAndroid
+                                Platform.environment['SNAP'] != null ||
+                                Platform.isAndroid
                           },
                           PlayerTypeName.custom: {
                             'str': AppLocalizations.of(context)!.strCustom,
@@ -327,9 +328,10 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                 leading: const Icon(Icons.download),
                 title: Text(AppLocalizations.of(context)!.strFolder),
                 value: Text(AppConfig.dlDirectory),
-                enabled: Platform.isLinux || Platform.isWindows,
+                enabled: !kIsWeb && (Platform.isLinux || Platform.isWindows),
                 onPressed: (context) async {
                   String home = '';
+                  if (kIsWeb) return;
                   if (Platform.isLinux) {
                     home = Platform.environment['HOME'] ??
                         Platform.environment['TMP']!;
