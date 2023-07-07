@@ -65,6 +65,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //debugPrint(video.srcJson!.replaceAll("'", "\\'"));
     //debugPrint(data.toString());
     if (data.isEmpty) {
       data = {
@@ -127,13 +128,22 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
         ],
       );
     }
-    String? swipeDirection;
     String appBarTitle;
     if (widget.title.isNotEmpty) {
       appBarTitle =
           '${widget.title} (${widget.index + 1}/${widget.videos.length})';
     } else {
       appBarTitle = AppLocalizations.of(context)!.strDetails;
+    }
+
+    String viewable = '';
+    switch (data['ageRating']) {
+      case 16:
+        viewable = '22h - 6h';
+        break;
+      case 18:
+        viewable = '23h - 6h';
+        break;
     }
 
     return Scaffold(
@@ -328,6 +338,28 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                     child: Text(
                                         '${AppLocalizations.of(context)!.strFrom} $availabilityStart\n${AppLocalizations.of(context)!.strTo} $availabilityEnd'))
                               ])
+                            ],
+                            const SizedBox(height: 10),
+                            Row(children: [
+                              Expanded(
+                                  flex: 1,
+                                  child: Text(AppLocalizations.of(context)!
+                                      .strAgeRating)),
+                              Expanded(
+                                  flex: 1,
+                                  child: Text(data['ageRating'] == 0
+                                      ? '⸺'
+                                      : '${data['ageRating']}'))
+                            ]),
+                            if (data['ageRating'] != 0) ...[
+                              const SizedBox(height: 10),
+                              Row(children: [
+                                Expanded(
+                                    flex: 1,
+                                    child: Text(AppLocalizations.of(context)!
+                                        .strViewable)),
+                                Expanded(flex: 1, child: Text(viewable))
+                              ]),
                             ],
                             const SizedBox(height: 10),
                             if (data['genre'] != null)

@@ -24,6 +24,7 @@ class Cache extends ChangeNotifier {
           z['displayOptions']['template'].startsWith('single')) {
         continue;
       }
+
       result.add({
         'title': z['title'],
         'videos': videos.map((v) => VideoData.fromJson(v)).toList()
@@ -180,6 +181,7 @@ class VideoData {
   //bool isFavorite;
   List<Version>? versions;
   String? teaserText;
+  int ageRating;
 
   VideoData({
     required this.programId,
@@ -191,6 +193,7 @@ class VideoData {
     required this.label,
     required this.durationLabel,
     required this.url,
+    required this.ageRating,
     this.srcJson,
     this.versions,
     this.teaserText,
@@ -210,6 +213,7 @@ class VideoData {
       durationLabel: video['durationLabel'],
       url: video['url'],
       teaserText: video['teaserText'],
+      ageRating: video['ageRating'],
       srcJson: !kReleaseMode ? json.encode(video) : null,
     );
   }

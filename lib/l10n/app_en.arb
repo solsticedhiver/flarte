@@ -63,5 +63,7 @@
     "strClearTheCacheNow": "Do you want to clear the cache now?",
     "strClearingTheCache": "Clearing the cache will force to refresh each screen section (or tab)\nThis does not include the images or the details about a program",
     "strYes": "Yes",
-    "strNo": "No"
+    "strNo": "No",
+    "strAgeRating": "Age Rating",
+    "strViewable": "Viewable"
 }

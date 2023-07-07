@@ -63,5 +63,7 @@
     "strClearTheCacheNow": "Möchten Sie den Cache jetzt leeren?",
     "strClearingTheCache": "Durch das Leeren des Caches wird die Aktualisierung jedes Bildschirmabschnitts (oder jeder Registerkarte) erzwungen.\nDies gilt nicht für Bilder oder Details zu einem Programm",
     "strYes": "Ja",
-    "strNo": "Nein"
+    "strNo": "Nein",
+    "strAgeRating": "Altersfreigabe",
+    "strViewable": "Sichtbar"
 }
