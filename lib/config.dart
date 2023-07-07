@@ -7,7 +7,7 @@ import 'package:path/path.dart' as path;
 
 class AppConfig {
   static const String name = 'Flarte';
-  static const String version = '0.3.1';
+  static const String version = '0.3.2';
   static const String commit = 'HEAD/main';
   static const String url = 'https://github.com/solsticedhiver/flarte';
   static PlayerTypeName player = PlayerTypeName.embedded;
