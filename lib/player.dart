@@ -72,12 +72,12 @@ class MyScreenState extends State<MyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (player.platform is libmpvPlayer) {
-      final pp = player.platform as dynamic;
-      // work-around ffmpeg bug #10149 and #10169
-      // mpv is plagged with the same problem/bug than ffmpeg, because it uses it somehow as back-end
-      // we use the same work-around by specifying video, audio and subtitle stream separately too
-      if (player.state.playlist.medias.isEmpty) {
+    if (player.state.playlist.medias.isEmpty) {
+      if (player.platform is libmpvPlayer) {
+        final pp = player.platform as dynamic;
+        // work-around ffmpeg bug #10149 and #10169
+        // mpv is plagged with the same problem/bug than ffmpeg, because it uses it somehow as back-end
+        // we use the same work-around by specifying video, audio and subtitle stream separately too
         if (widget.subtitle.isNotEmpty) {
           debugPrint('Playing with subtitle from ${widget.subtitle}');
           pp.setProperty('sub-files', widget.subtitle);
@@ -93,14 +93,13 @@ class MyScreenState extends State<MyScreen> {
           }
           pp.setProperty('audio-files', audio);
         }
-
-        player.setVolume(100);
-        player.open(Playlist([
-          Media(widget.videoStream,
-              httpHeaders: {'User-Agent': AppConfig.userAgent})
-        ]));
-        debugPrint('Playing ${widget.video}');
       }
+      player.setVolume(100);
+      player.open(Playlist([
+        Media(widget.videoStream,
+            httpHeaders: {'User-Agent': AppConfig.userAgent})
+      ]));
+      debugPrint('Playing ${widget.video}');
     }
 
     final List<double> availableSpeed = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
