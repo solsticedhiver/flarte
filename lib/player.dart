@@ -65,41 +65,37 @@ class MyScreenState extends State<MyScreen> {
   @override
   void dispose() {
     subscription.cancel();
-    player.pause();
+    player.stop();
     player.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (player.state.playlist.medias.isEmpty) {
-      if (player.platform is libmpvPlayer) {
-        final pp = player.platform as dynamic;
-        // work-around ffmpeg bug #10149 and #10169
-        // mpv is plagged with the same problem/bug than ffmpeg, because it uses it somehow as back-end
-        // we use the same work-around by specifying video, audio and subtitle stream separately too
+    if (!player.state.playing) {
+      player.open(
+          Media(widget.videoStream,
+              httpHeaders: {'User-Agent': AppConfig.userAgent}),
+          play: false);
+      debugPrint('Playing ${widget.video}');
+      // work-around ffmpeg bug #10149 and #10169
+      // mpv is plagged with the same problem/bug than ffmpeg, because it uses it somehow as back-end
+      // we use the same work-around by specifying video, audio and subtitle stream separately too
+      Future.microtask(() async {
         if (widget.subtitle.isNotEmpty) {
           debugPrint('Playing with subtitle from ${widget.subtitle}');
-          pp.setProperty('sub-files', widget.subtitle);
+          final data = await File(widget.subtitle).readAsString();
+          await player.setSubtitleTrack(SubtitleTrack.data(data));
         }
         if (widget.audioStream.isNotEmpty) {
           debugPrint('Playing audio from ${widget.audioStream}');
-          // escape character usedd as list seprator by mpv
-          String audio = widget.audioStream;
-          if (Platform.isLinux || Platform.isAndroid) {
-            audio = audio.replaceAll(':', '\\:');
-          } else if (Platform.isWindows) {
-            audio = audio.replaceAll(';', '\\;');
-          }
-          pp.setProperty('audio-files', audio);
+          await player.setAudioTrack(
+            AudioTrack.uri(widget.audioStream),
+          );
         }
-      }
+      });
       player.setVolume(100);
-      player.open(Playlist([
-        Media(widget.videoStream,
-            httpHeaders: {'User-Agent': AppConfig.userAgent})
-      ]));
-      debugPrint('Playing ${widget.video}');
+      player.play();
     }
 
     final List<double> availableSpeed = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
