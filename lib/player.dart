@@ -166,7 +166,23 @@ class MyScreenState extends State<MyScreen> {
                         child: SizedBox(
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.width * 9.0 / 16.0,
-                      child: Video(controller: controller),
+                      child: Video(
+                        controller: controller,
+                        subtitleViewConfiguration:
+                            const SubtitleViewConfiguration(
+                          style: TextStyle(
+                            height: 1.4,
+                            fontSize: 42.0,
+                            letterSpacing: 0.0,
+                            wordSpacing: 0.0,
+                            color: Color(0xffffffff),
+                            fontWeight: FontWeight.normal,
+                            backgroundColor: Color(0xaa000000),
+                          ),
+                          textAlign: TextAlign.center,
+                          padding: EdgeInsets.all(24.0),
+                        ),
+                      ),
                     ))))
           ]),
         ));
