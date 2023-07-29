@@ -72,16 +72,16 @@ class MyScreenState extends State<MyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (!player.state.playing) {
-      player.open(
-          Media(widget.videoStream,
-              httpHeaders: {'User-Agent': AppConfig.userAgent}),
-          play: false);
-      debugPrint('Playing ${widget.video}');
-      // work-around ffmpeg bug #10149 and #10169
-      // mpv is plagged with the same problem/bug than ffmpeg, because it uses it somehow as back-end
-      // we use the same work-around by specifying video, audio and subtitle stream separately too
-      Future.microtask(() async {
+    Future.microtask(() async {
+      if (!player.state.playing) {
+        await player.open(
+            Media(widget.videoStream,
+                httpHeaders: {'User-Agent': AppConfig.userAgent}),
+            play: false);
+        debugPrint('Playing ${widget.video}');
+        // work-around ffmpeg bug #10149 and #10169
+        // mpv is plagged with the same problem/bug than ffmpeg, because it uses it somehow as back-end
+        // we use the same work-around by specifying video, audio and subtitle stream separately too
         if (widget.subtitle.isNotEmpty) {
           debugPrint('Playing with subtitle from ${widget.subtitle}');
           final data = await File(widget.subtitle).readAsString();
@@ -93,10 +93,10 @@ class MyScreenState extends State<MyScreen> {
             AudioTrack.uri(widget.audioStream),
           );
         }
-      });
-      player.setVolume(100);
-      player.play();
-    }
+        await player.setVolume(100);
+        await player.play();
+      }
+    });
 
     final List<double> availableSpeed = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
     final themeData = Theme.of(context);
