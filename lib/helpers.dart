@@ -203,16 +203,16 @@ class VideoData {
     return VideoData(
       programId: video['programId'],
       title: video['title'],
-      subtitle: video['subtitle'],
+      subtitle: video['subtitle']?.trim(),
       imageUrl: (video['mainImage']['url'])
           .replaceFirst('__SIZE__', '400x225')
           .replaceFirst('?type=TEXT', ''),
-      shortDescription: video['shortDescription'],
+      shortDescription: video['shortDescription']?.trim(),
       isCollection: video['kind']['isCollection'],
-      label: video['kind']['label'],
-      durationLabel: video['durationLabel'],
+      label: video['kind']['label']?.trim(),
+      durationLabel: video['durationLabel']?.trim(),
       url: video['url'],
-      teaserText: video['teaserText'],
+      teaserText: video['teaserText']?.trim(),
       ageRating: video['ageRating'],
       srcJson: !kReleaseMode ? json.encode(video) : null,
     );
