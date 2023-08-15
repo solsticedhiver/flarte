@@ -44,7 +44,8 @@ class MyScreenState extends State<MyScreen> {
     super.initState();
 
     subscription = player.stream.position.listen((event) {
-      if (event > player.state.duration * 0.9) {
+      if (player.state.duration != Duration.zero &&
+          event > player.state.duration * 0.9) {
         final ad = Provider.of<AppData>(context, listen: false);
         if (!ad.watched.contains(widget.video.programId)) {
           ad.addWatched(widget.video.programId);
