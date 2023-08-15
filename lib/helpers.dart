@@ -213,7 +213,7 @@ class VideoData {
       durationLabel: video['durationLabel']?.trim(),
       url: video['url'],
       teaserText: video['teaserText']?.trim(),
-      ageRating: video['ageRating'],
+      ageRating: video['ageRating'] ?? 0,
       srcJson: !kReleaseMode ? json.encode(video) : null,
     );
   }
