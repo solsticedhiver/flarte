@@ -145,7 +145,10 @@ class MyScreenState extends State<MyScreen> {
     ];
 
     return Scaffold(
-        appBar: AppBar(title: Text(widget.title)),
+        appBar: AppBar(
+            title: Text(widget.title),
+            backgroundColor: Colors.deepOrange,
+            foregroundColor: Colors.white),
         body: Card(
           elevation: 8.0,
           clipBehavior: Clip.antiAlias,

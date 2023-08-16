@@ -72,6 +72,8 @@ class _FlarteSettingsState extends State<FlarteSettings> {
     debugPrint(AppLocalizations.supportedLocales.toString());
     return Scaffold(
       appBar: AppBar(
+          backgroundColor: Colors.deepOrange,
+          foregroundColor: Colors.white,
           leading: BackButton(
             onPressed: () {
               Map<String, dynamic> settings = {

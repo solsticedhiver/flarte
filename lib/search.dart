@@ -129,7 +129,10 @@ class _SearchScreenState extends State<SearchScreen> {
     }
 
     return Scaffold(
-        appBar: AppBar(title: Text(AppLocalizations.of(context)!.strSearch)),
+        appBar: AppBar(
+            title: Text(AppLocalizations.of(context)!.strSearch),
+            backgroundColor: Colors.deepOrange,
+            foregroundColor: Colors.white),
         body: Center(
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

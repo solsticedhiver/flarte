@@ -108,7 +108,10 @@ class _SerieScreenState extends State<SerieScreen> {
           style: Theme.of(context).textTheme.titleMedium);
       if (zoneCount > 1) {
         body = Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-          Container(margin: const EdgeInsets.all(10), child: description),
+          Container(
+              margin: const EdgeInsets.only(
+                  left: 20, top: 10, bottom: 10, right: 10),
+              child: description),
           Expanded(
               flex: 2,
               child: Container(
@@ -173,6 +176,12 @@ class _SerieScreenState extends State<SerieScreen> {
       body = Center(child: Text(AppLocalizations.of(context)!.strFetching));
     }
 
-    return Scaffold(appBar: AppBar(title: Text(widget.title)), body: body);
+    return Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
+          backgroundColor: Colors.deepOrange,
+          foregroundColor: Colors.white,
+        ),
+        body: body);
   }
 }

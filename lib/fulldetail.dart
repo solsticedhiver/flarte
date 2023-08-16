@@ -147,7 +147,10 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
     }
 
     return Scaffold(
-        appBar: AppBar(title: Text(appBarTitle)),
+        appBar: AppBar(
+            title: Text(appBarTitle),
+            backgroundColor: Colors.deepOrange,
+            foregroundColor: Colors.white),
         body: Stack(children: [
           Container(
               padding: const EdgeInsets.all(15),
