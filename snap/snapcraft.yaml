@@ -1,6 +1,6 @@
 name: flarte
 base: core22
-version: '0.3.2'
+version: '0.3.3'
 icon: assets/flarte.png
 summary: View and download video from arte.tv catch up TV site
 description: |
