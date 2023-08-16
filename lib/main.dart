@@ -530,7 +530,12 @@ class CarouselList extends StatelessWidget {
                 onTap: () {
                   StatefulWidget screen;
                   if (v.isCollection) {
-                    screen = SerieScreen(title: v.title, url: v.url);
+                    screen = SerieScreen(
+                        title: v.title,
+                        url: v.url,
+                        description: v.shortDescription != null
+                            ? v.shortDescription!
+                            : v.subtitle!);
                   } else {
                     screen = FullDetailScreen(
                         videos: videos,

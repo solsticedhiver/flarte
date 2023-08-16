@@ -170,7 +170,12 @@ class _ShowDetailState extends State<ShowDetail> {
                                         MaterialPageRoute(
                                             builder: (context) => SerieScreen(
                                                 title: video.title,
-                                                url: video.url)));
+                                                url: video.url,
+                                                description: video
+                                                            .shortDescription !=
+                                                        null
+                                                    ? video.shortDescription!
+                                                    : video.subtitle!)));
                                   },
                                   child: Text(AppLocalizations.of(context)!
                                       .strEpisodes),
