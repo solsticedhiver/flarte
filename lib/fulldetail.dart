@@ -253,17 +253,15 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                             Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        SerieScreen(
-                                                          title: video.title,
-                                                          url: video.url,
-                                                          description: video
-                                                                      .shortDescription !=
-                                                                  null
-                                                              ? video
-                                                                  .shortDescription!
-                                                              : video.subtitle!,
-                                                        )));
+                                                    builder: (context) => SerieScreen(
+                                                        title: video.title,
+                                                        url: video.url,
+                                                        description: video
+                                                                .shortDescription ??
+                                                            video.subtitle ??
+                                                            AppLocalizations.of(
+                                                                    context)!
+                                                                .strEpisodes)));
                                           },
                                           child: Text(
                                               AppLocalizations.of(context)!

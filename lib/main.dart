@@ -533,9 +533,9 @@ class CarouselList extends StatelessWidget {
                     screen = SerieScreen(
                         title: v.title,
                         url: v.url,
-                        description: v.shortDescription != null
-                            ? v.shortDescription!
-                            : v.subtitle!);
+                        description: v.shortDescription ??
+                            v.subtitle ??
+                            AppLocalizations.of(context)!.strEpisodes);
                   } else {
                     screen = FullDetailScreen(
                         videos: videos,
