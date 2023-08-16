@@ -111,63 +111,61 @@ class _SerieScreenState extends State<SerieScreen> {
           Container(margin: const EdgeInsets.all(10), child: description),
           Expanded(
               flex: 2,
-              child: CarouselList(
-                data: Cache.parseJson(data),
-                size: CarouselListSize.normal,
-              ))
+              child: Container(
+                  margin: const EdgeInsets.all(10),
+                  child: CarouselList(
+                    data: Cache.parseJson(data),
+                    size: CarouselListSize.normal,
+                  )))
         ]);
       } else if (zoneCount > 0) {
         List<VideoData> videos =
             teasers.map((t) => VideoData.fromJson(t)).toList();
         body = Center(
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-              // ignore: sized_box_for_whitespace
-              Container(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          // ignore: sized_box_for_whitespace
+          Container(
+              margin: const EdgeInsets.all(10),
+              width: width,
+              child: description),
+          // ignore: sized_box_for_whitespace
+          Expanded(
+              flex: 2,
+              child: SizedBox(
                   width: width,
-                  margin: const EdgeInsets.all(10),
-                  child: description),
-              // ignore: sized_box_for_whitespace
-              Expanded(
-                  flex: 2,
-                  child: SizedBox(
-                      width: width,
-                      height: MediaQuery.sizeOf(context).height -
-                          (50 + 10 * 2 + 56),
-                      child: GridView.count(
-                        childAspectRatio: 1.0,
-                        crossAxisCount: count,
-                        children: videos.map((v) {
-                          return InkWell(
-                              onLongPress: () {
-                                _showDialogProgram(
-                                    context, videos, videos.indexOf(v));
-                              },
-                              onDoubleTap: () {
-                                _showDialogProgram(
-                                    context, videos, videos.indexOf(v));
-                              },
-                              onTap: () {
-                                //_showDialogProgram(context, Video.fromJson(t));
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => FullDetailScreen(
-                                              videos: videos,
-                                              index: videos.indexOf(v),
-                                              title: widget.title,
-                                            )));
-                              },
-                              child: VideoCard(
-                                  video: v,
-                                  size: CarouselListSize.normal,
-                                  useSubtitle: useSubtitle,
-                                  withShortDescription: true));
-                        }).toList(),
-                      )))
-            ]));
+                  child: GridView.count(
+                    childAspectRatio: 1.0,
+                    crossAxisCount: count,
+                    children: videos.map((v) {
+                      return InkWell(
+                          onLongPress: () {
+                            _showDialogProgram(
+                                context, videos, videos.indexOf(v));
+                          },
+                          onDoubleTap: () {
+                            _showDialogProgram(
+                                context, videos, videos.indexOf(v));
+                          },
+                          onTap: () {
+                            //_showDialogProgram(context, Video.fromJson(t));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => FullDetailScreen(
+                                          videos: videos,
+                                          index: videos.indexOf(v),
+                                          title: widget.title,
+                                        )));
+                          },
+                          child: VideoCard(
+                              video: v,
+                              size: CarouselListSize.normal,
+                              useSubtitle: useSubtitle,
+                              withShortDescription: true));
+                    }).toList(),
+                  )))
+        ]));
       } else {
         body = Center(child: Text(AppLocalizations.of(context)!.strNoResults));
       }

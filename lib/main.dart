@@ -514,7 +514,7 @@ class CarouselList extends StatelessWidget {
       thumbnails
           .add(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
-            padding: const EdgeInsets.only(top: 8, bottom: 8),
+            padding: const EdgeInsets.only(top: 8, bottom: 8, left: 8),
             child: Text('${z['title']} (${videos.length})',
                 style: Theme.of(context).textTheme.titleLarge)),
         Carousel(
@@ -550,22 +550,19 @@ class CarouselList extends StatelessWidget {
             }).toList())
       ]));
     }
-    return SingleChildScrollView(
-        // subtract NavigationRail width
-        child: Container(
-            width: MediaQuery.sizeOf(context).width,
-            height: MediaQuery.sizeOf(context).height,
-            padding: const EdgeInsets.all(10),
-            child: thumbnails.isNotEmpty
-                ? ListView.builder(
-                    itemCount: thumbnails.length,
-                    itemBuilder: (context, index) {
-                      return thumbnails[index];
-                    },
-                  )
-                : Center(
-                    child: Text(
-                        AppLocalizations.of(context)!.strNothingDisplay))));
+    Widget ret;
+    if (thumbnails.isNotEmpty) {
+      ret = ListView.builder(
+        itemCount: thumbnails.length,
+        itemBuilder: (context, index) {
+          return thumbnails[index];
+        },
+      );
+    } else {
+      ret =
+          Center(child: Text(AppLocalizations.of(context)!.strNothingDisplay));
+    }
+    return ret;
   }
 }
 
