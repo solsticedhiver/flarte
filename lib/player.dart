@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -114,35 +115,117 @@ class MyScreenState extends State<MyScreen> {
                 style:
                     TextStyle(color: Theme.of(context).colorScheme.onSurface))))
         .toList();
-    final List<Widget> bottomButtonBar = [
-      const MaterialDesktopPlayOrPauseButton(),
-      const MaterialDesktopVolumeButton(),
-      const MaterialDesktopPositionIndicator(),
-      const Spacer(),
-      Theme(
-          data: ThemeData.from(colorScheme: themeData.colorScheme),
-          child: PopupMenuButton<double>(
-              enableFeedback: false,
-              /*
+    Widget themeVideo;
+    const subtitleViewConfigutation = SubtitleViewConfiguration(
+      style: TextStyle(
+        height: 1.4,
+        fontSize: 42.0,
+        letterSpacing: 0.0,
+        wordSpacing: 0.0,
+        color: Color(0xffffffff),
+        fontWeight: FontWeight.normal,
+        backgroundColor: Color(0xaa000000),
+      ),
+      textAlign: TextAlign.center,
+      padding: EdgeInsets.all(24.0),
+    );
+    if (Platform.isLinux || Platform.isWindows) {
+      final List<Widget> bottomDesktopButtonBar = [
+        const MaterialDesktopPlayOrPauseButton(),
+        const MaterialDesktopVolumeButton(),
+        const MaterialDesktopPositionIndicator(),
+        const Spacer(),
+        Theme(
+            data: ThemeData.from(colorScheme: themeData.colorScheme),
+            child: PopupMenuButton<double>(
+                enableFeedback: false,
+                /*
               onSelected: (value) {
                 debugPrint('rate play speed set to $value');
                 player.setRate(value);
               },
               */
-              color: Theme.of(context).colorScheme.surface,
-              initialValue: playSpeed,
-              // no tooltip because other buttons don't have one for now
-              splashRadius: 20,
-              tooltip: '',
-              itemBuilder: (context) {
-                return availableSpeedItems;
+                color: Theme.of(context).colorScheme.surface,
+                initialValue: playSpeed,
+                // no tooltip because other buttons don't have one for now
+                splashRadius: 20,
+                tooltip: '',
+                itemBuilder: (context) {
+                  return availableSpeedItems;
+                },
+                icon: Icon(
+                  Icons.speed,
+                  color: Theme.of(context).colorScheme.onBackground,
+                ))),
+        const MaterialDesktopFullscreenButton(),
+      ];
+
+      themeVideo = MaterialDesktopVideoControlsTheme(
+          normal: MaterialDesktopVideoControlsThemeData(
+              seekBarPositionColor: Colors.deepOrange,
+              seekBarThumbColor: Colors.deepOrange,
+              bottomButtonBar: bottomDesktopButtonBar),
+          fullscreen: MaterialDesktopVideoControlsThemeData(
+              seekBarPositionColor: Colors.deepOrange,
+              seekBarThumbColor: Colors.deepOrange,
+              bottomButtonBar: bottomDesktopButtonBar),
+          child: Center(
+              child: SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.width * 9.0 / 16.0,
+            child: Video(
+              controller: controller,
+              subtitleViewConfiguration: subtitleViewConfigutation,
+            ),
+          )));
+    } else {
+      final List<Widget> bottomButtonBar = [
+        const MaterialPositionIndicator(),
+        const Spacer(),
+        Theme(
+            data: ThemeData.from(colorScheme: themeData.colorScheme),
+            child: PopupMenuButton<double>(
+                enableFeedback: false,
+                /*
+              onSelected: (value) {
+                debugPrint('rate play speed set to $value');
+                player.setRate(value);
               },
-              icon: Icon(
-                Icons.speed,
-                color: Theme.of(context).colorScheme.onBackground,
-              ))),
-      const MaterialDesktopFullscreenButton(),
-    ];
+              */
+                color: Theme.of(context).colorScheme.surface,
+                initialValue: playSpeed,
+                // no tooltip because other buttons don't have one for now
+                splashRadius: 20,
+                tooltip: '',
+                itemBuilder: (context) {
+                  return availableSpeedItems;
+                },
+                icon: Icon(
+                  Icons.speed,
+                  color: Theme.of(context).colorScheme.onBackground,
+                ))),
+        const MaterialFullscreenButton(),
+      ];
+
+      themeVideo = MaterialVideoControlsTheme(
+          normal: MaterialVideoControlsThemeData(
+              seekBarPositionColor: Colors.deepOrange,
+              seekBarThumbColor: Colors.deepOrange,
+              bottomButtonBar: bottomButtonBar),
+          fullscreen: MaterialVideoControlsThemeData(
+              seekBarPositionColor: Colors.deepOrange,
+              seekBarThumbColor: Colors.deepOrange,
+              bottomButtonBar: bottomButtonBar),
+          child: Center(
+              child: SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.width * 9.0 / 16.0,
+            child: Video(
+              controller: controller,
+              subtitleViewConfiguration: subtitleViewConfigutation,
+            ),
+          )));
+    }
 
     return Scaffold(
         appBar: AppBar(
@@ -155,39 +238,7 @@ class MyScreenState extends State<MyScreen> {
           margin: const EdgeInsets.all(10),
           child: Stack(children: [
             Center(child: Text(AppLocalizations.of(context)!.strInitStream)),
-            Visibility(
-                visible: isVideoPlayalable,
-                child: MaterialDesktopVideoControlsTheme(
-                    normal: MaterialDesktopVideoControlsThemeData(
-                        seekBarPositionColor: Colors.deepOrange,
-                        seekBarThumbColor: Colors.deepOrange,
-                        bottomButtonBar: bottomButtonBar),
-                    fullscreen: MaterialDesktopVideoControlsThemeData(
-                        seekBarPositionColor: Colors.deepOrange,
-                        seekBarThumbColor: Colors.deepOrange,
-                        bottomButtonBar: bottomButtonBar),
-                    child: Center(
-                        child: SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.width * 9.0 / 16.0,
-                      child: Video(
-                        controller: controller,
-                        subtitleViewConfiguration:
-                            const SubtitleViewConfiguration(
-                          style: TextStyle(
-                            height: 1.4,
-                            fontSize: 42.0,
-                            letterSpacing: 0.0,
-                            wordSpacing: 0.0,
-                            color: Color(0xffffffff),
-                            fontWeight: FontWeight.normal,
-                            backgroundColor: Color(0xaa000000),
-                          ),
-                          textAlign: TextAlign.center,
-                          padding: EdgeInsets.all(24.0),
-                        ),
-                      ),
-                    ))))
+            Visibility(visible: isVideoPlayalable, child: themeVideo)
           ]),
         ));
   }
