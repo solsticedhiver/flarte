@@ -57,23 +57,6 @@ class MyScreenState extends State<MyScreen> {
 
     player.setRate(playSpeed);
 
-    controller.waitUntilFirstFrameRendered.then((value) {
-      setState(() {
-        isVideoPlayalable = true;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    subscription.cancel();
-    player.stop();
-    player.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     Future.microtask(() async {
       if (!player.state.playing) {
         await player.open(
@@ -100,6 +83,23 @@ class MyScreenState extends State<MyScreen> {
       }
     });
 
+    controller.waitUntilFirstFrameRendered.then((value) {
+      setState(() {
+        isVideoPlayalable = true;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    subscription.cancel();
+    player.stop();
+    player.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final List<double> availableSpeed = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
     final themeData = Theme.of(context);
     final List<PopupMenuItem<double>> availableSpeedItems = availableSpeed
@@ -237,7 +237,9 @@ class MyScreenState extends State<MyScreen> {
           clipBehavior: Clip.antiAlias,
           margin: const EdgeInsets.all(10),
           child: Stack(children: [
-            Center(child: Text(AppLocalizations.of(context)!.strInitStream)),
+            SizedBox.expand(
+                child: Center(
+                    child: Text(AppLocalizations.of(context)!.strInitStream))),
             Visibility(visible: isVideoPlayalable, child: themeVideo)
           ]),
         ));
