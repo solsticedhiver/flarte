@@ -71,6 +71,8 @@ class MyScreenState extends State<MyScreen> {
           debugPrint('Playing with subtitle from ${widget.subtitle}');
           final data = await File(widget.subtitle).readAsString();
           await player.setSubtitleTrack(SubtitleTrack.data(data));
+        } else {
+          await player.setSubtitleTrack(SubtitleTrack.no());
         }
         if (widget.audioStream.isNotEmpty) {
           debugPrint('Playing audio from ${widget.audioStream}');
