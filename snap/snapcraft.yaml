@@ -17,13 +17,41 @@ architectures:
   - build-on: [ amd64 ]
 
 parts:
+  libmpv:
+    source: https://github.com/mpv-player/mpv.git
+    source-type: git
+    source-tag: v0.36.0
+    plugin: meson
+    meson-parameters: ['-Dbuild-date=false', '-Dlibmpv=true', '-Dcplayer=false', '--prefix=/usr']
+    build-packages:
+      - libavcodec-dev
+      - libavfilter-dev
+      - libass-dev
+      - libavformat-dev
+      - libavutil-dev
+      - libswresample-dev
+      - libswscale-dev
+      - libasound2-dev
+      - libpulse-dev
+      - libgl-dev
+      - libegl-dev
+      - libglx-dev
+      - pkg-config
+    stage:
+      - "usr/include/mpv/*"
+      - "usr/lib/$SNAPCRAFT_ARCH_TRIPLET/*"
   flarte:
     source: .
     plugin: flutter
     flutter-target: lib/main.dart
     flutter-channel: stable
-    build-packages: [pkg-config, ninja-build, cmake, libgtk-3-dev, libmpv-dev, mpv]
-    stage-packages: [libmpv1, libblas3, liblapack3, ffmpeg]
+    build-packages: [pkg-config, ninja-build, cmake, libgtk-3-dev]
+    build-environment: # WTF: libmpv.so.2 is not found without this
+      - LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAPCRAFT_STAGE/usr/lib/$SNAPCRAFT_ARCH_TRIPLET"
+      #- LDFLAGS: "$LDFLAGS -L$SNAPCRAFT_STAGE/usr/lib/$SNAPCRAFT_ARCH_TRIPLET"
+    stage-packages: [libblas3, liblapack3, ffmpeg]
+    after:
+      - libmpv
   cleanup:
     after:
       - flarte
