@@ -31,10 +31,9 @@ modules:
       - --disable-libv4l2
       - --enable-libdav1d
     sources:
-      - type: git
-        url: https://github.com/FFmpeg/FFmpeg.git
-        tag: n6.0
-
+      - type: archive
+        url: https://ffmpeg.org/releases/ffmpeg-6.0.tar.gz
+        sha256: f4ccf961403752c93961927715f524576d1f4dd02cd76d8c76aed3bbe6686656
   - name: libass
     cleanup:
       - '/include'
@@ -43,9 +42,9 @@ modules:
     config-opts:
       - --disable-static
     sources:
-      - type: git
-        url: https://github.com/libass/libass.git
-        tag: 0.17.1
+      - type: archive
+        url: https://github.com/libass/libass/releases/download/0.17.1/libass-0.17.1.tar.gz
+        sha256: d653be97198a0543c69111122173c41a99e0b91426f9e17f06a858982c2fb03d
 
   - name: libmpv
     cleanup:
@@ -58,9 +57,9 @@ modules:
       - -Dlibmpv=true
       - -Dcplayer=false
     sources:
-      - type: git
-        url: https://github.com/mpv-player/mpv.git
-        tag: v0.36.0
+      - type: archive
+        url: https://github.com/mpv-player/mpv/archive/refs/tags/v0.36.0.tar.gz
+        sha256: 29abc44f8ebee013bb2f9fe14d80b30db19b534c679056e4851ceadf5a5e8bf6
     
   - name: Flarte
     buildsystem: simple
