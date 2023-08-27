@@ -10,7 +10,7 @@ jobs:
     outputs:
       output1: ${{ steps.version.outputs.version }}
     container:
-      image: bilelmoussaoui/flatpak-github-actions:gnome-44
+      image: bilelmoussaoui/flatpak-github-actions:freedesktop-22.08
       options: --privileged
     steps:
     - name: Checkout repo
