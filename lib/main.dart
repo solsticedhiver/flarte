@@ -100,7 +100,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    const pageTransitionsTheme = PageTransitionsTheme(
+    PageTransitionsTheme pageTransitionsTheme = const PageTransitionsTheme(
       builders: {
         // TODO: change transition to ZoomPageTransitionsBuilder() when media_kit fixes their issue#64
         TargetPlatform.android: OpenUpwardsPageTransitionsBuilder(),

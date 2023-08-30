@@ -15,14 +15,14 @@ class MyScreen extends StatefulWidget {
   final String title;
   final String videoStream;
   final String audioStream;
-  final String subtitle;
+  final String subtitleData;
   final VideoData video;
   const MyScreen(
       {super.key,
       required this.title,
       required this.videoStream,
       required this.audioStream,
-      required this.subtitle,
+      required this.subtitleData,
       required this.video});
 
   @override
@@ -61,21 +61,19 @@ class MyScreenState extends State<MyScreen> {
       if (!player.state.playing) {
         await player.open(
             Media(widget.videoStream,
-                httpHeaders: {'User-Agent': AppConfig.userAgent}),
+                httpHeaders:
+                    kIsWeb ? null : {'User-Agent': AppConfig.userAgent}),
             play: false);
-        debugPrint('Playing ${widget.video}');
         // work-around ffmpeg bug #10149 and #10169
         // mpv is plagged with the same problem/bug than ffmpeg, because it uses it somehow as back-end
         // we use the same work-around by specifying video, audio and subtitle stream separately too
-        if (widget.subtitle.isNotEmpty) {
-          debugPrint('Playing with subtitle from ${widget.subtitle}');
-          final data = await File(widget.subtitle).readAsString();
-          await player.setSubtitleTrack(SubtitleTrack.data(data));
-        } else {
+        if (widget.subtitleData.isNotEmpty) {
+          await player
+              .setSubtitleTrack(SubtitleTrack.data(widget.subtitleData));
+        } else if (!kIsWeb) {
           await player.setSubtitleTrack(SubtitleTrack.no());
         }
         if (widget.audioStream.isNotEmpty) {
-          debugPrint('Playing audio from ${widget.audioStream}');
           await player.setAudioTrack(
             AudioTrack.uri(widget.audioStream),
           );
@@ -117,7 +115,7 @@ class MyScreenState extends State<MyScreen> {
                 style:
                     TextStyle(color: Theme.of(context).colorScheme.onSurface))))
         .toList();
-    Widget themeVideo;
+    Widget themeVideo = SizedBox.shrink(); // to make the compiler happy
     const subtitleViewConfigutation = SubtitleViewConfiguration(
       style: TextStyle(
         height: 1.4,
@@ -131,7 +129,75 @@ class MyScreenState extends State<MyScreen> {
       textAlign: TextAlign.center,
       padding: EdgeInsets.all(24.0),
     );
-    if (Platform.isLinux || Platform.isWindows) {
+
+    int method = 1;
+    if (kIsWeb) {
+      method = 2;
+      // TODO: fix it to customize the toolbar
+    } else if (Platform.isAndroid) {
+      method = 2;
+    } else if (Platform.isLinux || Platform.isWindows) {
+      method = 1;
+    }
+    /*
+      themeVideo = Center(
+          child: SizedBox(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.width * 9.0 / 16.0,
+        child: Video(
+          controller: controller,
+          subtitleViewConfiguration: subtitleViewConfigutation,
+        ),
+      ));
+      */
+    if (method == 2) {
+      final List<Widget> bottomButtonBar = [
+        const MaterialPositionIndicator(),
+        const Spacer(),
+        Theme(
+            data: ThemeData.from(colorScheme: themeData.colorScheme),
+            child: PopupMenuButton<double>(
+                enableFeedback: false,
+                /*
+              onSelected: (value) {
+                debugPrint('rate play speed set to $value');
+                player.setRate(value);
+              },
+              */
+                color: Theme.of(context).colorScheme.surface,
+                initialValue: playSpeed,
+                // no tooltip because other buttons don't have one for now
+                splashRadius: 20,
+                tooltip: '',
+                itemBuilder: (context) {
+                  return availableSpeedItems;
+                },
+                icon: Icon(
+                  Icons.speed,
+                  color: Theme.of(context).colorScheme.onBackground,
+                ))),
+        const MaterialFullscreenButton(),
+      ];
+
+      themeVideo = MaterialVideoControlsTheme(
+          normal: MaterialVideoControlsThemeData(
+              seekBarPositionColor: Colors.deepOrange,
+              seekBarThumbColor: Colors.deepOrange,
+              bottomButtonBar: bottomButtonBar),
+          fullscreen: MaterialVideoControlsThemeData(
+              seekBarPositionColor: Colors.deepOrange,
+              seekBarThumbColor: Colors.deepOrange,
+              bottomButtonBar: bottomButtonBar),
+          child: Center(
+              child: SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.width * 9.0 / 16.0,
+            child: Video(
+              controller: controller,
+              subtitleViewConfiguration: subtitleViewConfigutation,
+            ),
+          )));
+    } else if (method == 1) {
       final List<Widget> bottomDesktopButtonBar = [
         const MaterialDesktopPlayOrPauseButton(),
         const MaterialDesktopVolumeButton(),
@@ -171,53 +237,6 @@ class MyScreenState extends State<MyScreen> {
               seekBarPositionColor: Colors.deepOrange,
               seekBarThumbColor: Colors.deepOrange,
               bottomButtonBar: bottomDesktopButtonBar),
-          child: Center(
-              child: SizedBox(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.width * 9.0 / 16.0,
-            child: Video(
-              controller: controller,
-              subtitleViewConfiguration: subtitleViewConfigutation,
-            ),
-          )));
-    } else {
-      final List<Widget> bottomButtonBar = [
-        const MaterialPositionIndicator(),
-        const Spacer(),
-        Theme(
-            data: ThemeData.from(colorScheme: themeData.colorScheme),
-            child: PopupMenuButton<double>(
-                enableFeedback: false,
-                /*
-              onSelected: (value) {
-                debugPrint('rate play speed set to $value');
-                player.setRate(value);
-              },
-              */
-                color: Theme.of(context).colorScheme.surface,
-                initialValue: playSpeed,
-                // no tooltip because other buttons don't have one for now
-                splashRadius: 20,
-                tooltip: '',
-                itemBuilder: (context) {
-                  return availableSpeedItems;
-                },
-                icon: Icon(
-                  Icons.speed,
-                  color: Theme.of(context).colorScheme.onBackground,
-                ))),
-        const MaterialFullscreenButton(),
-      ];
-
-      themeVideo = MaterialVideoControlsTheme(
-          normal: MaterialVideoControlsThemeData(
-              seekBarPositionColor: Colors.deepOrange,
-              seekBarThumbColor: Colors.deepOrange,
-              bottomButtonBar: bottomButtonBar),
-          fullscreen: MaterialVideoControlsThemeData(
-              seekBarPositionColor: Colors.deepOrange,
-              seekBarThumbColor: Colors.deepOrange,
-              bottomButtonBar: bottomButtonBar),
           child: Center(
               child: SizedBox(
             width: MediaQuery.of(context).size.width,

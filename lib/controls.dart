@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hls_parser/flutter_hls_parser.dart' as hls;
 import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
 import 'package:process/process.dart';
 import 'package:path/path.dart' as path;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -176,7 +175,7 @@ class _VideoButtonsState extends State<VideoButtons> {
     return "${video.programId}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat.resolution}.mp4";
   }
 
-  Future<void> _webvtt(Uri url, String subFilename) async {
+  Future<String> _webvtt(Uri url) async {
     final req = await http.get(url);
     String resp = utf8.decode(req.bodyBytes);
     StringBuffer webvtt = StringBuffer('');
@@ -191,7 +190,7 @@ class _VideoButtonsState extends State<VideoButtons> {
         webvtt.writeln(line.trim());
       }
     }
-    await File(subFilename).writeAsString(webvtt.toString(), flush: true);
+    return webvtt.toString();
   }
 
   void _ffmpeg() async {
@@ -297,7 +296,8 @@ class _VideoButtonsState extends State<VideoButtons> {
         // WORKAROUND: because of ffmpeg bug #10169, remove all STYLE blocks in webvtt
         subFilename = stream.subtitle.toString().split('/').last;
         final subn = path.join(cwd, subFilename);
-        await _webvtt(stream.subtitle!, subn);
+        final subtitle = await _webvtt(stream.subtitle!);
+        await File(subn).writeAsString(subtitle, flush: true);
         debugPrint(subn);
         cmd =
             '$ffmpeg -i $videoFilename -i $audioFilename -i $subFilename -map 0:v -map 1:a -map 2:s -c:v copy -c:a copy -c:s mov_text $outputFilename';
@@ -421,9 +421,8 @@ class _VideoButtonsState extends State<VideoButtons> {
 
   void _libmpv() async {
     String title = '';
-    String? subtitle = video.subtitle;
-    if (subtitle != null && subtitle.isNotEmpty) {
-      title = '${video.title} / $subtitle';
+    if (video.subtitle != null && video.subtitle!.isNotEmpty) {
+      title = '${video.title} / ${video.subtitle}';
     } else {
       title = video.title;
     }
@@ -437,24 +436,35 @@ class _VideoButtonsState extends State<VideoButtons> {
       stream = await MediaStream.getMediaPlaylist(
           selectedVersion.url, selectedFormat.resolution);
     }
-    String subFilename = '';
+    debugPrint('Playing $video');
+    String subtitleData = '';
     if (stream.subtitle != null) {
-      Directory tmpDir = await getTemporaryDirectory();
-      debugPrint(tmpDir.toString());
-      subFilename =
-          path.join(tmpDir.path, stream.subtitle.toString().split('/').last);
-      await _webvtt(stream.subtitle!, subFilename);
+      subtitleData = await _webvtt(stream.subtitle!);
+      debugPrint('Playing with subtitle from ${stream.subtitle}');
     }
     debugPrint(stream.toString());
     if (!context.mounted) return;
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      if (Platform.isLinux || Platform.isWindows || Platform.isAndroid) {
+      if (kIsWeb ||
+          Platform.isLinux ||
+          Platform.isWindows ||
+          Platform.isAndroid) {
+        String videoStream, audioStream = '';
+        if (kIsWeb) {
+          videoStream = selectedVersion.url;
+        } else {
+          videoStream = stream.video!.toString();
+          if (stream.audio != null) {
+            audioStream = stream.audio.toString();
+            debugPrint('Playing audio from $audioStream');
+          }
+        }
         return MyScreen(
             title:
                 '$title [${selectedVersion.shortLabel}, ${selectedFormat.resolution}]',
-            videoStream: stream.video!.toString(),
-            audioStream: stream.audio != null ? stream.audio.toString() : '',
-            subtitle: subFilename,
+            videoStream: videoStream,
+            audioStream: audioStream,
+            subtitleData: subtitleData,
             video: video);
       } else {
         return Center(child: Text(AppLocalizations.of(context)!.strNotImpl));
@@ -468,7 +478,7 @@ class _VideoButtonsState extends State<VideoButtons> {
       IconButton(
         icon: const Icon(Icons.play_arrow),
         tooltip: AppLocalizations.of(context)!.strPlay,
-        onPressed: versions.isNotEmpty && formats.isNotEmpty && !kIsWeb
+        onPressed: versions.isNotEmpty && formats.isNotEmpty
             ? () {
                 if (AppConfig.player == PlayerTypeName.embedded) {
                   _libmpv();
@@ -556,6 +566,7 @@ class _VideoButtonsState extends State<VideoButtons> {
               hint: const Text('Format'),
               value: selectedFormat,
               selectedItemBuilder: (BuildContext context) {
+                debugPrint(formats.toString());
                 return formats.map<Widget>((f) {
                   return Container(
                     padding: const EdgeInsets.only(left: 10),
