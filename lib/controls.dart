@@ -36,7 +36,7 @@ class VideoButtons extends StatefulWidget {
 
 class _VideoButtonsState extends State<VideoButtons> {
   late Version selectedVersion;
-  late Format selectedFormat;
+  Format? selectedFormat;
   List<Version> versions = [];
   List<DropdownMenuItem<Version>> versionItems = [];
   List<DropdownMenuItem<Format>> formatItems = [];
@@ -61,8 +61,7 @@ class _VideoButtonsState extends State<VideoButtons> {
         debugPrint(cv.toString());
         if (cv.isNotEmpty && mounted) {
           setState(() {
-            versions.clear();
-            versions.addAll(cv);
+            versions = cv;
             selectedVersion = versions.first;
             debugPrint(selectedVersion.url);
             versionItems = versions
@@ -71,7 +70,21 @@ class _VideoButtonsState extends State<VideoButtons> {
                 .toList();
           });
           video.versions = versions;
-          _getFormats(selectedVersion.url);
+        }
+        final tf = await _getFormats(selectedVersion.url);
+        if (tf.isNotEmpty && mounted) {
+          setState(() {
+            formats = tf;
+            if (formats.length - 1 >= AppConfig.playerIndexQuality) {
+              selectedFormat = formats[AppConfig.playerIndexQuality];
+            } else {
+              selectedFormat = formats.last;
+            }
+            formatItems = formats
+                .map((e) => DropdownMenuItem<Format>(
+                    value: e, child: Text('${e.resolution.split('x').last}p')))
+                .toList();
+          });
         }
       } catch (e) {
         final error = e as Map<String, dynamic>;
@@ -111,7 +124,7 @@ class _VideoButtonsState extends State<VideoButtons> {
     return cv;
   }
 
-  void _getFormats(String url) async {
+  Future<List<Format>> _getFormats(String url) async {
     // directly parse the .m3u8 to get the bandwidth value to pass to libmpv backend
     final cache = Provider.of<Cache>(context, listen: false);
     final resp = await cache.get(url, isJson: false);
@@ -143,36 +156,11 @@ class _VideoButtonsState extends State<VideoButtons> {
       return aa.compareTo(bb);
     });
     debugPrint(tf.toString());
-    if (tf.isNotEmpty && mounted) {
-      setState(() {
-        formats.clear();
-        formats.addAll(tf);
-        // try to keep the previously defined resolution, if initiliazed
-        try {
-          final _ = selectedFormat;
-          for (var f in formats) {
-            if (f.resolution == selectedFormat.resolution) {
-              selectedFormat = f;
-              break;
-            }
-          }
-        } catch (e) {
-          if (formats.length - 1 >= AppConfig.playerIndexQuality) {
-            selectedFormat = formats[AppConfig.playerIndexQuality];
-          } else {
-            selectedFormat = formats.last;
-          }
-        }
-        formatItems = formats
-            .map((e) => DropdownMenuItem<Format>(
-                value: e, child: Text('${e.resolution.split('x').last}p')))
-            .toList();
-      });
-    }
+    return tf;
   }
 
   String _outputFilename() {
-    return "${video.programId}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat.resolution}.mp4";
+    return "${video.programId}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat!.resolution}.mp4";
   }
 
   Future<String> _webvtt(Uri url) async {
@@ -197,7 +185,7 @@ class _VideoButtonsState extends State<VideoButtons> {
     final cwd = AppConfig.dlDirectory;
     debugPrint(cwd);
     final outputFilename =
-        '${video.programId}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat.resolution}.mp4';
+        '${video.programId}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat!.resolution}.mp4';
     debugPrint(outputFilename);
     final messengerState = ScaffoldMessenger.of(context);
     final themeData = Theme.of(context);
@@ -214,11 +202,11 @@ class _VideoButtonsState extends State<VideoButtons> {
     MediaStream stream;
     try {
       stream = await MediaStream.getMediaStream(
-          selectedVersion.url, selectedFormat.resolution);
+          selectedVersion.url, selectedFormat!.resolution);
     } catch (e) {
       // this is a TS stream with no separate audio stream, causing the timed_id3 error
       stream = await MediaStream.getMediaPlaylist(
-          selectedVersion.url, selectedFormat.resolution);
+          selectedVersion.url, selectedFormat!.resolution);
     }
     debugPrint(stream.toString());
     ProcessManager mgr = const LocalProcessManager();
@@ -379,7 +367,7 @@ class _VideoButtonsState extends State<VideoButtons> {
         '--play-and-exit',
         '--quiet',
         '--http-user-agent="${AppConfig.userAgent}"',
-        '--adaptive-maxheight=${selectedFormat.resolution.split('x').last}',
+        '--adaptive-maxheight=${selectedFormat!.resolution.split('x').last}',
         selectedVersion.url
       ];
     } else {
@@ -390,7 +378,7 @@ class _VideoButtonsState extends State<VideoButtons> {
         '--http-user-agent',
         AppConfig.userAgent,
         '--adaptive-maxheight',
-        selectedFormat.resolution.split('x').last,
+        selectedFormat!.resolution.split('x').last,
         selectedVersion.url
       ];
     }
@@ -430,11 +418,11 @@ class _VideoButtonsState extends State<VideoButtons> {
     MediaStream stream;
     try {
       stream = await MediaStream.getMediaStream(
-          selectedVersion.url, selectedFormat.resolution);
+          selectedVersion.url, selectedFormat!.resolution);
     } catch (e) {
       // this is a TS stream with no separate audio stream, causing the timed_id3 error
       stream = await MediaStream.getMediaPlaylist(
-          selectedVersion.url, selectedFormat.resolution);
+          selectedVersion.url, selectedFormat!.resolution);
     }
     debugPrint('Playing $video');
     String subtitleData = '';
@@ -461,7 +449,7 @@ class _VideoButtonsState extends State<VideoButtons> {
         }
         return MyScreen(
             title:
-                '$title [${selectedVersion.shortLabel}, ${selectedFormat.resolution}]',
+                '$title [${selectedVersion.shortLabel}, ${selectedFormat!.resolution}]',
             videoStream: videoStream,
             audioStream: audioStream,
             subtitleData: subtitleData,
@@ -551,12 +539,39 @@ class _VideoButtonsState extends State<VideoButtons> {
               },
               value: selectedVersion,
               items: versionItems,
-              onChanged: (value) {
+              onChanged: (value) async {
                 setState(() {
                   selectedVersion = value!;
                   debugPrint(selectedVersion.url);
-                  _getFormats(selectedVersion.url);
                 });
+
+                final tf = await _getFormats(selectedVersion.url);
+                if (tf.isNotEmpty && mounted) {
+                  setState(() {
+                    formats = tf;
+                    formatItems = formats
+                        .map((e) => DropdownMenuItem<Format>(
+                            value: e,
+                            child: Text('${e.resolution.split('x').last}p')))
+                        .toList();
+                    // try to keep the previously defined resolution, if initiliazed
+                    final previouSelectedFormat = selectedFormat;
+                    selectedFormat = null;
+                    for (var f in formats) {
+                      if (f.resolution == previouSelectedFormat!.resolution) {
+                        selectedFormat = f;
+                        break;
+                      }
+                    }
+                    if (selectedFormat == null) {
+                      if (formats.length - 1 >= AppConfig.playerIndexQuality) {
+                        selectedFormat = formats[AppConfig.playerIndexQuality];
+                      } else {
+                        selectedFormat = formats.last;
+                      }
+                    }
+                  });
+                }
               })
           : const SizedBox(height: 24),
       const SizedBox(width: 10),
