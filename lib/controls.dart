@@ -436,6 +436,7 @@ class _VideoButtonsState extends State<VideoButtons> {
       if (kIsWeb ||
           Platform.isLinux ||
           Platform.isWindows ||
+          Platform.isMacOS ||
           Platform.isAndroid) {
         String videoStream, audioStream = '';
         if (kIsWeb) {
