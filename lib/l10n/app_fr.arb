@@ -65,5 +65,9 @@
     "strYes": "Oui",
     "strNo": "Non",
     "strAgeRating": "Limite âge",
-    "strViewable": "Visible"
+    "strViewable": "Visible",
+    "strYouAreAboutToWatch": "Le programme que vous vous apprétez à regarder comporte des scènes déconseillées à un public jeune ou sensible.",
+    "strCancel": "Annuler",
+    "strContinue": "Continuer",
+    "strWarning": "Avertissement"
 }

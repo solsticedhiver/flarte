@@ -65,5 +65,9 @@
     "strYes": "Ja",
     "strNo": "Nein",
     "strAgeRating": "Altersfreigabe",
-    "strViewable": "Sichtbar"
+    "strViewable": "Sichtbar",
+    "strYouAreAboutToWatch": "Die Sendung, die Sie gerade ansehen, enthält Szenen, die nicht für junge oder sensible Zuschauer geeignet sind.",
+    "strCancel": "Abbrechen",
+    "strContinue": "Weiter",
+    "strWarning": "Warnung"
 }

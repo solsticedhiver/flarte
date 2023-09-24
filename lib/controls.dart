@@ -465,7 +465,7 @@ class _VideoButtonsState extends State<VideoButtons> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Warning'),
+          title: Text(AppLocalizations.of(context)!.strWarning),
           content: Column(mainAxisSize: MainAxisSize.min, children: [
             CircleAvatar(
               radius: 24,
@@ -475,15 +475,14 @@ class _VideoButtonsState extends State<VideoButtons> {
                       color: Colors.white, fontWeight: FontWeight.bold)),
             ),
             const SizedBox(height: 10),
-            const Text(
-                'The program you are about to watch contains scenes not recommended for young or sensitive audiences.'),
+            Text(AppLocalizations.of(context)!.strYouAreAboutToWatch),
           ]),
           actions: <Widget>[
             TextButton(
               style: TextButton.styleFrom(
                 textStyle: Theme.of(context).textTheme.labelLarge,
               ),
-              child: const Text('Cancel'),
+              child: Text(AppLocalizations.of(context)!.strCancel),
               onPressed: () {
                 Navigator.of(context).pop(false);
               },
@@ -492,7 +491,7 @@ class _VideoButtonsState extends State<VideoButtons> {
               style: TextButton.styleFrom(
                 textStyle: Theme.of(context).textTheme.labelLarge,
               ),
-              child: const Text('Continue'),
+              child: Text(AppLocalizations.of(context)!.strContinue),
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
