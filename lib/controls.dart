@@ -460,6 +460,49 @@ class _VideoButtonsState extends State<VideoButtons> {
     }));
   }
 
+  Future<bool?> _displayAgeWarning(BuildContext context, int ageRating) {
+    return showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Warning'),
+          content: Column(mainAxisSize: MainAxisSize.min, children: [
+            CircleAvatar(
+              radius: 24,
+              backgroundColor: Colors.black87,
+              child: Text('-${video.ageRating}',
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+                'The program you are about to watch contains scenes not recommended for young or sensitive audiences.'),
+          ]),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Continue'),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> top = [
@@ -468,11 +511,22 @@ class _VideoButtonsState extends State<VideoButtons> {
         tooltip: AppLocalizations.of(context)!.strPlay,
         onPressed: versions.isNotEmpty && formats.isNotEmpty
             ? () {
-                if (AppConfig.player == PlayerTypeName.embedded) {
-                  _libmpv();
-                } else if (AppConfig.player == PlayerTypeName.vlc) {
-                  _vlc();
-                }
+                Future.microtask(() async {
+                  bool? showVideo;
+                  if (video.ageRating != 0) {
+                    showVideo =
+                        await _displayAgeWarning(context, video.ageRating);
+                  } else {
+                    showVideo = true;
+                  }
+                  if (showVideo != null && showVideo!) {
+                    if (AppConfig.player == PlayerTypeName.embedded) {
+                      _libmpv();
+                    } else if (AppConfig.player == PlayerTypeName.vlc) {
+                      _vlc();
+                    }
+                  }
+                });
               }
             : null,
       ),
