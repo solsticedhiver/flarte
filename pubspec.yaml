@@ -39,9 +39,9 @@ dependencies:
   cached_network_image: ^3.2.3
   provider: ^6.0.5
   process: ^4.2.4
-  media_kit: ^1.1.8
-  media_kit_video: ^1.2.1
-  media_kit_libs_video: ^1.0.3
+  media_kit: ^1.1.10
+  media_kit_video: ^1.2.4
+  media_kit_libs_video: ^1.0.4
   xdg_directories: ^1.0.1
   path: ^1.8.2
   html: ^0.15.2
