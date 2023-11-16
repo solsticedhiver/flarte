@@ -94,19 +94,30 @@ enum PlayerTypeName { embedded, vlc, custom }
 class Version {
   String shortLabel;
   String label;
-  String url;
-  Version({required this.shortLabel, required this.label, required this.url});
+  Uri url;
+  String audioLanguage;
+  String? subtitleLanguage;
+
+  Version(
+      {required this.shortLabel,
+      required this.label,
+      required this.url,
+      required this.audioLanguage,
+      this.subtitleLanguage});
 
   @override
   String toString() {
-    return 'Version($shortLabel, $label)';
+    return 'Version($shortLabel/$audioLanguage, $label)';
   }
 }
 
 class Format {
   String resolution;
   String bandwidth; // used with media_kit/libmpv player
-  Format({required this.resolution, required this.bandwidth});
+  Uri url;
+
+  Format(
+      {required this.resolution, required this.bandwidth, required this.url});
 
   @override
   String toString() {
@@ -469,48 +480,48 @@ class AppData extends ChangeNotifier {
 }
 
 class MediaStream {
-  Uri? video;
-  Uri? audio;
-  Uri? subtitle;
+  Map<String, Uri> audio;
+  Map<String, Uri> subtitle;
+  Map<String, Uri> resolution;
   int videoSize = 0;
   int audioSize = 0;
   MediaStream(
-      {required this.video,
-      required this.audio,
+      {required this.audio,
       required this.subtitle,
+      required this.resolution,
       this.videoSize = 0,
       this.audioSize = 0});
 
-  static Future<MediaStream> getMediaPlaylist(
-      String url, String resolution) async {
+  static Future<MediaStream> getMediaPlaylist(String url) async {
     // get m3u8 playlist for each video, audio and subtitle stream
     Uri playlistUri = Uri.parse(url);
     final resp = await http.get(playlistUri);
-    String contentString = resp.body;
-    int height = int.parse(resolution.split('x')[1]);
+    String contentString = utf8.decode(resp.bodyBytes);
 
     try {
       final playlist = await HlsPlaylistParser.create()
           .parseString(playlistUri, contentString);
       if (playlist is HlsMasterPlaylist) {
-        Uri? video, audio, subtitle;
+        Map<String, Uri> resolution = {};
+        Map<String, Uri> audio = {};
+        Map<String, Uri> subtitle = {};
         for (var v in playlist.variants) {
-          if (v.format.height == height) {
-            video = v.url;
-            break;
-          }
+          resolution[
+                  '${v.format.width}x${v.format.height}@${v.format.bitrate}'] =
+              v.url;
         }
         if (playlist.audios.isNotEmpty) {
-          audio = playlist.audios[0].url;
-        } else {
-          audio = null;
+          for (var a in playlist.audios) {
+            audio[a.name!] = a.url!;
+          }
         }
         if (playlist.subtitles.isNotEmpty) {
-          subtitle = playlist.subtitles[0].url;
-        } else {
-          subtitle = null;
+          for (var s in playlist.subtitles) {
+            subtitle[s.name!] = s.url!;
+          }
         }
-        return MediaStream(video: video, audio: audio, subtitle: subtitle);
+        return MediaStream(
+            resolution: resolution, audio: audio, subtitle: subtitle);
       } else {
         // we expect a master paylist m3u8
         return Future.error(Exception('Expecting a master m3u8 playlist'));
@@ -520,56 +531,50 @@ class MediaStream {
     }
   }
 
-  static Future<MediaStream> getMediaStream(
-      String url, String resolution) async {
+  static Future<(Uri?, Uri?, Uri?)> getMediaStream(
+      Uri video, Uri? audio, Uri? subtitle) async {
     // get real stream for video, audio, subtitle
-    MediaStream playlists = await MediaStream.getMediaPlaylist(url, resolution);
 
-    Uri? video, audio, subtitle;
-    int videoSize = 0;
-    if (playlists.video != null) {
-      final resp = await http.get(playlists.video!);
-      String contentString = resp.body;
+    Uri? videoStream, audioStream, subtitleUrl;
+    int videoSize = 0, audioSize = 0;
+    final resp = await http.get(video);
+    String contentString = utf8.decode(resp.bodyBytes);
 
-      try {
-        final playlist = await HlsPlaylistParser.create()
-            .parseString(playlists.video!, contentString);
-        if (playlist is HlsMediaPlaylist) {
-          final _ = playlist.baseUri!.split('/');
-          _.removeLast();
-          final baseUri = _.join('/');
-          video = Uri.parse('$baseUri/${playlist.segments[0].url!}');
-          final count = playlist.segments
-              .where((s) => s.url == playlist.segments[0].url)
-              .length;
-          if (count != playlist.segments.length) {
-            debugPrint('Warning: different urls for video stream segments');
-          }
-          for (var s in playlist.segments) {
-            if (s.byterangeLength != null) {
-              videoSize = videoSize + s.byterangeLength!;
-            }
+    try {
+      final playlist =
+          await HlsPlaylistParser.create().parseString(video, contentString);
+      if (playlist is HlsMediaPlaylist) {
+        final _ = playlist.baseUri!.split('/');
+        _.removeLast();
+        final baseUri = _.join('/');
+        videoStream = Uri.parse('$baseUri/${playlist.segments[0].url!}');
+        final count = playlist.segments
+            .where((s) => s.url == playlist.segments[0].url)
+            .length;
+        if (count != playlist.segments.length) {
+          debugPrint('Warning: different urls for video stream segments');
+        }
+        for (var s in playlist.segments) {
+          if (s.byterangeLength != null) {
+            videoSize = videoSize + s.byterangeLength!;
           }
         }
-      } on ParserException catch (e) {
-        return Future.error(e);
       }
-    } else {
-      return Future.error(Exception('MediaStream video Uri is null'));
+    } on ParserException catch (e) {
+      return Future.error(e);
     }
-    int audioSize = 0;
-    if (playlists.audio != null) {
-      final resp = await http.get(playlists.audio!);
-      String contentString = resp.body;
+    if (audio != null) {
+      final resp = await http.get(audio);
+      String contentString = utf8.decode(resp.bodyBytes);
 
       try {
-        final playlist = await HlsPlaylistParser.create()
-            .parseString(playlists.audio!, contentString);
+        final playlist =
+            await HlsPlaylistParser.create().parseString(audio, contentString);
         if (playlist is HlsMediaPlaylist) {
           final _ = playlist.baseUri!.split('/');
           _.removeLast();
           final baseUri = _.join('/');
-          audio = Uri.parse('$baseUri/${playlist.segments[0].url!}');
+          audioStream = Uri.parse('$baseUri/${playlist.segments[0].url!}');
           final count = playlist.segments
               .where((s) => s.url == playlist.segments[0].url)
               .length;
@@ -588,33 +593,23 @@ class MediaStream {
     } else {
       return Future.error(Exception('MediaStream audio Uri is null'));
     }
-    if (playlists.subtitle != null) {
-      final resp = await http.get(playlists.subtitle!);
-      String contentString = resp.body;
+    if (subtitle != null) {
+      final resp = await http.get(subtitle);
+      String contentString = utf8.decode(resp.bodyBytes);
 
       try {
         final playlist = await HlsPlaylistParser.create()
-            .parseString(playlists.subtitle!, contentString);
+            .parseString(subtitle, contentString);
         if (playlist is HlsMediaPlaylist) {
           final _ = playlist.baseUri!.split('/');
           _.removeLast();
           final baseUri = _.join('/');
-          subtitle = Uri.parse('$baseUri/${playlist.segments[0].url!}');
+          subtitleUrl = Uri.parse('$baseUri/${playlist.segments[0].url!}');
         }
       } on ParserException catch (e) {
         return Future.error(e);
       }
     }
-    return MediaStream(
-        video: video,
-        audio: audio,
-        subtitle: subtitle,
-        videoSize: videoSize,
-        audioSize: audioSize);
-  }
-
-  @override
-  String toString() {
-    return 'MediaStream(video: $video, audio: $audio, subtitle: $subtitle, videoSize: ${(videoSize / 1024 / 1024).toStringAsFixed(2)}MB, audioSize: ${(audioSize / 1024 / 1024).toStringAsFixed(2)}MB)';
+    return (videoStream, audioStream, subtitleUrl);
   }
 }

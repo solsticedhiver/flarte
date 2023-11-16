@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_hls_parser/flutter_hls_parser.dart' as hls;
 import 'package:http/http.dart' as http;
 import 'package:process/process.dart';
 import 'package:path/path.dart' as path;
@@ -36,12 +35,13 @@ class VideoButtons extends StatefulWidget {
 
 class _VideoButtonsState extends State<VideoButtons> {
   late Version selectedVersion;
-  Format? selectedFormat;
+  late Format selectedFormat;
   List<Version> versions = [];
   List<DropdownMenuItem<Version>> versionItems = [];
   List<DropdownMenuItem<Format>> formatItems = [];
   List<Format> formats = [];
   late VideoData video = widget.videos[widget.index];
+  late String _stream;
 
   @override
   void initState() {
@@ -57,13 +57,13 @@ class _VideoButtonsState extends State<VideoButtons> {
 
       debugPrint('programId: $programId');
       try {
-        final cv = await _getVersions(lang, programId);
-        debugPrint(cv.toString());
+        final (cv, tf) = await _getDetails(lang, programId);
+        debugPrint('Versions: $cv');
+        debugPrint('Formats: $tf');
         if (cv.isNotEmpty && mounted) {
           setState(() {
             versions = cv;
             selectedVersion = versions.first;
-            debugPrint(selectedVersion.url);
             versionItems = versions
                 .map((e) =>
                     DropdownMenuItem<Version>(value: e, child: Text(e.label)))
@@ -71,7 +71,6 @@ class _VideoButtonsState extends State<VideoButtons> {
           });
           video.versions = versions;
         }
-        final tf = await _getFormats(selectedVersion.url);
         if (tf.isNotEmpty && mounted) {
           setState(() {
             formats = tf;
@@ -87,80 +86,63 @@ class _VideoButtonsState extends State<VideoButtons> {
           });
         }
       } catch (e) {
-        final error = e as Map<String, dynamic>;
-        final messengerState = ScaffoldMessenger.of(context);
-        final themeData = Theme.of(context);
-        _showMessage(messengerState, themeData,
-            '${error['title']} / ${error['message']}');
+        if (e is Map<String, dynamic>) {
+          final messengerState = ScaffoldMessenger.of(context);
+          final themeData = Theme.of(context);
+          _showMessage(
+              messengerState, themeData, '${e['title']} / ${e['message']}');
+        } else {
+          debugPrint('Error: ${e.toString()}');
+        }
       }
     });
   }
 
-  Future<List<Version>> _getVersions(String lang, String programId) async {
+  Future<(List<Version>, List<Format>)> _getDetails(
+      String lang, String programId) async {
     final cache = Provider.of<Cache>(context, listen: false);
 
     final url = 'https://api.arte.tv/api/player/v2/config/$lang/$programId';
-    //debugPrint(url);
+    debugPrint(url);
     Map<String, dynamic>? jr;
     List<Version> cv = [];
+    List<Format> tf = [];
     jr = await cache.get(url);
     if (jr['data'] == null ||
         jr['data']['attributes'] == null ||
         jr['data']['attributes']['streams'] == null) {
-      return cv;
+      return (<Version>[], <Format>[]);
     }
     //debugPrint(json.encode(jr).toString());
     final streams = jr['data']['attributes']['streams'];
     //debugPrint(json.encode(streams).toString());
-    for (var s in streams) {
-      final v = s['versions'][0];
-      //debugPrint(v['shortLabel']);
+    // pick-up first url stream
+    _stream = streams[0]['url'];
+    debugPrint('First stream found: $_stream');
+
+    final stream = await MediaStream.getMediaPlaylist(_stream);
+    for (var v in stream.audio.keys) {
+      final url = stream.audio[v]!;
+      final urlPart = url.toString().split('_');
+      final shortLabel = urlPart[urlPart.length - 2].split('-')[0];
       cv.add(Version(
-          shortLabel: v['shortLabel'], label: v['label'], url: s['url']));
+          url: url, label: v, shortLabel: shortLabel, audioLanguage: v));
     }
-    if (cv.isEmpty && jr['data']['attributes']['error'] != null) {
-      throw jr['data']['attributes']['error'];
-    }
-    return cv;
-  }
-
-  Future<List<Format>> _getFormats(String url) async {
-    // directly parse the .m3u8 to get the bandwidth value to pass to libmpv backend
-    final cache = Provider.of<Cache>(context, listen: false);
-    final resp = await cache.get(url, isJson: false);
-
-    Uri playlistUri = Uri.parse(url);
-    List<Format> tf = [];
-    try {
-      final playlist = await hls.HlsPlaylistParser.create()
-          .parseString(playlistUri, resp['body']);
-      if (playlist is hls.HlsMasterPlaylist) {
-        for (var v in playlist.variants) {
-          final f = Format(
-              resolution: '${v.format.width}x${v.format.height}',
-              bandwidth: v.format.bitrate.toString());
-          if (!tf.contains(f)) {
-            tf.add(f);
-          }
-        }
-        // master m3u8 file
-      } else if (playlist is hls.HlsMediaPlaylist) {
-        // media m3u8 file
-      }
-    } on hls.ParserException catch (e) {
-      debugPrint(e.toString());
+    for (var f in stream.resolution.keys) {
+      final rb = f.split('@');
+      tf.add(Format(
+          bandwidth: rb[1], resolution: rb[0], url: stream.resolution[f]!));
     }
     tf.sort((a, b) {
       int aa = int.parse(a.bandwidth);
       int bb = int.parse(b.bandwidth);
       return aa.compareTo(bb);
     });
-    debugPrint(tf.toString());
-    return tf;
+    return (cv, tf);
   }
 
   String _outputFilename() {
-    return "${video.programId}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat!.resolution}.mp4";
+    return "${video.programId}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat.resolution}.mp4";
   }
 
   Future<String> _webvtt(Uri url) async {
@@ -185,7 +167,7 @@ class _VideoButtonsState extends State<VideoButtons> {
     final cwd = AppConfig.dlDirectory;
     debugPrint(cwd);
     final outputFilename =
-        '${video.programId}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat!.resolution}.mp4';
+        '${video.programId}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat.resolution}.mp4';
     debugPrint(outputFilename);
     final messengerState = ScaffoldMessenger.of(context);
     final themeData = Theme.of(context);
@@ -198,17 +180,11 @@ class _VideoButtonsState extends State<VideoButtons> {
     // work-around ffmpeg bug #10149 and #10169
     // because ffmpeg can't handle vtt subtitle correctly or choke on some time_id3/sidx stream
     // we download subtitle to modify it and then stream video, audio and subtitle separatly
-    debugPrint('looking at ${selectedVersion.url}');
-    MediaStream stream;
-    try {
-      stream = await MediaStream.getMediaStream(
-          selectedVersion.url, selectedFormat!.resolution);
-    } catch (e) {
-      // this is a TS stream with no separate audio stream, causing the timed_id3 error
-      stream = await MediaStream.getMediaPlaylist(
-          selectedVersion.url, selectedFormat!.resolution);
-    }
-    debugPrint(stream.toString());
+    final (videoStream, audioStream, subtitleUrl) =
+        await MediaStream.getMediaStream(
+            selectedFormat.url, selectedVersion.url, null);
+    debugPrint('Playing $video');
+    debugPrint(videoStream.toString());
     ProcessManager mgr = const LocalProcessManager();
     String ffmpeg = 'ffmpeg';
     if (Platform.isWindows) {
@@ -226,7 +202,7 @@ class _VideoButtonsState extends State<VideoButtons> {
         isError: false);
 
     String videoFilename =
-        stream.video.toString().split('/').last.replaceFirst('m3u8', 'mp4');
+        videoStream.toString().split('/').last.replaceFirst('m3u8', 'mp4');
     String audioFilename = '';
     String subFilename = '';
     debugPrint(videoFilename);
@@ -235,21 +211,21 @@ class _VideoButtonsState extends State<VideoButtons> {
       '-headers',
       'User-Agent: ${AppConfig.userAgent}',
       '-i',
-      stream.video.toString(),
+      videoStream.toString(),
       '-c',
       'copy',
       videoFilename
     ], workingDirectory: cwd);
     List<Future> tasks = [dlVideo];
-    if (stream.audio != null) {
-      audioFilename = stream.audio.toString().split('/').last;
+    if (audioStream != null) {
+      audioFilename = audioStream.toString().split('/').last;
       debugPrint(audioFilename);
       final dlAudio = mgr.run([
         ffmpeg,
         '-headers',
         'User-Agent: ${AppConfig.userAgent}',
         '-i',
-        stream.audio.toString(),
+        audioStream.toString(),
         '-c',
         'copy',
         audioFilename
@@ -265,7 +241,7 @@ class _VideoButtonsState extends State<VideoButtons> {
         debugPrint(responses[0].stderr);
         throw (Exception('Error downloading video $programId'));
       }
-      if (stream.audio != null &&
+      if (audioStream != null &&
           responses[1] is ProcessResult &&
           responses[1].exitCode != 0) {
         debugPrint(responses[0].stderr);
@@ -273,18 +249,18 @@ class _VideoButtonsState extends State<VideoButtons> {
       }
       // combine video/audio/subtitle together
       final String cmd;
-      if (stream.audio == null && stream.subtitle == null) {
+      if (audioStream == null && subtitleUrl == null) {
         await File(path.join(cwd, videoFilename))
             .rename(path.join(cwd, outputFilename));
         cmd = '';
-      } else if (stream.subtitle == null) {
+      } else if (subtitleUrl == null) {
         cmd =
             '$ffmpeg -i $videoFilename -i $audioFilename -map 0:v -map 1:a -c copy $outputFilename';
       } else {
         // WORKAROUND: because of ffmpeg bug #10169, remove all STYLE blocks in webvtt
-        subFilename = stream.subtitle.toString().split('/').last;
+        subFilename = subtitleUrl.toString().split('/').last;
         final subn = path.join(cwd, subFilename);
-        final subtitle = await _webvtt(stream.subtitle!);
+        final subtitle = await _webvtt(subtitleUrl);
         await File(subn).writeAsString(subtitle, flush: true);
         debugPrint(subn);
         cmd =
@@ -304,10 +280,10 @@ class _VideoButtonsState extends State<VideoButtons> {
           message = 'Download of video ${video.programId} finished';
         }
       }
-      if (stream.audio != null && audioFilename.isNotEmpty) {
+      if (audioStream != null && audioFilename.isNotEmpty) {
         await File(path.join(cwd, audioFilename)).delete();
       }
-      if (stream.subtitle != null && subFilename.isNotEmpty) {
+      if (subtitleUrl != null && subFilename.isNotEmpty) {
         await File(path.join(cwd, subFilename)).delete();
       }
       if (File(path.join(cwd, videoFilename)).existsSync()) {
@@ -367,8 +343,8 @@ class _VideoButtonsState extends State<VideoButtons> {
         '--play-and-exit',
         '--quiet',
         '--http-user-agent="${AppConfig.userAgent}"',
-        '--adaptive-maxheight=${selectedFormat!.resolution.split('x').last}',
-        selectedVersion.url
+        '--adaptive-maxheight=${selectedFormat.resolution.split('x').last}',
+        _stream
       ];
     } else {
       cmd = [
@@ -378,8 +354,8 @@ class _VideoButtonsState extends State<VideoButtons> {
         '--http-user-agent',
         AppConfig.userAgent,
         '--adaptive-maxheight',
-        selectedFormat!.resolution.split('x').last,
-        selectedVersion.url
+        selectedFormat.resolution.split('x').last,
+        _stream
       ];
     }
     /*
@@ -415,43 +391,38 @@ class _VideoButtonsState extends State<VideoButtons> {
       title = video.title;
     }
 
-    MediaStream stream;
-    try {
-      stream = await MediaStream.getMediaStream(
-          selectedVersion.url, selectedFormat!.resolution);
-    } catch (e) {
-      // this is a TS stream with no separate audio stream, causing the timed_id3 error
-      stream = await MediaStream.getMediaPlaylist(
-          selectedVersion.url, selectedFormat!.resolution);
-    }
+    final (videoStream, audioStream, subtitleUrl) =
+        await MediaStream.getMediaStream(
+            selectedFormat.url, selectedVersion.url, null);
     debugPrint('Playing $video');
+
     String subtitleData = '';
-    if (stream.subtitle != null) {
-      subtitleData = await _webvtt(stream.subtitle!);
-      debugPrint('Playing with subtitle from ${stream.subtitle}');
+    if (subtitleUrl != null) {
+      subtitleData = await _webvtt(subtitleUrl);
+      debugPrint('Playing with subtitle from $subtitleUrl');
     }
-    debugPrint(stream.toString());
+    debugPrint(videoStream.toString());
     if (!context.mounted) return;
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       if (kIsWeb ||
           Platform.isLinux ||
           Platform.isWindows ||
           Platform.isAndroid) {
-        String videoStream, audioStream = '';
+        String videoStreamString, audioStreamString = '';
         if (kIsWeb) {
-          videoStream = selectedVersion.url;
+          videoStreamString = _stream;
         } else {
-          videoStream = stream.video!.toString();
-          if (stream.audio != null) {
-            audioStream = stream.audio.toString();
+          videoStreamString = videoStream.toString();
+          if (audioStream != null) {
+            audioStreamString = audioStream.toString();
             debugPrint('Playing audio from $audioStream');
           }
         }
         return MyScreen(
             title:
-                '$title [${selectedVersion.shortLabel}, ${selectedFormat!.resolution}]',
-            videoStream: videoStream,
-            audioStream: audioStream,
+                '$title [${selectedVersion.shortLabel}, ${selectedFormat.resolution}]',
+            videoStream: videoStreamString,
+            audioStream: audioStreamString,
             subtitleData: subtitleData,
             video: video);
       } else {
@@ -518,7 +489,7 @@ class _VideoButtonsState extends State<VideoButtons> {
                   } else {
                     showVideo = true;
                   }
-                  if (showVideo != null && showVideo!) {
+                  if (showVideo != null && showVideo) {
                     if (AppConfig.player == PlayerTypeName.embedded) {
                       _libmpv();
                     } else if (AppConfig.player == PlayerTypeName.vlc) {
@@ -546,7 +517,7 @@ class _VideoButtonsState extends State<VideoButtons> {
         tooltip: AppLocalizations.of(context)!.strURL,
         onPressed: versions.isNotEmpty
             ? () {
-                _copyToClipboard(context, selectedVersion.url);
+                _copyToClipboard(context, _stream);
               }
             : null,
       ),
@@ -582,7 +553,8 @@ class _VideoButtonsState extends State<VideoButtons> {
                     alignment: Alignment.centerLeft,
                     constraints: const BoxConstraints(minWidth: 100),
                     child: Text(
-                      v.shortLabel,
+                      //v.shortLabel,
+                      v.label,
                       style: const TextStyle(
                           color: Colors.deepOrange,
                           fontWeight: FontWeight.w600),
@@ -595,36 +567,8 @@ class _VideoButtonsState extends State<VideoButtons> {
               onChanged: (value) async {
                 setState(() {
                   selectedVersion = value!;
-                  debugPrint(selectedVersion.url);
+                  debugPrint(selectedVersion.url.toString());
                 });
-
-                final tf = await _getFormats(selectedVersion.url);
-                if (tf.isNotEmpty && mounted) {
-                  setState(() {
-                    formats = tf;
-                    formatItems = formats
-                        .map((e) => DropdownMenuItem<Format>(
-                            value: e,
-                            child: Text('${e.resolution.split('x').last}p')))
-                        .toList();
-                    // try to keep the previously defined resolution, if initiliazed
-                    final previouSelectedFormat = selectedFormat;
-                    selectedFormat = null;
-                    for (var f in formats) {
-                      if (f.resolution == previouSelectedFormat!.resolution) {
-                        selectedFormat = f;
-                        break;
-                      }
-                    }
-                    if (selectedFormat == null) {
-                      if (formats.length - 1 >= AppConfig.playerIndexQuality) {
-                        selectedFormat = formats[AppConfig.playerIndexQuality];
-                      } else {
-                        selectedFormat = formats.last;
-                      }
-                    }
-                  });
-                }
               })
           : const SizedBox(height: 24),
       const SizedBox(width: 10),
@@ -634,7 +578,6 @@ class _VideoButtonsState extends State<VideoButtons> {
               hint: const Text('Format'),
               value: selectedFormat,
               selectedItemBuilder: (BuildContext context) {
-                debugPrint(formats.toString());
                 return formats.map<Widget>((f) {
                   return Container(
                     padding: const EdgeInsets.only(left: 10),
