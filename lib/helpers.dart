@@ -297,8 +297,8 @@ class VideoCardState extends State<VideoCard> {
                 widget.useSubtitle && widget.video.subtitle != null
                     ? widget.video.subtitle!
                     : widget.video.title,
-                maxLines: 2,
-                softWrap: true,
+                maxLines: 1,
+                softWrap: false,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: padding / 3),
@@ -321,7 +321,7 @@ class VideoCardState extends State<VideoCard> {
         title: Text(
           widget.video.title,
           overflow: TextOverflow.ellipsis,
-          maxLines: 2,
+          maxLines: 1,
         ),
         subtitle: (widget.size == CarouselListSize.normal)
             ? Text(

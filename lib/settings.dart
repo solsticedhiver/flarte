@@ -87,7 +87,7 @@ class _FlarteSettingsState extends State<FlarteSettings> {
             },
           ),
           title: Text(AppLocalizations.of(context)!.strSettings)),
-      body: SettingsList(sections: [
+      body: SettingsList(applicationType: ApplicationType.material, sections: [
         SettingsSection(
             title: Text(AppLocalizations.of(context)!.strInterface),
             tiles: [
