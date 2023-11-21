@@ -69,5 +69,6 @@
     "strYouAreAboutToWatch": "The program you are about to watch contains scenes not recommended for young or sensitive audiences.",
     "strCancel": "Cancel",
     "strContinue": "Continue",
-    "strWarning": "Warning"
+    "strWarning": "Warning",
+    "strNone": "None"
 }

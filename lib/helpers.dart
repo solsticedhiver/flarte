@@ -137,6 +137,15 @@ class Format {
   }
 }
 
+class Subtitle {
+  String name;
+  Uri? url;
+  String audioLanguage;
+
+  Subtitle(
+      {required this.name, required this.url, required this.audioLanguage});
+}
+
 class LocaleModel with ChangeNotifier {
   Locale? _locale;
   Locale? get locale => _locale;
@@ -512,12 +521,12 @@ class MediaStream {
         }
         if (playlist.audios.isNotEmpty) {
           for (var a in playlist.audios) {
-            audio[a.name!] = a.url!;
+            audio[a.name!.trim()] = a.url!;
           }
         }
         if (playlist.subtitles.isNotEmpty) {
           for (var s in playlist.subtitles) {
-            subtitle[s.name!] = s.url!;
+            subtitle[s.name!.trim()] = s.url!;
           }
         }
         return MediaStream(

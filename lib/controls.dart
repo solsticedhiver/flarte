@@ -36,10 +36,13 @@ class VideoButtons extends StatefulWidget {
 class _VideoButtonsState extends State<VideoButtons> {
   late Version selectedVersion;
   late Format selectedFormat;
+  late Subtitle? selectedSubtitle;
   List<Version> versions = [];
+  List<Format> formats = [];
+  List<Subtitle> subtitles = [];
   List<DropdownMenuItem<Version>> versionItems = [];
   List<DropdownMenuItem<Format>> formatItems = [];
-  List<Format> formats = [];
+  List<DropdownMenuItem<Subtitle>> subtitleItems = [];
   late VideoData video = widget.videos[widget.index];
   late String _stream;
 
@@ -57,9 +60,10 @@ class _VideoButtonsState extends State<VideoButtons> {
 
       debugPrint('programId: $programId');
       try {
-        final (cv, tf) = await _getDetails(lang, programId);
+        final (cv, tf, ss) = await _getDetails(lang, programId);
         debugPrint('Versions: $cv');
         debugPrint('Formats: $tf');
+        debugPrint('Subtitles: $ss');
         if (cv.isNotEmpty && mounted) {
           setState(() {
             versions = cv;
@@ -85,6 +89,24 @@ class _VideoButtonsState extends State<VideoButtons> {
                 .toList();
           });
         }
+        if (ss.isNotEmpty && mounted) {
+          ss.insert(
+              0,
+              Subtitle(
+                  name: AppLocalizations.of(context)!.strNone,
+                  url: null,
+                  audioLanguage: 'None'));
+          setState(() {
+            subtitles = ss;
+            selectedSubtitle = subtitles.first;
+            subtitleItems = subtitles
+                .map((e) =>
+                    DropdownMenuItem<Subtitle>(value: e, child: Text(e.name)))
+                .toList();
+          });
+        } else {
+          selectedSubtitle = null;
+        }
       } catch (e) {
         if (e is Map<String, dynamic>) {
           final messengerState = ScaffoldMessenger.of(context);
@@ -98,7 +120,7 @@ class _VideoButtonsState extends State<VideoButtons> {
     });
   }
 
-  Future<(List<Version>, List<Format>)> _getDetails(
+  Future<(List<Version>, List<Format>, List<Subtitle>)> _getDetails(
       String lang, String programId) async {
     final cache = Provider.of<Cache>(context, listen: false);
 
@@ -107,11 +129,13 @@ class _VideoButtonsState extends State<VideoButtons> {
     Map<String, dynamic>? jr;
     List<Version> cv = [];
     List<Format> tf = [];
+    List<Subtitle> ss = [];
+
     jr = await cache.get(url);
     if (jr['data'] == null ||
         jr['data']['attributes'] == null ||
         jr['data']['attributes']['streams'] == null) {
-      return (<Version>[], <Format>[]);
+      return (<Version>[], <Format>[], <Subtitle>[]);
     }
     //debugPrint(json.encode(jr).toString());
     final streams = jr['data']['attributes']['streams'];
@@ -138,7 +162,11 @@ class _VideoButtonsState extends State<VideoButtons> {
       int bb = int.parse(b.bandwidth);
       return aa.compareTo(bb);
     });
-    return (cv, tf);
+    for (var s in stream.subtitle.keys) {
+      ss.add(Subtitle(
+          name: s, url: stream.subtitle[s]!, audioLanguage: 'unknown'));
+    }
+    return (cv, tf, ss);
   }
 
   String _outputFilename() {
@@ -182,7 +210,7 @@ class _VideoButtonsState extends State<VideoButtons> {
     // we download subtitle to modify it and then stream video, audio and subtitle separatly
     final (videoStream, audioStream, subtitleUrl) =
         await MediaStream.getMediaStream(
-            selectedFormat.url, selectedVersion.url, null);
+            selectedFormat.url, selectedVersion.url, selectedSubtitle?.url);
     debugPrint('Playing $video');
     debugPrint(videoStream.toString());
     ProcessManager mgr = const LocalProcessManager();
@@ -393,7 +421,7 @@ class _VideoButtonsState extends State<VideoButtons> {
 
     final (videoStream, audioStream, subtitleUrl) =
         await MediaStream.getMediaStream(
-            selectedFormat.url, selectedVersion.url, null);
+            selectedFormat.url, selectedVersion.url, selectedSubtitle?.url);
     debugPrint('Playing $video');
 
     String subtitleData = '';
@@ -551,7 +579,7 @@ class _VideoButtonsState extends State<VideoButtons> {
                   return Container(
                     padding: const EdgeInsets.only(left: 10),
                     alignment: Alignment.centerLeft,
-                    constraints: const BoxConstraints(minWidth: 100),
+                    //constraints: const BoxConstraints(minWidth: 100),
                     child: Text(
                       //v.shortLabel,
                       v.label,
@@ -582,7 +610,7 @@ class _VideoButtonsState extends State<VideoButtons> {
                   return Container(
                     padding: const EdgeInsets.only(left: 10),
                     alignment: Alignment.centerLeft,
-                    constraints: const BoxConstraints(minWidth: 100),
+                    //constraints: const BoxConstraints(minWidth: 100),
                     child: Text(
                       '${f.resolution.split('x').last}p',
                     ),
@@ -596,13 +624,34 @@ class _VideoButtonsState extends State<VideoButtons> {
                 });
               })
           : const SizedBox(height: 24),
+      const SizedBox(width: 10),
+      subtitleItems.isNotEmpty
+          ? DropdownButton<Subtitle>(
+              underline: const SizedBox.shrink(),
+              hint: const Text('Subtitle'),
+              value: selectedSubtitle,
+              selectedItemBuilder: (BuildContext context) {
+                return subtitles.map<Widget>((s) {
+                  return Container(
+                    padding: const EdgeInsets.only(left: 10),
+                    alignment: Alignment.centerLeft,
+                    //constraints: const BoxConstraints(minWidth: 100),
+                    child: Text(
+                      s.name,
+                    ),
+                  );
+                }).toList();
+              },
+              items: subtitleItems,
+              onChanged: (value) {
+                setState(() {
+                  selectedSubtitle = value!;
+                });
+              })
+          : const SizedBox(height: 24),
     ];
 
-    if (widget.oneLine) {
-      return Row(children: [...top, ...bottom]);
-    } else {
-      return Column(children: [Row(children: top), Row(children: bottom)]);
-    }
+    return Column(children: [Row(children: top), Row(children: bottom)]);
   }
 
   void _showMessage(ScaffoldMessengerState messengerState, ThemeData themeData,

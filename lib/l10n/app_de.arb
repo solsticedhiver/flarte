@@ -69,5 +69,6 @@
     "strYouAreAboutToWatch": "Die Sendung, die Sie gerade ansehen, enthält Szenen, die nicht für junge oder sensible Zuschauer geeignet sind.",
     "strCancel": "Abbrechen",
     "strContinue": "Weiter",
-    "strWarning": "Warnung"
+    "strWarning": "Warnung",
+    "strNone": "Keine"
 }
