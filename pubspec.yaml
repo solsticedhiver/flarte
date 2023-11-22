@@ -85,6 +85,7 @@ flutter:
   assets:
     - assets/flarte.png
     - assets/GPL3.txt
+    - assets/lets-encrypt-r3.pem
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

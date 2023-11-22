@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:flarte/helpers.dart';
 import 'package:flarte/config.dart';
 import 'package:flutter/foundation.dart';
@@ -22,6 +25,21 @@ void main() async {
 
   if (kReleaseMode) {
     debugPrint = (String? message, {int? wrapWidth}) {};
+  }
+
+  try {
+    // check we can reach some let's encrypt certificate based website
+    final http.Response _ =
+        await http.get(Uri.parse('https://valid-isrgrootx1.letsencrypt.org/'));
+  } on HandshakeException {
+    // load Let's Encrypt new certificate if this has failed
+    ByteData data =
+        await PlatformAssetBundle().load('assets/lets-encrypt-r3.pem');
+    SecurityContext.defaultContext
+        .setTrustedCertificatesBytes(data.buffer.asUint8List());
+  } on SocketException {
+    // TODO: we need to recheck that later on
+    debugPrint('debug: Failed to test for valid-isrgrootx1.letsencrypt.org');
   }
 
   final SharedPreferences prefs = await SharedPreferences.getInstance();
