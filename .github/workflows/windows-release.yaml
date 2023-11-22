@@ -32,20 +32,20 @@ jobs:
     - run: flutter config --enable-windows-desktop
     - run: flutter build windows --release
     - name: Rename main folder
-      run: mv build/windows/runner/Release build/windows/runner/flarte-${{ steps.version.outputs.version }}
+      run: mv build/windows/x64/runner/Release build/windows/x64/runner/flarte-${{ steps.version.outputs.version }}
       shell: bash
     - name: Archive Release
       uses: thedoctor0/zip-release@0.7.1
       with:
         type: 'zip'
-        directory: 'build/windows/runner/'
+        directory: 'build/windows/x64/runner/'
         path: 'flarte-${{ steps.version.outputs.version }}'
         filename: 'flarte-windows_x64.zip'
     - name: Create a release on GitHub
       uses: ncipollo/release-action@v1
       with:
         allowUpdates: true
-        artifacts: "build/windows/runner/flarte-windows_x64.zip"
+        artifacts: "build/windows/x64/runner/flarte-windows_x64.zip"
         token: "${{ secrets.GH_TOKEN }}"
         tag: "v${{ steps.version.outputs.version }}"
         commit: "${{ github.sha }}"
