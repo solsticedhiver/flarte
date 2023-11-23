@@ -10,11 +10,11 @@ jobs:
     outputs:
       output1: ${{ steps.version.outputs.version }}
     container:
-      image: bilelmoussaoui/flatpak-github-actions:freedesktop-22.08
+      image: bilelmoussaoui/flatpak-github-actions:freedesktop-23.08
       options: --privileged
     steps:
     - name: Checkout repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Create version
       id: version
       run: echo "version=v$(grep ^version pubspec.yaml |cut -f 2 -d ' '|cut -f 1 -d '+')" >> $GITHUB_OUTPUT
@@ -42,7 +42,7 @@ jobs:
     - name: Install missing nodejs and other packages [for act run]
       if: ${{ env.ACT }}
       run: sudo dnf install -y nodejs tar zstd
-    - uses: flatpak/flatpak-github-actions/flatpak-builder@v6.1
+    - uses: flatpak/flatpak-github-actions/flatpak-builder@v6.3
       with:
         bundle: flarte-${{ steps.version.outputs.version }}-x86_64.flatpak
         manifest-path: flatpak/io.github.solsticedhiver.flarte.yml
