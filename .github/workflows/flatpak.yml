@@ -26,22 +26,23 @@ jobs:
       run: sed -i "/commit/s/HEAD/${{ steps.short_sha.outputs.short_sha }}/" lib/config.dart
       shell: bash
     - name: Install missing package to build with flutter
-      run: sudo dnf install -y ninja-build gtk3-devel cmake clang jq curl pkgconf mpv-devel mpv-libs mpv
+      run: sudo dnf install -y ninja-build gtk3-devel cmake clang jq curl pkgconf mpv-devel mpv-libs mpv lzma-sdk
+    - name: Install missing nodejs and other packages [for act run]
+      if: ${{ env.ACT }}
+      run: sudo dnf install -y nodejs tar zstd
     - uses: subosito/flutter-action@v2
       with:
         channel : 'stable'
         cache: true
     - name: Trust flutter git repo
       run: git config --global --add safe.directory /opt/hostedtoolcache/flutter/stable-*
-    - run: flutter pub get
-    #- run: flutter test
+    - if: ${{ env.ACT }}
+      run: flutter clean
     - run: flutter config --enable-linux-desktop
+    - run: flutter pub get
     - run: flutter build linux --release
     - run: rm -rf flatpak/flarte
     - run: mv build/linux/x64/release/bundle/ flatpak/flarte
-    - name: Install missing nodejs and other packages [for act run]
-      if: ${{ env.ACT }}
-      run: sudo dnf install -y nodejs tar zstd
     - uses: flatpak/flatpak-github-actions/flatpak-builder@v6.3
       with:
         bundle: flarte-${{ steps.version.outputs.version }}-x86_64.flatpak
