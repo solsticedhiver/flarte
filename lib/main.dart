@@ -131,47 +131,51 @@ class MyApp extends StatelessWidget {
 
     return Consumer2<LocaleModel, ThemeModeProvider>(
         builder: (context, localeModel, themeModeProvider, child) {
-      return MaterialApp(
-        title: 'Flarte',
-        locale: localeModel.locale,
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        localeListResolutionCallback: (locales, supportedLocales) {
-          const defaultLocale = Locale('en');
-          if (locales == null) {
-            return defaultLocale;
-          } else {
-            for (var l in locales) {
-              // supportedLocales is expected to be only languageCode only (no contryCode)
-              if (supportedLocales.contains(Locale(l.languageCode))) {
-                return l;
+      return Shortcuts(
+          shortcuts: <LogicalKeySet, Intent>{
+            LogicalKeySet(LogicalKeyboardKey.select): const ActivateIntent(),
+          },
+          child: MaterialApp(
+            title: 'Flarte',
+            locale: localeModel.locale,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            localeListResolutionCallback: (locales, supportedLocales) {
+              const defaultLocale = Locale('en');
+              if (locales == null) {
+                return defaultLocale;
+              } else {
+                for (var l in locales) {
+                  // supportedLocales is expected to be only languageCode only (no contryCode)
+                  if (supportedLocales.contains(Locale(l.languageCode))) {
+                    return l;
+                  }
+                }
               }
-            }
-          }
-          return defaultLocale;
-        },
-        //theme: ThemeData(
-        //  primarySwatch: Colors.deepOrange,
-        //),
-        theme: ThemeData(
-          primarySwatch: Colors.deepOrange,
-          brightness: Brightness.light,
-          pageTransitionsTheme: pageTransitionsTheme,
-          /* light theme settings */
-        ),
-        darkTheme: ThemeData(
-          primarySwatch: Colors.deepOrange,
-          brightness: Brightness.dark,
-          pageTransitionsTheme: pageTransitionsTheme,
-          /* dark theme settings */
-        ),
-        themeMode: themeModeProvider.themeMode,
-        /* ThemeMode.system to follow system theme,
+              return defaultLocale;
+            },
+            //theme: ThemeData(
+            //  primarySwatch: Colors.deepOrange,
+            //),
+            theme: ThemeData(
+              primarySwatch: Colors.deepOrange,
+              brightness: Brightness.light,
+              pageTransitionsTheme: pageTransitionsTheme,
+              /* light theme settings */
+            ),
+            darkTheme: ThemeData(
+              primarySwatch: Colors.deepOrange,
+              brightness: Brightness.dark,
+              pageTransitionsTheme: pageTransitionsTheme,
+              /* dark theme settings */
+            ),
+            themeMode: themeModeProvider.themeMode,
+            /* ThemeMode.system to follow system theme,
          ThemeMode.light for light theme,
          ThemeMode.dark for dark theme
       */
-        home: const MyHomePage(title: 'arte.tv'),
-      );
+            home: const MyHomePage(title: 'arte.tv'),
+          ));
     });
   }
 }

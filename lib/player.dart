@@ -39,6 +39,8 @@ class MyScreenState extends State<MyScreen> {
   late StreamSubscription subscription;
   bool isVideoPlayalable = false;
   double playSpeed = 1.0;
+  // A [GlobalKey<VideoState>] is required to access the programmatic fullscreen interface.
+  late final GlobalKey<VideoState> key = GlobalKey<VideoState>();
 
   @override
   void initState() {
@@ -54,8 +56,13 @@ class MyScreenState extends State<MyScreen> {
         }
       }
     });
-
     player.setRate(playSpeed);
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if (kIsWeb || Platform.isAndroid) {
+        key.currentState?.enterFullscreen();
+      }
+    });
 
     Future.microtask(() async {
       if (!player.state.playing) {
@@ -96,6 +103,21 @@ class MyScreenState extends State<MyScreen> {
     player.stop();
     player.dispose();
     super.dispose();
+  }
+
+  List<Widget> topBar(BuildContext context) {
+    return [
+      MaterialDesktopCustomButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () {
+          if (key.currentState?.isFullscreen() ?? false) {
+            key.currentState?.exitFullscreen();
+          }
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        },
+      ),
+      const Spacer(),
+    ];
   }
 
   @override
@@ -176,18 +198,19 @@ class MyScreenState extends State<MyScreen> {
                   Icons.speed,
                   color: Theme.of(context).colorScheme.onBackground,
                 ))),
-        const MaterialFullscreenButton(),
       ];
 
       themeVideo = MaterialVideoControlsTheme(
           normal: MaterialVideoControlsThemeData(
               seekBarPositionColor: Colors.deepOrange,
               seekBarThumbColor: Colors.deepOrange,
-              bottomButtonBar: bottomButtonBar),
+              bottomButtonBar: bottomButtonBar,
+              topButtonBar: topBar(context)),
           fullscreen: MaterialVideoControlsThemeData(
               seekBarPositionColor: Colors.deepOrange,
               seekBarThumbColor: Colors.deepOrange,
-              bottomButtonBar: bottomButtonBar),
+              bottomButtonBar: bottomButtonBar,
+              topButtonBar: topBar(context)),
           child: Center(
               child: SizedBox(
             width: MediaQuery.of(context).size.width,
@@ -195,6 +218,15 @@ class MyScreenState extends State<MyScreen> {
             child: Video(
               controller: controller,
               subtitleViewConfiguration: subtitleViewConfigutation,
+              onEnterFullscreen: () async {
+                await defaultEnterNativeFullscreen();
+              },
+              onExitFullscreen: () async {
+                await defaultExitNativeFullscreen();
+                if (Platform.isAndroid) {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                }
+              },
             ),
           )));
     } else if (method == 1) {
@@ -248,22 +280,29 @@ class MyScreenState extends State<MyScreen> {
           )));
     }
 
-    return Scaffold(
-        appBar: AppBar(
-            title: Text(widget.title),
-            backgroundColor: Colors.deepOrange,
-            foregroundColor: Colors.white),
-        body: Card(
-          elevation: 8.0,
-          clipBehavior: Clip.antiAlias,
-          margin: const EdgeInsets.all(10),
-          child: Stack(children: [
-            SizedBox.expand(
-                child: Center(
-                    child: Text(AppLocalizations.of(context)!.strInitStream))),
-            Visibility(visible: isVideoPlayalable, child: themeVideo)
-          ]),
-        ));
+    Widget mainWidget = Stack(children: [
+      SizedBox.expand(
+          child:
+              Center(child: Text(AppLocalizations.of(context)!.strInitStream))),
+      Visibility(visible: isVideoPlayalable, child: themeVideo)
+    ]);
+    Widget scaffold;
+    if (method == 2) {
+      scaffold = Scaffold(body: mainWidget);
+    } else {
+      scaffold = Scaffold(
+          appBar: AppBar(
+              title: Text(widget.title),
+              backgroundColor: Colors.deepOrange,
+              foregroundColor: Colors.white),
+          body: Card(
+            elevation: 8.0,
+            clipBehavior: Clip.antiAlias,
+            margin: const EdgeInsets.all(10),
+            child: mainWidget,
+          ));
+    }
+    return scaffold;
   }
 }
 
