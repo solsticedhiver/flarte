@@ -378,6 +378,8 @@ class VideoCardState extends State<VideoCard> {
                           bottom: 5,
                           left: 5,
                           child: Chip(
+                            labelPadding: const EdgeInsets.only(
+                                left: 0, right: 0, top: 0, bottom: 0),
                             backgroundColor:
                                 Theme.of(context).colorScheme.surface,
                             label: Text(widget.video.durationLabel!,

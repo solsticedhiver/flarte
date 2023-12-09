@@ -543,6 +543,9 @@ class CarouselList extends StatelessWidget {
             size: size,
             children: videos.map((v) {
               return InkWell(
+                borderRadius: BorderRadius.circular(16),
+                focusColor: Colors.deepOrange,
+                highlightColor: Colors.deepOrange,
                 onLongPress: () {
                   _showDialogProgram(context, videos, videos.indexOf(v));
                 },
