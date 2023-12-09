@@ -117,7 +117,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
           .format(DateTime.parse(data['firstBroadcastDate']).toLocal());
     }
     List<Widget> credits = [];
-    for (var c in data['credits']) {
+    for (var c in data['credits'] ?? []) {
       credits.addAll(
         [
           const SizedBox(height: 10),
