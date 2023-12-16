@@ -570,7 +570,10 @@ class CarouselList extends StatelessWidget {
                   Navigator.push(
                       context, MaterialPageRoute(builder: (context) => screen));
                 },
-                child: VideoCard(video: v, size: size, withDurationLabel: true),
+                child: VideoCard(
+                    video: v,
+                    size: size,
+                    withDurationLabel: size != CarouselListSize.small),
               );
             }).toList())
       ]));

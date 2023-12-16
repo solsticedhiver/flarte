@@ -336,6 +336,17 @@ class VideoCardState extends State<VideoCard> {
             ),
           ]);
     } else {
+      Text? subtitle = null;
+      if (widget.size == CarouselListSize.normal) {
+        subtitle = Text(
+          widget.video.subtitle ?? '',
+          overflow: TextOverflow.ellipsis,
+          maxLines: 2,
+        );
+      } else if (widget.size == CarouselListSize.small &&
+          !widget.withDurationLabel) {
+        subtitle = Text(widget.video.durationLabel ?? '');
+      }
       bottomText = ListTile(
         contentPadding: EdgeInsets.zero,
         title: Text(
@@ -343,13 +354,7 @@ class VideoCardState extends State<VideoCard> {
           overflow: TextOverflow.ellipsis,
           maxLines: 1,
         ),
-        subtitle: (widget.size == CarouselListSize.normal)
-            ? Text(
-                widget.video.subtitle ?? '',
-                overflow: TextOverflow.ellipsis,
-                maxLines: 2,
-              )
-            : null,
+        subtitle: subtitle,
         isThreeLine: widget.size == CarouselListSize.normal,
       );
     }
