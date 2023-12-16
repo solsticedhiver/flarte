@@ -195,6 +195,8 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                   const SizedBox(height: 10),
                                   Row(children: [
                                     Chip(
+                                      labelPadding: const EdgeInsets.only(
+                                          left: 0, right: 0, top: 0, bottom: 0),
                                       backgroundColor: Theme.of(context)
                                           .colorScheme
                                           .inverseSurface,
@@ -208,6 +210,11 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                     if (!data['kind']['isCollection'] &&
                                         data['durationLabel'] != null)
                                       Chip(
+                                        labelPadding: const EdgeInsets.only(
+                                            left: 0,
+                                            right: 0,
+                                            top: 0,
+                                            bottom: 0),
                                         backgroundColor: Theme.of(context)
                                             .colorScheme
                                             .inverseSurface,
