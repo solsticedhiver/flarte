@@ -193,7 +193,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                             .headlineSmall),
                                   ],
                                   const SizedBox(height: 10),
-                                  Row(children: [
+                                  /*Row(children: [
                                     Chip(
                                       labelPadding: const EdgeInsets.only(
                                           left: 0, right: 0, top: 0, bottom: 0),
@@ -250,6 +250,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                       }
                                     }),
                                   ]),
+                                  */
                                   const SizedBox(height: 10),
                                   !video.isCollection
                                       ? VideoButtons(
