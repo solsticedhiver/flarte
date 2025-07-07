@@ -10,7 +10,7 @@ jobs:
     outputs:
       output1: ${{ steps.version.outputs.version }}
     container:
-      image: bilelmoussaoui/flatpak-github-actions:freedesktop-23.08
+      image: bilelmoussaoui/flatpak-github-actions:freedesktop-24.08
       options: --privileged
     steps:
     - name: Checkout repo
@@ -25,17 +25,19 @@ jobs:
     - name: set HEAD git short sha in config.dart
       run: sed -i "/commit/s/HEAD/${{ steps.short_sha.outputs.short_sha }}/" lib/config.dart
       shell: bash
+    - name: Update packages first (FORCE_COLMUNS to work around dnf/rpm coredump see https://github.com/rpm-software-management/dnf5/issues/2085)
+      run: FORCE_COLUMNS=100 dnf update -y
     - name: Install missing package to build with flutter
-      run: sudo dnf install -y ninja-build gtk3-devel cmake clang jq curl pkgconf mpv-devel mpv-libs mpv lzma-sdk
+      run: dnf install -y ninja-build gtk3-devel cmake clang jq curl pkgconf mpv-devel mpv-libs mpv lzma-sdk which
     - name: Install missing nodejs and other packages [for act run]
       if: ${{ env.ACT }}
-      run: sudo dnf install -y nodejs tar zstd
+      run: dnf install -y nodejs tar zstd
     - uses: subosito/flutter-action@v2
       with:
         channel : 'stable'
         cache: true
     - name: Trust flutter git repo
-      run: git config --global --add safe.directory /opt/hostedtoolcache/flutter/stable-*
+      run: git config --global --add safe.directory /__t/flutter/stable-*
     - if: ${{ env.ACT }}
       run: flutter clean
     - run: flutter config --enable-linux-desktop
@@ -43,7 +45,7 @@ jobs:
     - run: flutter build linux --release
     - run: rm -rf flatpak/flarte
     - run: mv build/linux/x64/release/bundle/ flatpak/flarte
-    - uses: flatpak/flatpak-github-actions/flatpak-builder@v6.3
+    - uses: flatpak/flatpak-github-actions/flatpak-builder@v6.4
       with:
         bundle: flarte-${{ steps.version.outputs.version }}-x86_64.flatpak
         manifest-path: flatpak/io.github.solsticedhiver.flarte.yml

@@ -3,7 +3,7 @@
 ---
 app-id: io.github.solsticedhiver.flarte
 runtime: org.freedesktop.Platform
-runtime-version: "22.08"
+runtime-version: "24.08"
 sdk: org.freedesktop.Sdk
 command: flarte
 separate-locales: false
@@ -19,8 +19,7 @@ finish-args:
 modules:
   - name: ffmpeg
     cleanup:
-      - '/include'
-      - '/lib/pkgconfig'
+      - '/share/name'
       - '/share/ffmpeg/examples'
     config-opts:
       - --enable-shared
@@ -32,8 +31,8 @@ modules:
       - --enable-libdav1d
     sources:
       - type: archive
-        url: https://ffmpeg.org/releases/ffmpeg-6.0.tar.gz
-        sha256: f4ccf961403752c93961927715f524576d1f4dd02cd76d8c76aed3bbe6686656
+        url: https://ffmpeg.org/releases/ffmpeg-7.1.1.tar.gz
+        sha256: 9a6e57a446b671012612aaeb9df5126794d5ac8f2015ca220934f99a6a4e0601
   - name: libass
     cleanup:
       - '/include'
@@ -43,14 +42,54 @@ modules:
       - --disable-static
     sources:
       - type: archive
-        url: https://github.com/libass/libass/releases/download/0.17.1/libass-0.17.1.tar.gz
-        sha256: d653be97198a0543c69111122173c41a99e0b91426f9e17f06a858982c2fb03d
+        url: https://github.com/libass/libass/releases/download/0.17.4/libass-0.17.4.tar.gz
+        sha256: a886b3b80867f437bc55cff3280a652bfa0d37b43d2aff39ddf3c4f288b8c5a8
+  # Dependency for libplacebo. Generated with `flatpak-pip-generator --runtime=org.freedesktop.Sdk//24.08 --yaml jinja2`
+  - name: python3-jinja2
+    buildsystem: simple
+    build-commands:
+      - pip3 install --verbose --exists-action=i --no-index --find-links="file://${PWD}"
+        --prefix=${FLATPAK_DEST} "jinja2" --no-build-isolation
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/b2/97/5d42485e71dfc078108a86d6de8fa46db44a1a9295e89c5d6d4a06e23a62/markupsafe-3.0.2.tar.gz
+        sha256: ee55d3edf80167e48ea11a923c7386f4669df67d7994554387f84e7d8b0a2bf0
+      - type: file
+        url: https://files.pythonhosted.org/packages/62/a1/3d680cbfd5f4b8f15abc1d571870c5fc3e594bb582bc3b64ea099db13e56/jinja2-3.1.6-py3-none-any.whl
+        sha256: 85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67
+  - name: libplacebo
+    cleanup:
+      - '/include'
+      - '/lib/pkgconfig'
+    buildsystem: meson
+    config-opts:
+      - -Dvulkan=disabled
+      - -Dshaderc=disabled
+      - -Dvulkan=disabled
+      - -Dvk-proc-addr=disabled
+      - -Dvulkan-registry=disabled
+      - -Dopengl=disabled
+      - -Dgl-proc-addr=disabled
+      - -Dd3d11=disabled
+      - -Dglslang=disabled
+      - -Dshaderc=disabled
+      - -Dlcms=disabled
+      - -Ddovi=disabled
+      - -Dlibdovi=disabled
+      - -Dunwind=disabled
+      - -Dxxhash=disabled
+      - -Ddemos=false
+    sources:
+      - type: archive
+        url: https://github.com/haasn/libplacebo/archive/refs/tags/v7.351.0.tar.gz
+        sha256: 716954501d9b76e6906fddda66febc5886493d0673dd265ec1e6e52f4e5cd7c6
 
   - name: libmpv
     cleanup:
-    - '/include'
-    - '/lib/pkgconfig'
-    - '/share/name'
+      - '/include'
+      - '/lib/pkgconfig'
+      - '/share/name'
+      - 'lib/*.a'
     buildsystem: meson
     config-opts:
       - -Dbuild-date=false
@@ -58,8 +97,8 @@ modules:
       - -Dcplayer=false
     sources:
       - type: archive
-        url: https://github.com/mpv-player/mpv/archive/refs/tags/v0.36.0.tar.gz
-        sha256: 29abc44f8ebee013bb2f9fe14d80b30db19b534c679056e4851ceadf5a5e8bf6
+        url: https://github.com/mpv-player/mpv/archive/refs/tags/v0.40.0.tar.gz
+        sha256: 10a0f4654f62140a6dd4d380dcf0bbdbdcf6e697556863dc499c296182f081a3
     
   - name: Flarte
     buildsystem: simple
@@ -84,3 +123,9 @@ modules:
         path: io.github.solsticedhiver.flarte.metainfo.xml
       - type: file
         path: io.github.solsticedhiver.flarte.desktop
+    cleanup:
+      - '/lib/*.a'
+      - '/lib/debug'
+      - '/lib/python*'
+      - '/lib/pkgconfig'
+
