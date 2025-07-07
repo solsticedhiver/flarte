@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'l10n/app_localizations.dart';
 
 import 'config.dart';
 import 'helpers.dart';
@@ -28,13 +28,11 @@ class MyScreen extends StatefulWidget {
   @override
   State<MyScreen> createState() => MyScreenState();
 
-  static MyScreenState of(BuildContext context) =>
-      context.findAncestorStateOfType<MyScreenState>()!;
+  static MyScreenState of(BuildContext context) => context.findAncestorStateOfType<MyScreenState>()!;
 }
 
 class MyScreenState extends State<MyScreen> {
-  final Player player =
-      Player(configuration: const PlayerConfiguration(title: AppConfig.name));
+  final Player player = Player(configuration: const PlayerConfiguration(title: AppConfig.name));
   late final controller = VideoController(player);
   late StreamSubscription subscription;
   bool isVideoPlayalable = false;
@@ -47,8 +45,7 @@ class MyScreenState extends State<MyScreen> {
     super.initState();
 
     subscription = player.stream.position.listen((event) {
-      if (player.state.duration != Duration.zero &&
-          event > player.state.duration * 0.9) {
+      if (player.state.duration != Duration.zero && event > player.state.duration * 0.9) {
         final ad = Provider.of<AppData>(context, listen: false);
         if (!ad.watched.contains(widget.video.programId)) {
           ad.addWatched(widget.video.programId);
@@ -66,17 +63,13 @@ class MyScreenState extends State<MyScreen> {
 
     Future.microtask(() async {
       if (!player.state.playing) {
-        await player.open(
-            Media(widget.videoStream,
-                httpHeaders:
-                    kIsWeb ? null : {'User-Agent': AppConfig.userAgent}),
+        await player.open(Media(widget.videoStream, httpHeaders: kIsWeb ? null : {'User-Agent': AppConfig.userAgent}),
             play: false);
         // work-around ffmpeg bug #10149 and #10169
         // mpv is plagged with the same problem/bug than ffmpeg, because it uses it somehow as back-end
         // we use the same work-around by specifying video, audio and subtitle stream separately too
         if (widget.subtitleData.isNotEmpty) {
-          await player
-              .setSubtitleTrack(SubtitleTrack.data(widget.subtitleData));
+          await player.setSubtitleTrack(SubtitleTrack.data(widget.subtitleData));
         } else if (!kIsWeb) {
           await player.setSubtitleTrack(SubtitleTrack.no());
         }
@@ -133,9 +126,7 @@ class MyScreenState extends State<MyScreen> {
               player.setRate(playSpeed);
             },
             value: s,
-            child: Text('x$s',
-                style:
-                    TextStyle(color: Theme.of(context).colorScheme.onSurface))))
+            child: Text('x$s', style: TextStyle(color: Theme.of(context).colorScheme.onSurface))))
         .toList();
     Widget themeVideo = SizedBox.shrink(); // to make the compiler happy
     const subtitleViewConfigutation = SubtitleViewConfiguration(
@@ -281,9 +272,7 @@ class MyScreenState extends State<MyScreen> {
     }
 
     Widget mainWidget = Stack(children: [
-      SizedBox.expand(
-          child:
-              Center(child: Text(AppLocalizations.of(context)!.strInitStream))),
+      SizedBox.expand(child: Center(child: Text(AppLocalizations.of(context)!.strInitStream))),
       Visibility(visible: isVideoPlayalable, child: themeVideo)
     ]);
     Widget scaffold;
@@ -291,10 +280,7 @@ class MyScreenState extends State<MyScreen> {
       scaffold = Scaffold(body: mainWidget);
     } else {
       scaffold = Scaffold(
-          appBar: AppBar(
-              title: Text(widget.title),
-              backgroundColor: Colors.deepOrange,
-              foregroundColor: Colors.white),
+          appBar: AppBar(title: Text(widget.title), backgroundColor: Colors.deepOrange, foregroundColor: Colors.white),
           body: Card(
             elevation: 8.0,
             clipBehavior: Clip.antiAlias,

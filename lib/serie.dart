@@ -5,7 +5,7 @@ import 'package:flarte/helpers.dart';
 import 'package:flarte/main.dart';
 import 'package:flutter/material.dart';
 import 'package:html/parser.dart' as parser;
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import 'detail.dart';
@@ -15,11 +15,7 @@ class SerieScreen extends StatefulWidget {
   final String title;
   final String url;
   final String description;
-  const SerieScreen(
-      {super.key,
-      required this.title,
-      required this.url,
-      required this.description});
+  const SerieScreen({super.key, required this.title, required this.url, required this.description});
 
   @override
   State<SerieScreen> createState() => _SerieScreenState();
@@ -75,8 +71,7 @@ class _SerieScreenState extends State<SerieScreen> {
     super.dispose();
   }
 
-  void _showDialogProgram(
-      BuildContext context, List<VideoData> videos, int index) {
+  void _showDialogProgram(BuildContext context, List<VideoData> videos, int index) {
     showDialog(
         context: context,
         builder: (context) {
@@ -94,8 +89,7 @@ class _SerieScreenState extends State<SerieScreen> {
     double width = 285.0 * count;
     final titles = teasers.map((t) => t['title']).toList();
     // use the subtitle if all titles are the same
-    bool useSubtitle =
-        teasers.length == titles.where((t) => t == titles[0]).length;
+    bool useSubtitle = teasers.length == titles.where((t) => t == titles[0]).length;
     Widget body;
     if (data.isNotEmpty) {
       int zoneCount = 0;
@@ -104,14 +98,10 @@ class _SerieScreenState extends State<SerieScreen> {
           zoneCount++;
         }
       }
-      final description = Text(widget.description,
-          style: Theme.of(context).textTheme.titleMedium);
+      final description = Text(widget.description, style: Theme.of(context).textTheme.titleMedium);
       if (zoneCount > 1) {
         body = Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-          Container(
-              margin: const EdgeInsets.only(
-                  left: 20, top: 10, bottom: 10, right: 10),
-              child: description),
+          Container(margin: const EdgeInsets.only(left: 20, top: 10, bottom: 10, right: 10), child: description),
           Expanded(
               flex: 2,
               child: Container(
@@ -122,16 +112,11 @@ class _SerieScreenState extends State<SerieScreen> {
                   )))
         ]);
       } else if (zoneCount > 0) {
-        List<VideoData> videos =
-            teasers.map((t) => VideoData.fromJson(t)).toList();
+        List<VideoData> videos = teasers.map((t) => VideoData.fromJson(t)).toList();
         body = Center(
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           // ignore: sized_box_for_whitespace
-          Container(
-              margin: const EdgeInsets.all(10),
-              width: width,
-              child: description),
+          Container(margin: const EdgeInsets.all(10), width: width, child: description),
           // ignore: sized_box_for_whitespace
           Expanded(
               flex: 2,
@@ -146,12 +131,10 @@ class _SerieScreenState extends State<SerieScreen> {
                           focusColor: Colors.deepOrange,
                           highlightColor: Colors.deepOrange,
                           onLongPress: () {
-                            _showDialogProgram(
-                                context, videos, videos.indexOf(v));
+                            _showDialogProgram(context, videos, videos.indexOf(v));
                           },
                           onDoubleTap: () {
-                            _showDialogProgram(
-                                context, videos, videos.indexOf(v));
+                            _showDialogProgram(context, videos, videos.indexOf(v));
                           },
                           onTap: () {
                             //_showDialogProgram(context, Video.fromJson(t));

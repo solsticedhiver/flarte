@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:process/process.dart';
 import 'package:path/path.dart' as path;
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import 'config.dart';
@@ -54,9 +54,7 @@ class _VideoButtonsState extends State<VideoButtons> {
 
     Future.microtask(() async {
       final programId = video.programId;
-      final lang = Provider.of<LocaleModel>(context, listen: false)
-          .getCurrentLocale(context)
-          .languageCode;
+      final lang = Provider.of<LocaleModel>(context, listen: false).getCurrentLocale(context).languageCode;
 
       debugPrint('programId: $programId');
       try {
@@ -68,10 +66,7 @@ class _VideoButtonsState extends State<VideoButtons> {
           setState(() {
             versions = cv;
             selectedVersion = versions.first;
-            versionItems = versions
-                .map((e) =>
-                    DropdownMenuItem<Version>(value: e, child: Text(e.label)))
-                .toList();
+            versionItems = versions.map((e) => DropdownMenuItem<Version>(value: e, child: Text(e.label))).toList();
           });
           video.versions = versions;
         }
@@ -84,25 +79,16 @@ class _VideoButtonsState extends State<VideoButtons> {
               selectedFormat = formats.last;
             }
             formatItems = formats
-                .map((e) => DropdownMenuItem<Format>(
-                    value: e, child: Text('${e.resolution.split('x').last}p')))
+                .map((e) => DropdownMenuItem<Format>(value: e, child: Text('${e.resolution.split('x').last}p')))
                 .toList();
           });
         }
         if (ss.isNotEmpty && mounted) {
-          ss.insert(
-              0,
-              Subtitle(
-                  name: AppLocalizations.of(context)!.strNone,
-                  url: null,
-                  audioLanguage: 'None'));
+          ss.insert(0, Subtitle(name: AppLocalizations.of(context)!.strNone, url: null, audioLanguage: 'None'));
           setState(() {
             subtitles = ss;
             selectedSubtitle = subtitles.first;
-            subtitleItems = subtitles
-                .map((e) =>
-                    DropdownMenuItem<Subtitle>(value: e, child: Text(e.name)))
-                .toList();
+            subtitleItems = subtitles.map((e) => DropdownMenuItem<Subtitle>(value: e, child: Text(e.name))).toList();
           });
         } else {
           selectedSubtitle = null;
@@ -111,8 +97,7 @@ class _VideoButtonsState extends State<VideoButtons> {
         if (e is Map<String, dynamic>) {
           final messengerState = ScaffoldMessenger.of(context);
           final themeData = Theme.of(context);
-          _showMessage(
-              messengerState, themeData, '${e['title']} / ${e['message']}');
+          _showMessage(messengerState, themeData, '${e['title']} / ${e['message']}');
         } else {
           debugPrint('Error: ${e.toString()}');
         }
@@ -120,8 +105,7 @@ class _VideoButtonsState extends State<VideoButtons> {
     });
   }
 
-  Future<(List<Version>, List<Format>, List<Subtitle>)> _getDetails(
-      String lang, String programId) async {
+  Future<(List<Version>, List<Format>, List<Subtitle>)> _getDetails(String lang, String programId) async {
     final cache = Provider.of<Cache>(context, listen: false);
 
     final url = 'https://api.arte.tv/api/player/v2/config/$lang/$programId';
@@ -132,9 +116,7 @@ class _VideoButtonsState extends State<VideoButtons> {
     List<Subtitle> ss = [];
 
     jr = await cache.get(url);
-    if (jr['data'] == null ||
-        jr['data']['attributes'] == null ||
-        jr['data']['attributes']['streams'] == null) {
+    if (jr['data'] == null || jr['data']['attributes'] == null || jr['data']['attributes']['streams'] == null) {
       return (<Version>[], <Format>[], <Subtitle>[]);
     }
     //debugPrint(json.encode(jr).toString());
@@ -149,13 +131,11 @@ class _VideoButtonsState extends State<VideoButtons> {
       final url = stream.audio[v]!;
       final urlPart = url.toString().split('_');
       final shortLabel = urlPart[urlPart.length - 2].split('-')[0];
-      cv.add(Version(
-          url: url, label: v, shortLabel: shortLabel, audioLanguage: v));
+      cv.add(Version(url: url, label: v, shortLabel: shortLabel, audioLanguage: v));
     }
     for (var f in stream.resolution.keys) {
       final rb = f.split('@');
-      tf.add(Format(
-          bandwidth: rb[1], resolution: rb[0], url: stream.resolution[f]!));
+      tf.add(Format(bandwidth: rb[1], resolution: rb[0], url: stream.resolution[f]!));
     }
     tf.sort((a, b) {
       int aa = int.parse(a.bandwidth);
@@ -163,8 +143,7 @@ class _VideoButtonsState extends State<VideoButtons> {
       return aa.compareTo(bb);
     });
     for (var s in stream.subtitle.keys) {
-      ss.add(Subtitle(
-          name: s, url: stream.subtitle[s]!, audioLanguage: 'unknown'));
+      ss.add(Subtitle(name: s, url: stream.subtitle[s]!, audioLanguage: 'unknown'));
     }
     return (cv, tf, ss);
   }
@@ -201,16 +180,14 @@ class _VideoButtonsState extends State<VideoButtons> {
     final themeData = Theme.of(context);
 
     if (File(path.join(cwd, outputFilename)).existsSync()) {
-      _showMessage(
-          messengerState, themeData, 'File $outputFilename already exists');
+      _showMessage(messengerState, themeData, 'File $outputFilename already exists');
       return;
     }
     // work-around ffmpeg bug #10149 and #10169
     // because ffmpeg can't handle vtt subtitle correctly or choke on some time_id3/sidx stream
     // we download subtitle to modify it and then stream video, audio and subtitle separatly
     final (videoStream, audioStream, subtitleUrl) =
-        await MediaStream.getMediaStream(
-            selectedFormat.url, selectedVersion.url, selectedSubtitle?.url);
+        await MediaStream.getMediaStream(selectedFormat.url, selectedVersion.url, selectedSubtitle?.url);
     debugPrint('Playing $video');
     debugPrint(videoStream.toString());
     ProcessManager mgr = const LocalProcessManager();
@@ -225,12 +202,9 @@ class _VideoButtonsState extends State<VideoButtons> {
       _showMessage(messengerState, themeData, 'ffmpeg has not been found');
       return;
     }
-    _showMessage(
-        messengerState, themeData, 'Downloading video ${video.programId}',
-        isError: false);
+    _showMessage(messengerState, themeData, 'Downloading video ${video.programId}', isError: false);
 
-    String videoFilename =
-        videoStream.toString().split('/').last.replaceFirst('m3u8', 'mp4');
+    String videoFilename = videoStream.toString().split('/').last.replaceFirst('m3u8', 'mp4');
     String audioFilename = '';
     String subFilename = '';
     debugPrint(videoFilename);
@@ -269,21 +243,17 @@ class _VideoButtonsState extends State<VideoButtons> {
         debugPrint(responses[0].stderr);
         throw (Exception('Error downloading video $programId'));
       }
-      if (audioStream != null &&
-          responses[1] is ProcessResult &&
-          responses[1].exitCode != 0) {
+      if (audioStream != null && responses[1] is ProcessResult && responses[1].exitCode != 0) {
         debugPrint(responses[0].stderr);
         throw (Exception('Error downloading audio $programId'));
       }
       // combine video/audio/subtitle together
       final String cmd;
       if (audioStream == null && subtitleUrl == null) {
-        await File(path.join(cwd, videoFilename))
-            .rename(path.join(cwd, outputFilename));
+        await File(path.join(cwd, videoFilename)).rename(path.join(cwd, outputFilename));
         cmd = '';
       } else if (subtitleUrl == null) {
-        cmd =
-            '$ffmpeg -i $videoFilename -i $audioFilename -map 0:v -map 1:a -c copy $outputFilename';
+        cmd = '$ffmpeg -i $videoFilename -i $audioFilename -map 0:v -map 1:a -c copy $outputFilename';
       } else {
         // WORKAROUND: because of ffmpeg bug #10169, remove all STYLE blocks in webvtt
         subFilename = subtitleUrl.toString().split('/').last;
@@ -299,12 +269,10 @@ class _VideoButtonsState extends State<VideoButtons> {
       if (cmd.isNotEmpty) {
         final result = await mgr.run(cmd.split(' '), workingDirectory: cwd);
         if (result.exitCode != 0) {
-          debugPrint(
-              'Failed to combine video/audio/subtitle for ${video.programId}\n${result.stderr}');
+          debugPrint('Failed to combine video/audio/subtitle for ${video.programId}\n${result.stderr}');
           message = 'Error downloading video ${video.programId}';
         } else {
-          debugPrint(
-              'Finished combining video/audio/subtitle for ${video.programId}');
+          debugPrint('Finished combining video/audio/subtitle for ${video.programId}');
           message = 'Download of video ${video.programId} finished';
         }
       }
@@ -344,8 +312,7 @@ class _VideoButtonsState extends State<VideoButtons> {
         // try in Program Files (x86)
         programFiles = Platform.environment['ProgramFiles(x86)'];
         if (programFiles == null || programFiles.isEmpty) {
-          _showMessage(
-              messengerState, themeData, '%ProgramFiles(x86)% is empty');
+          _showMessage(messengerState, themeData, '%ProgramFiles(x86)% is empty');
           return;
         }
         binary = path.join(programFiles, 'VideoLAN', 'VLC', 'vlc.exe');
@@ -355,8 +322,7 @@ class _VideoButtonsState extends State<VideoButtons> {
         }
       }
     } else {
-      _showMessage(
-          messengerState, themeData, AppLocalizations.of(context)!.strNotImpl);
+      _showMessage(messengerState, themeData, AppLocalizations.of(context)!.strNotImpl);
       return;
     }
     if (!mgr.canRun(binary)) {
@@ -396,8 +362,7 @@ class _VideoButtonsState extends State<VideoButtons> {
     }
     */
     try {
-      _showMessage(messengerState, themeData,
-          'Launching external [c]vlc instance to read video ${video.programId}',
+      _showMessage(messengerState, themeData, 'Launching external [c]vlc instance to read video ${video.programId}',
           isError: false);
       ProcessResult result = await mgr.run(cmd);
       if (result.exitCode != 0) {
@@ -420,8 +385,7 @@ class _VideoButtonsState extends State<VideoButtons> {
     }
 
     final (videoStream, audioStream, subtitleUrl) =
-        await MediaStream.getMediaStream(
-            selectedFormat.url, selectedVersion.url, selectedSubtitle?.url);
+        await MediaStream.getMediaStream(selectedFormat.url, selectedVersion.url, selectedSubtitle?.url);
     debugPrint('Playing $video');
 
     String subtitleData = '';
@@ -432,10 +396,7 @@ class _VideoButtonsState extends State<VideoButtons> {
     debugPrint(videoStream.toString());
     if (!context.mounted) return;
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      if (kIsWeb ||
-          Platform.isLinux ||
-          Platform.isWindows ||
-          Platform.isAndroid) {
+      if (kIsWeb || Platform.isLinux || Platform.isWindows || Platform.isAndroid) {
         String videoStreamString, audioStreamString = '';
         if (kIsWeb) {
           videoStreamString = _stream;
@@ -447,8 +408,7 @@ class _VideoButtonsState extends State<VideoButtons> {
           }
         }
         return MyScreen(
-            title:
-                '$title [${selectedVersion.shortLabel}, ${selectedFormat.resolution}]',
+            title: '$title [${selectedVersion.shortLabel}, ${selectedFormat.resolution}]',
             videoStream: videoStreamString,
             audioStream: audioStreamString,
             subtitleData: subtitleData,
@@ -469,9 +429,8 @@ class _VideoButtonsState extends State<VideoButtons> {
             CircleAvatar(
               radius: 24,
               backgroundColor: Colors.black87,
-              child: Text('-${video.ageRating}',
-                  style: const TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold)),
+              child:
+                  Text('-${video.ageRating}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             ),
             const SizedBox(height: 10),
             Text(AppLocalizations.of(context)!.strYouAreAboutToWatch),
@@ -512,8 +471,7 @@ class _VideoButtonsState extends State<VideoButtons> {
                 Future.microtask(() async {
                   bool? showVideo;
                   if (video.ageRating != 0) {
-                    showVideo =
-                        await _displayAgeWarning(context, video.ageRating);
+                    showVideo = await _displayAgeWarning(context, video.ageRating);
                   } else {
                     showVideo = true;
                   }
@@ -532,10 +490,7 @@ class _VideoButtonsState extends State<VideoButtons> {
       IconButton(
         icon: const Icon(Icons.download),
         tooltip: AppLocalizations.of(context)!.strDownload,
-        onPressed: versions.isNotEmpty &&
-                formats.isNotEmpty &&
-                !kIsWeb &&
-                (Platform.isWindows || Platform.isLinux)
+        onPressed: versions.isNotEmpty && formats.isNotEmpty && !kIsWeb && (Platform.isWindows || Platform.isLinux)
             ? _ffmpeg
             : null,
       ),
@@ -562,10 +517,7 @@ class _VideoButtonsState extends State<VideoButtons> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => FullDetailScreen(
-                          videos: widget.videos,
-                          index: widget.index,
-                          title: '')));
+                      builder: (context) => FullDetailScreen(videos: widget.videos, index: widget.index, title: '')));
             })
       ],
     ];
@@ -583,9 +535,7 @@ class _VideoButtonsState extends State<VideoButtons> {
                     child: Text(
                       //v.shortLabel,
                       v.label,
-                      style: const TextStyle(
-                          color: Colors.deepOrange,
-                          fontWeight: FontWeight.w600),
+                      style: const TextStyle(color: Colors.deepOrange, fontWeight: FontWeight.w600),
                     ),
                   );
                 }).toList();
@@ -654,21 +604,13 @@ class _VideoButtonsState extends State<VideoButtons> {
     return Column(children: [Row(children: top), Row(children: bottom)]);
   }
 
-  void _showMessage(ScaffoldMessengerState messengerState, ThemeData themeData,
-      String message,
-      {bool isError = true}) {
+  void _showMessage(ScaffoldMessengerState messengerState, ThemeData themeData, String message, {bool isError = true}) {
     messengerState.showSnackBar(SnackBar(
       content: Text(message,
-          style: TextStyle(
-              color: isError
-                  ? themeData.colorScheme.onError
-                  : themeData.colorScheme.onInverseSurface)),
-      backgroundColor: isError
-          ? themeData.colorScheme.error
-          : themeData.colorScheme.inverseSurface,
+          style: TextStyle(color: isError ? themeData.colorScheme.onError : themeData.colorScheme.onInverseSurface)),
+      backgroundColor: isError ? themeData.colorScheme.error : themeData.colorScheme.inverseSurface,
       behavior: SnackBarBehavior.floating,
-      duration:
-          isError ? const Duration(seconds: 20) : const Duration(seconds: 5),
+      duration: isError ? const Duration(seconds: 20) : const Duration(seconds: 5),
       showCloseIcon: isError,
       closeIconColor: themeData.colorScheme.onError,
     ));
@@ -678,8 +620,7 @@ class _VideoButtonsState extends State<VideoButtons> {
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(AppLocalizations.of(context)!.strCopiedClipboard,
-          style:
-              TextStyle(color: Theme.of(context).colorScheme.onInverseSurface)),
+          style: TextStyle(color: Theme.of(context).colorScheme.onInverseSurface)),
       behavior: SnackBarBehavior.floating,
       backgroundColor: Theme.of(context).colorScheme.inverseSurface,
     ));

@@ -3,7 +3,7 @@ import 'package:flarte/controls.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'l10n/app_localizations.dart';
 
 import 'helpers.dart';
 import 'config.dart';
@@ -35,13 +35,10 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
     //debugPrint('in _FullDetailScreeState.initState()');
 
     Future.microtask(() async {
-      final lang = Provider.of<LocaleModel>(context, listen: false)
-          .getCurrentLocale(context)
-          .languageCode;
+      final lang = Provider.of<LocaleModel>(context, listen: false).getCurrentLocale(context).languageCode;
       final cache = Provider.of<Cache>(context, listen: false);
       Map<String, dynamic> jr;
-      final url =
-          'https://www.arte.tv/api/rproxy/emac/v4/$lang/web/programs/${video.programId}';
+      final url = 'https://www.arte.tv/api/rproxy/emac/v4/$lang/web/programs/${video.programId}';
       jr = await cache.get(url);
       if (mounted && jr.isNotEmpty) {
         setState(() {
@@ -72,9 +69,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
         'programId': video.programId,
         'title': video.title,
         'subtitle': video.subtitle,
-        'mainImage': {
-          'url': video.imageUrl!.replaceFirst('400x225', '300x450')
-        },
+        'mainImage': {'url': video.imageUrl!.replaceFirst('400x225', '300x450')},
         'fullDescription': '',
         'shortDescription': video.shortDescription,
         'availability': null,
@@ -87,8 +82,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
     String description = data['fullDescription'] ?? '';
     String shortDescription = data['shortDescription'] ?? '';
     // make sure that <br> breakline become carriage return \n
-    description = description.replaceAllMapped(
-        RegExp(r'<br ?/?>([^\n])'), (match) => '\n${match.group(1)}');
+    description = description.replaceAllMapped(RegExp(r'<br ?/?>([^\n])'), (match) => '\n${match.group(1)}');
     description = Bidi.stripHtmlIfNeeded(description.trim());
     // remove leading space on each line
     description = description
@@ -97,24 +91,19 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
         .replaceAll(RegExp('\n{2,}', multiLine: true), '\n\n');
     shortDescription = Bidi.stripHtmlIfNeeded(shortDescription).trim();
 
-    final imageUrl =
-        '${data['mainImage']['url'].replaceFirst('__SIZE__', '300x450')}?type=TEXT';
+    final imageUrl = '${data['mainImage']['url'].replaceFirst('__SIZE__', '300x450')}?type=TEXT';
     bool showImage = MediaQuery.sizeOf(context).width > 1280;
-    Locale locale = Provider.of<LocaleModel>(context, listen: false)
-        .getCurrentLocale(context);
+    Locale locale = Provider.of<LocaleModel>(context, listen: false).getCurrentLocale(context);
     DateFormat dateFormat = DateFormat.yMd(locale.toString());
     String availabilityStart = '';
     String availabilityEnd = '';
     if (data['availability'] != null) {
-      availabilityStart = dateFormat
-          .format(DateTime.parse(data['availability']['start']).toLocal());
-      availabilityEnd = dateFormat
-          .format(DateTime.parse(data['availability']['end']).toLocal());
+      availabilityStart = dateFormat.format(DateTime.parse(data['availability']['start']).toLocal());
+      availabilityEnd = dateFormat.format(DateTime.parse(data['availability']['end']).toLocal());
     }
     String firstBroadcastDate = '';
     if (data['firstBroadcastDate'] != null) {
-      firstBroadcastDate = dateFormat
-          .format(DateTime.parse(data['firstBroadcastDate']).toLocal());
+      firstBroadcastDate = dateFormat.format(DateTime.parse(data['firstBroadcastDate']).toLocal());
     }
     List<Widget> credits = [];
     for (var c in data['credits'] ?? []) {
@@ -130,8 +119,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
     }
     String appBarTitle;
     if (widget.title.isNotEmpty) {
-      appBarTitle =
-          '${widget.title} (${widget.index + 1}/${widget.videos.length})';
+      appBarTitle = '${widget.title} (${widget.index + 1}/${widget.videos.length})';
     } else {
       appBarTitle = AppLocalizations.of(context)!.strDetails;
     }
@@ -147,10 +135,7 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
     }
 
     return Scaffold(
-        appBar: AppBar(
-            title: Text(appBarTitle),
-            backgroundColor: Colors.deepOrange,
-            foregroundColor: Colors.white),
+        appBar: AppBar(title: Text(appBarTitle), backgroundColor: Colors.deepOrange, foregroundColor: Colors.white),
         body: Stack(children: [
           Container(
               padding: const EdgeInsets.all(15),
@@ -165,10 +150,8 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                           child: Center(
                               child: SizedBox.expand(
                                   child: Image(
-                            errorBuilder: (context, error, stackTrace) =>
-                                const SizedBox.shrink(),
-                            image: CachedNetworkImageProvider(imageUrl,
-                                headers: {'User-Agent': AppConfig.userAgent}),
+                            errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+                            image: CachedNetworkImageProvider(imageUrl, headers: {'User-Agent': AppConfig.userAgent}),
                             fit: BoxFit.fitWidth,
                           )))),
                     Expanded(
@@ -180,17 +163,10 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text(data['title'],
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headlineLarge),
-                                  if (data['subtitle'] != null &&
-                                      data['subtitle'].isNotEmpty) ...[
+                                  Text(data['title'], style: Theme.of(context).textTheme.headlineLarge),
+                                  if (data['subtitle'] != null && data['subtitle'].isNotEmpty) ...[
                                     const SizedBox(height: 5),
-                                    Text(data['subtitle'],
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headlineSmall),
+                                    Text(data['subtitle'], style: Theme.of(context).textTheme.headlineSmall),
                                   ],
                                   const SizedBox(height: 10),
                                   /*Row(children: [
@@ -267,26 +243,18 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                                     builder: (context) => SerieScreen(
                                                         title: video.title,
                                                         url: video.url,
-                                                        description: video
-                                                                .shortDescription ??
+                                                        description: video.shortDescription ??
                                                             video.subtitle ??
-                                                            AppLocalizations.of(
-                                                                    context)!
-                                                                .strEpisodes)));
+                                                            AppLocalizations.of(context)!.strEpisodes)));
                                           },
-                                          child: Text(
-                                              AppLocalizations.of(context)!
-                                                  .strEpisodes),
+                                          child: Text(AppLocalizations.of(context)!.strEpisodes),
                                         ),
                                   Flexible(
                                       child: SingleChildScrollView(
                                           child: Column(children: [
                                     if (data['subtile'] != null) ...[
                                       const SizedBox(height: 10),
-                                      Text(data['subtitle'],
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headlineMedium)
+                                      Text(data['subtitle'], style: Theme.of(context).textTheme.headlineMedium)
                                     ],
                                     if (shortDescription.isNotEmpty) ...[
                                       const SizedBox(height: 10),
@@ -294,18 +262,14 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                                           style: Theme.of(context)
                                               .textTheme
                                               .headlineSmall!
-                                              .copyWith(
-                                                  fontSize: 17.5,
-                                                  letterSpacing: 0.5))
+                                              .copyWith(fontSize: 17.5, letterSpacing: 0.5))
                                     ],
                                     const SizedBox(height: 10),
                                     Text(description,
                                         style: Theme.of(context)
                                             .textTheme
                                             .bodyMedium!
-                                            .copyWith(
-                                                height: 1.35,
-                                                letterSpacing: 0.5))
+                                            .copyWith(height: 1.35, letterSpacing: 0.5))
                                   ]))),
                                 ]))),
                     Expanded(
@@ -318,37 +282,24 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                           children: [
                             Row(children: [
                               const Expanded(flex: 1, child: Text('ID')),
-                              Expanded(
-                                  flex: 1, child: Text('${data['programId']}'))
+                              Expanded(flex: 1, child: Text('${data['programId']}'))
                             ]),
                             const SizedBox(height: 10),
                             Row(children: [
-                              Expanded(
-                                  flex: 1,
-                                  child: Text(AppLocalizations.of(context)!
-                                      .strDuration)),
-                              Expanded(
-                                  flex: 1,
-                                  child: Text('${data['durationLabel']}'))
+                              Expanded(flex: 1, child: Text(AppLocalizations.of(context)!.strDuration)),
+                              Expanded(flex: 1, child: Text('${data['durationLabel']}'))
                             ]),
                             if (firstBroadcastDate.isNotEmpty) ...[
                               const SizedBox(height: 10),
                               Row(children: [
-                                Expanded(
-                                    flex: 1,
-                                    child: Text(AppLocalizations.of(context)!
-                                        .strFirstBroadcastDate)),
-                                Expanded(
-                                    flex: 1, child: Text(firstBroadcastDate))
+                                Expanded(flex: 1, child: Text(AppLocalizations.of(context)!.strFirstBroadcastDate)),
+                                Expanded(flex: 1, child: Text(firstBroadcastDate))
                               ])
                             ],
                             if (availabilityStart.isNotEmpty) ...[
                               const SizedBox(height: 10),
                               Row(children: [
-                                Expanded(
-                                    flex: 1,
-                                    child: Text(AppLocalizations.of(context)!
-                                        .strAvailability)),
+                                Expanded(flex: 1, child: Text(AppLocalizations.of(context)!.strAvailability)),
                                 Expanded(
                                     flex: 1,
                                     child: Text(
@@ -357,46 +308,27 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
                             ],
                             const SizedBox(height: 10),
                             Row(children: [
-                              Expanded(
-                                  flex: 1,
-                                  child: Text(AppLocalizations.of(context)!
-                                      .strAgeRating)),
-                              Expanded(
-                                  flex: 1,
-                                  child: Text(data['ageRating'] == 0
-                                      ? '⸺'
-                                      : '${data['ageRating']}'))
+                              Expanded(flex: 1, child: Text(AppLocalizations.of(context)!.strAgeRating)),
+                              Expanded(flex: 1, child: Text(data['ageRating'] == 0 ? '⸺' : '${data['ageRating']}'))
                             ]),
                             if (data['ageRating'] != 0) ...[
                               const SizedBox(height: 10),
                               Row(children: [
-                                Expanded(
-                                    flex: 1,
-                                    child: Text(AppLocalizations.of(context)!
-                                        .strViewable)),
+                                Expanded(flex: 1, child: Text(AppLocalizations.of(context)!.strViewable)),
                                 Expanded(flex: 1, child: Text(viewable))
                               ]),
                             ],
                             const SizedBox(height: 10),
                             if (data['genre'] != null)
                               Row(children: [
-                                Expanded(
-                                    flex: 1,
-                                    child: Text(AppLocalizations.of(context)!
-                                        .strGenre)),
-                                Expanded(
-                                    flex: 1,
-                                    child: Text('${data['genre']['label']}'))
+                                Expanded(flex: 1, child: Text(AppLocalizations.of(context)!.strGenre)),
+                                Expanded(flex: 1, child: Text('${data['genre']['label']}'))
                               ]),
                             if (data['geoblocking'] != null) ...[
                               const SizedBox(height: 10),
                               Row(children: [
-                                const Expanded(
-                                    flex: 1, child: Text('GeoBlocking')),
-                                Expanded(
-                                    flex: 1,
-                                    child:
-                                        Text('${data['geoblocking']['code']}'))
+                                const Expanded(flex: 1, child: Text('GeoBlocking')),
+                                Expanded(flex: 1, child: Text('${data['geoblocking']['code']}'))
                               ])
                             ],
                             const SizedBox(height: 10),
@@ -407,21 +339,16 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
           Builder(builder: (context) {
             return Positioned(
                 left: 10,
-                top: (MediaQuery.sizeOf(context).height -
-                        Scaffold.of(context).appBarMaxHeight!) /
-                    2,
+                top: (MediaQuery.sizeOf(context).height - Scaffold.of(context).appBarMaxHeight!) / 2,
                 child: ElevatedButton(
                   onPressed: widget.index == 0
                       ? null
                       : () {
                           final wi = widget.index - 1;
                           if (wi >= 0) {
-                            Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                    builder: (context) => FullDetailScreen(
-                                        videos: widget.videos,
-                                        index: wi,
-                                        title: widget.title)));
+                            Navigator.of(context).pushReplacement(MaterialPageRoute(
+                                builder: (context) =>
+                                    FullDetailScreen(videos: widget.videos, index: wi, title: widget.title)));
                           }
                         },
                   style: ElevatedButton.styleFrom(
@@ -438,21 +365,16 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
           Builder(builder: (context) {
             return Positioned(
                 right: 10,
-                top: (MediaQuery.sizeOf(context).height -
-                        Scaffold.of(context).appBarMaxHeight!) /
-                    2,
+                top: (MediaQuery.sizeOf(context).height - Scaffold.of(context).appBarMaxHeight!) / 2,
                 child: ElevatedButton(
                   onPressed: widget.index == widget.videos.length - 1
                       ? null
                       : () {
                           final wi = widget.index + 1;
                           if (wi < widget.videos.length) {
-                            Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                    builder: (context) => FullDetailScreen(
-                                        videos: widget.videos,
-                                        index: wi,
-                                        title: widget.title)));
+                            Navigator.of(context).pushReplacement(MaterialPageRoute(
+                                builder: (context) =>
+                                    FullDetailScreen(videos: widget.videos, index: wi, title: widget.title)));
                           }
                         },
                   style: ElevatedButton.styleFrom(

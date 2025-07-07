@@ -10,7 +10,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'detail.dart';
@@ -29,14 +30,11 @@ void main() async {
 
   try {
     // check we can reach some let's encrypt certificate based website
-    final http.Response _ =
-        await http.get(Uri.parse('https://valid-isrgrootx1.letsencrypt.org/'));
+    final http.Response _ = await http.get(Uri.parse('https://valid-isrgrootx1.letsencrypt.org/'));
   } on HandshakeException {
     // load Let's Encrypt new certificate if this has failed
-    ByteData data =
-        await PlatformAssetBundle().load('assets/lets-encrypt-r3.pem');
-    SecurityContext.defaultContext
-        .setTrustedCertificatesBytes(data.buffer.asUint8List());
+    ByteData data = await PlatformAssetBundle().load('assets/lets-encrypt-r3.pem');
+    SecurityContext.defaultContext.setTrustedCertificatesBytes(data.buffer.asUint8List());
   } on SocketException {
     // TODO: we need to recheck that later on
     debugPrint('debug: Failed to test for valid-isrgrootx1.letsencrypt.org');
@@ -65,8 +63,7 @@ void main() async {
         break;
     }
   }
-  AppConfig.playerIndexQuality =
-      prefs.getInt('quality') ?? AppConfig.playerIndexQuality;
+  AppConfig.playerIndexQuality = prefs.getInt('quality') ?? AppConfig.playerIndexQuality;
   String? ptn = prefs.getString('player');
   if (ptn != null) {
     switch (ptn) {
@@ -89,17 +86,14 @@ void main() async {
       ChangeNotifierProvider<Cache>(create: (_) => Cache()),
       ChangeNotifierProvider<AppData>(create: (_) => AppData()),
       ChangeNotifierProvider<LocaleModel>(create: (_) => LocaleModel()),
-      ChangeNotifierProvider<ThemeModeProvider>(
-          create: (_) => ThemeModeProvider()),
+      ChangeNotifierProvider<ThemeModeProvider>(create: (_) => ThemeModeProvider()),
     ],
     builder: (context, child) {
       if (locale != null) {
-        Provider.of<LocaleModel>(context, listen: false)
-            .changeLocale(locale, notify: false);
+        Provider.of<LocaleModel>(context, listen: false).changeLocale(locale, notify: false);
       }
       if (themeMode != null) {
-        Provider.of<ThemeModeProvider>(context, listen: false).themeMode =
-            themeMode;
+        Provider.of<ThemeModeProvider>(context, listen: false).themeMode = themeMode;
       }
       if (adw != null) {
         Provider.of<AppData>(context, listen: false).watched = adw;
@@ -129,8 +123,7 @@ class MyApp extends StatelessWidget {
       },
     );
 
-    return Consumer2<LocaleModel, ThemeModeProvider>(
-        builder: (context, localeModel, themeModeProvider, child) {
+    return Consumer2<LocaleModel, ThemeModeProvider>(builder: (context, localeModel, themeModeProvider, child) {
       return Shortcuts(
           shortcuts: <LogicalKeySet, Intent>{
             LogicalKeySet(LogicalKeyboardKey.select): const ActivateIntent(),
@@ -138,7 +131,7 @@ class MyApp extends StatelessWidget {
           child: MaterialApp(
             title: 'Flarte',
             locale: localeModel.locale,
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            localizationsDelegates: const [AppLocalizations.delegate, ...GlobalMaterialLocalizations.delegates],
             supportedLocales: AppLocalizations.supportedLocales,
             localeListResolutionCallback: (locales, supportedLocales) {
               const defaultLocale = Locale('en');
@@ -195,8 +188,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(
-        initialIndex: 0, length: CategoriesList.codes.length, vsync: this);
+    _tabController = TabController(initialIndex: 0, length: CategoriesList.codes.length, vsync: this);
   }
 
   @override
@@ -230,84 +222,71 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               child: Container(
                   color: Theme.of(context)
                       .canvasColor, // added a Container to fix the visual bug of hover highlight on first InkWell in Carousel
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Expanded(
-                            flex: 1,
-                            child: Consumer<LocaleModel>(
-                                builder: (context, localeModel, child) {
-                              String lang = localeModel
-                                  .getCurrentLocale(context)
-                                  .languageCode;
-                              return CategoriesList(
-                                  size: catSize,
-                                  controller: _tabController,
-                                  lang: lang);
-                            })),
-                        Material(
-                            child: ListTile(
-                          enabled: false,
-                          selectedTileColor: Theme.of(context).highlightColor,
-                          contentPadding: EdgeInsets.only(
-                            left: 20,
-                            top: padding,
-                          ),
-                          minLeadingWidth: 30,
-                          leading: const Icon(Icons.cloud_download),
-                          title: leftSideWidth != 64
-                              ? Text(AppLocalizations.of(context)!.strDownloads,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w500))
-                              : null,
-                          onTap: () {},
-                        )),
-                        Material(
-                            child: ListTile(
-                          selectedTileColor: Theme.of(context).highlightColor,
-                          contentPadding: EdgeInsets.only(
-                            left: 20,
-                            top: padding,
-                          ),
-                          minLeadingWidth: 30,
-                          leading: const Icon(Icons.search),
-                          title: leftSideWidth != 64
-                              ? Text(AppLocalizations.of(context)!.strSearch,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w500))
-                              : null,
-                          onTap: () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) {
-                              return const SearchScreen();
-                            }));
-                          },
-                        )),
-                        Material(
-                            child: ListTile(
-                          selectedTileColor: Theme.of(context).highlightColor,
-                          contentPadding: EdgeInsets.only(
-                            left: 20,
-                            top: padding,
-                            bottom: padding,
-                          ),
-                          minLeadingWidth: 30,
-                          leading: const Icon(Icons.settings),
-                          title: leftSideWidth != 64
-                              ? Text(AppLocalizations.of(context)!.strSettings,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w500))
-                              : null,
-                          onTap: () async {
-                            final settings = await Navigator.push(context,
-                                MaterialPageRoute<Map<String, dynamic>>(
-                                    builder: (context) {
-                              return const FlarteSettings();
-                            }));
-                            _saveSettings(settings);
-                          },
-                        )),
-                      ]))),
+                  child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+                    Expanded(
+                        flex: 1,
+                        child: Consumer<LocaleModel>(builder: (context, localeModel, child) {
+                          String lang = localeModel.getCurrentLocale(context).languageCode;
+                          return CategoriesList(size: catSize, controller: _tabController, lang: lang);
+                        })),
+                    Material(
+                        child: ListTile(
+                      enabled: false,
+                      selectedTileColor: Theme.of(context).highlightColor,
+                      contentPadding: EdgeInsets.only(
+                        left: 20,
+                        top: padding,
+                      ),
+                      minLeadingWidth: 30,
+                      leading: const Icon(Icons.cloud_download),
+                      title: leftSideWidth != 64
+                          ? Text(AppLocalizations.of(context)!.strDownloads,
+                              style: const TextStyle(fontWeight: FontWeight.w500))
+                          : null,
+                      onTap: () {},
+                    )),
+                    Material(
+                        child: ListTile(
+                      selectedTileColor: Theme.of(context).highlightColor,
+                      contentPadding: EdgeInsets.only(
+                        left: 20,
+                        top: padding,
+                      ),
+                      minLeadingWidth: 30,
+                      leading: const Icon(Icons.search),
+                      title: leftSideWidth != 64
+                          ? Text(AppLocalizations.of(context)!.strSearch,
+                              style: const TextStyle(fontWeight: FontWeight.w500))
+                          : null,
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) {
+                          return const SearchScreen();
+                        }));
+                      },
+                    )),
+                    Material(
+                        child: ListTile(
+                      selectedTileColor: Theme.of(context).highlightColor,
+                      contentPadding: EdgeInsets.only(
+                        left: 20,
+                        top: padding,
+                        bottom: padding,
+                      ),
+                      minLeadingWidth: 30,
+                      leading: const Icon(Icons.settings),
+                      title: leftSideWidth != 64
+                          ? Text(AppLocalizations.of(context)!.strSettings,
+                              style: const TextStyle(fontWeight: FontWeight.w500))
+                          : null,
+                      onTap: () async {
+                        final settings =
+                            await Navigator.push(context, MaterialPageRoute<Map<String, dynamic>>(builder: (context) {
+                          return const FlarteSettings();
+                        }));
+                        _saveSettings(settings);
+                      },
+                    )),
+                  ]))),
           Expanded(
             flex: 1,
             child: TabBarView(
@@ -315,10 +294,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               controller: _tabController,
               children: List.generate(
                   CategoriesList.codes.length,
-                  (index) => Consumer2<Cache, LocaleModel>(
-                          builder: (context, cache, localeModel, child) {
-                        final lang =
-                            localeModel.getCurrentLocale(context).languageCode;
+                  (index) => Consumer2<Cache, LocaleModel>(builder: (context, cache, localeModel, child) {
+                        final lang = localeModel.getCurrentLocale(context).languageCode;
                         final key = CategoriesList.codes[index];
                         return FutureBuilder(future: Future.microtask(() async {
                           List<dynamic>? data = await cache.fetch(key, lang);
@@ -336,15 +313,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                   data: snapshot.data!,
                                   size: carSize);
                             }
-                          } else if (snapshot.hasData &&
-                              snapshot.data == null) {
-                            return Center(
-                                child: Text(
-                                    AppLocalizations.of(context)!.strError));
+                          } else if (snapshot.hasData && snapshot.data == null) {
+                            return Center(child: Text(AppLocalizations.of(context)!.strError));
                           } else /*if (!snapshot.hasData) */ {
-                            return Center(
-                                child: Text(
-                                    AppLocalizations.of(context)!.strFetching));
+                            return Center(child: Text(AppLocalizations.of(context)!.strFetching));
                           }
                         });
                       })),
@@ -374,10 +346,7 @@ class Carousel extends StatefulWidget {
   @override
   State<Carousel> createState() => _CarouselState();
 
-  Carousel(
-      {super.key,
-      required this.children,
-      this.size = CarouselListSize.normal}) {
+  Carousel({super.key, required this.children, this.size = CarouselListSize.normal}) {
     switch (size) {
       case CarouselListSize.normal:
         _width = 285;
@@ -417,8 +386,7 @@ class _CarouselState extends State<Carousel> {
             height: widget._height,
             child: ListView(
               controller: _controller,
-              prototypeItem:
-                  SizedBox(width: widget._width, height: widget._height),
+              prototypeItem: SizedBox(width: widget._width, height: widget._height),
               scrollDirection: Axis.horizontal,
               children: widget.children,
             )),
@@ -436,13 +404,10 @@ class _CarouselState extends State<Carousel> {
                           while (scrollWidth + widget._width < box.size.width) {
                             scrollWidth += widget._width;
                           }
-                          _controller.animateTo(
-                              _controller.offset - scrollWidth,
-                              duration: const Duration(milliseconds: 500),
-                              curve: Curves.easeInOut);
+                          _controller.animateTo(_controller.offset - scrollWidth,
+                              duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
                           setState(() {
-                            if (_controller.offset <
-                                _controller.position.viewportDimension) {
+                            if (_controller.offset < _controller.position.viewportDimension) {
                               isChevronLeftEnabled = false;
                             }
                             isChevronRightEnabled = true;
@@ -472,14 +437,11 @@ class _CarouselState extends State<Carousel> {
                           while (scrollWidth + widget._width < box.size.width) {
                             scrollWidth += widget._width;
                           }
-                          _controller.animateTo(
-                              _controller.offset + scrollWidth,
-                              duration: const Duration(milliseconds: 500),
-                              curve: Curves.easeInOut);
+                          _controller.animateTo(_controller.offset + scrollWidth,
+                              duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
                           setState(() {
                             if (_controller.offset >=
-                                _controller.position.maxScrollExtent -
-                                    _controller.position.viewportDimension) {
+                                _controller.position.maxScrollExtent - _controller.position.viewportDimension) {
                               isChevronRightEnabled = false;
                             }
                             isChevronLeftEnabled = true;
@@ -504,19 +466,16 @@ class CarouselList extends StatelessWidget {
   final List<dynamic> data;
   final CarouselListSize size;
 
-  const CarouselList(
-      {super.key, required this.data, this.size = CarouselListSize.normal});
+  const CarouselList({super.key, required this.data, this.size = CarouselListSize.normal});
 
-  void _showDialogProgram(
-      BuildContext context, List<VideoData> videos, int index) {
+  void _showDialogProgram(BuildContext context, List<VideoData> videos, int index) {
     showDialog(
         context: context,
         builder: (context) {
           return Dialog(
               elevation: 8.0,
               child: SizedBox(
-                  width: min(MediaQuery.sizeOf(context).width, 650),
-                  child: ShowDetail(videos: videos, index: index)));
+                  width: min(MediaQuery.sizeOf(context).width, 650), child: ShowDetail(videos: videos, index: index)));
         });
   }
 
@@ -533,12 +492,10 @@ class CarouselList extends StatelessWidget {
     }
     for (var z in zones) {
       List<VideoData> videos = z['videos'];
-      thumbnails
-          .add(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      thumbnails.add(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
             padding: const EdgeInsets.only(top: 8, bottom: 8, left: 8),
-            child: Text('${z['title']} (${videos.length})',
-                style: Theme.of(context).textTheme.titleLarge)),
+            child: Text('${z['title']} (${videos.length})', style: Theme.of(context).textTheme.titleLarge)),
         Carousel(
             size: size,
             children: videos.map((v) {
@@ -558,22 +515,13 @@ class CarouselList extends StatelessWidget {
                     screen = SerieScreen(
                         title: v.title,
                         url: v.url,
-                        description: v.shortDescription ??
-                            v.subtitle ??
-                            AppLocalizations.of(context)!.strEpisodes);
+                        description: v.shortDescription ?? v.subtitle ?? AppLocalizations.of(context)!.strEpisodes);
                   } else {
-                    screen = FullDetailScreen(
-                        videos: videos,
-                        index: videos.indexOf(v),
-                        title: z['title']);
+                    screen = FullDetailScreen(videos: videos, index: videos.indexOf(v), title: z['title']);
                   }
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => screen));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
                 },
-                child: VideoCard(
-                    video: v,
-                    size: size,
-                    withDurationLabel: size != CarouselListSize.small),
+                child: VideoCard(video: v, size: size, withDurationLabel: size != CarouselListSize.small),
               );
             }).toList())
       ]));
@@ -587,8 +535,7 @@ class CarouselList extends StatelessWidget {
         },
       );
     } else {
-      ret =
-          Center(child: Text(AppLocalizations.of(context)!.strNothingDisplay));
+      ret = Center(child: Text(AppLocalizations.of(context)!.strNothingDisplay));
     }
     return ret;
   }
@@ -599,25 +546,10 @@ class CategoriesList extends StatefulWidget {
   final TabController controller;
   final String lang;
 
-  const CategoriesList(
-      {super.key,
-      required this.size,
-      required this.controller,
-      required this.lang});
+  const CategoriesList({super.key, required this.size, required this.controller, required this.lang});
 
   // WARNING: this should match the order of categories in _CategoriesListState
-  static List<String> codes = [
-    'HOME',
-    'DOR',
-    'SER',
-    'CIN',
-    'EMI',
-    'HIS',
-    'DEC',
-    'SCI',
-    'ACT',
-    'CPO'
-  ];
+  static List<String> codes = ['HOME', 'DOR', 'SER', 'CIN', 'EMI', 'HIS', 'DEC', 'SCI', 'ACT', 'CPO'];
 
   @override
   State<CategoriesList> createState() => _CategoriesListState();
@@ -706,19 +638,13 @@ class _CategoriesListState extends State<CategoriesList> {
                     border: Border.all(
                         width: widget.size == CategoriesListSize.tiny ? 4 : 2,
                         strokeAlign: BorderSide.strokeAlignOutside,
-                        color: index == selectedIndex
-                            ? Colors.deepOrange
-                            : Theme.of(context).canvasColor)),
+                        color: index == selectedIndex ? Colors.deepOrange : Theme.of(context).canvasColor)),
                 child: CircleAvatar(
                     radius: 22,
-                    backgroundColor: Color.fromARGB(
-                        255, c['color'][0], c['color'][1], c['color'][2]),
+                    backgroundColor: Color.fromARGB(255, c['color'][0], c['color'][1], c['color'][2]),
                     child: Text(text.substring(0, 1),
                         style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .inversePrimary)))));
+                            fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.inversePrimary)))));
         Widget leading;
         if (widget.size != CategoriesListSize.normal) {
           text = c['text'].split(' ').first;
@@ -729,8 +655,7 @@ class _CategoriesListState extends State<CategoriesList> {
           title = null;
         } else {
           leading = avatar;
-          title =
-              Text(text, style: const TextStyle(fontWeight: FontWeight.w500));
+          title = Text(text, style: const TextStyle(fontWeight: FontWeight.w500));
         }
         return Material(
             child: ListTile(
@@ -745,8 +670,7 @@ class _CategoriesListState extends State<CategoriesList> {
             cache.fetch(c['code'], widget.lang);
           },
           minLeadingWidth: 30,
-          contentPadding:
-              EdgeInsets.only(left: 20, top: padding, bottom: padding),
+          contentPadding: EdgeInsets.only(left: 20, top: padding, bottom: padding),
           title: title,
         ));
       },
@@ -759,8 +683,7 @@ class ZoneList extends StatefulWidget {
   final CarouselListSize size;
   final List<dynamic> _zones = [];
 
-  ZoneList(
-      {super.key, required this.data, this.size = CarouselListSize.normal}) {
+  ZoneList({super.key, required this.data, this.size = CarouselListSize.normal}) {
     _zones.addAll(data);
   }
 
@@ -793,8 +716,7 @@ class _ZoneListState extends State<ZoneList> {
                 itemBuilder: (context, index) {
                   if (widget._zones.isNotEmpty) {
                     return ListTile(
-                        selectedTileColor:
-                            Theme.of(context).listTileTheme.selectedTileColor,
+                        selectedTileColor: Theme.of(context).listTileTheme.selectedTileColor,
                         selected: index == selectedZoneIndex,
                         onTap: () {
                           setState(() {
@@ -814,9 +736,7 @@ class _ZoneListState extends State<ZoneList> {
           flex: 2,
           child: ShowList(
               key: Key('$selectedZoneIndex'),
-              videos: widget._zones.isNotEmpty
-                  ? widget._zones[selectedZoneIndex]['videos']
-                  : [])),
+              videos: widget._zones.isNotEmpty ? widget._zones[selectedZoneIndex]['videos'] : [])),
     ]);
   }
 }
@@ -853,13 +773,10 @@ class _ShowListState extends State<ShowList> {
               itemCount: widget.videos.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  selectedTileColor:
-                      Theme.of(context).listTileTheme.selectedTileColor,
+                  selectedTileColor: Theme.of(context).listTileTheme.selectedTileColor,
                   selected: index == selectedShowIndex,
                   title: Text(widget.videos[index].title),
-                  subtitle: (widget.videos[index].subtitle != null)
-                      ? Text(widget.videos[index].subtitle!)
-                      : null,
+                  subtitle: (widget.videos[index].subtitle != null) ? Text(widget.videos[index].subtitle!) : null,
                   onTap: () {
                     setState(() {
                       selectedShowIndex = index;

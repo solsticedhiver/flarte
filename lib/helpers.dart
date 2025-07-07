@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hls_parser/flutter_hls_parser.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -25,18 +25,14 @@ class Cache extends ChangeNotifier {
         continue;
       }
 
-      result.add({
-        'title': z['title'],
-        'videos': videos.map((v) => VideoData.fromJson(v)).toList()
-      });
+      result.add({'title': z['title'], 'videos': videos.map((v) => VideoData.fromJson(v)).toList()});
     }
     return result;
   }
 
   Future<Map<String, dynamic>> get(String key, {isJson = true}) async {
     if (!data.containsKey(key) || data[key].isEmpty) {
-      final resp = await http
-          .get(Uri.parse(key), headers: {'User-Agent': AppConfig.userAgent});
+      final resp = await http.get(Uri.parse(key), headers: {'User-Agent': AppConfig.userAgent});
       Map<String, dynamic> jr = {};
       if (resp.statusCode != 200) {
         return jr;
@@ -68,10 +64,8 @@ class Cache extends ChangeNotifier {
   Future<List<dynamic>?> fetch(String key, String lang) async {
     final cacheKey = '$key-$lang';
     if (!data.containsKey(cacheKey) || data[cacheKey] == null) {
-      final String url =
-          "https://www.arte.tv/api/rproxy/emac/v4/$lang/web/pages/$key/";
-      final resp = await http
-          .get(Uri.parse(url), headers: {'User-Agent': AppConfig.userAgent});
+      final String url = "https://www.arte.tv/api/rproxy/emac/v4/$lang/web/pages/$key/";
+      final resp = await http.get(Uri.parse(url), headers: {'User-Agent': AppConfig.userAgent});
       if (resp.statusCode == 200) {
         final jr = json.decode(resp.body);
         set(cacheKey, parseJson(jr), notify: true);
@@ -116,8 +110,7 @@ class Format {
   String bandwidth; // used with media_kit/libmpv player
   Uri url;
 
-  Format(
-      {required this.resolution, required this.bandwidth, required this.url});
+  Format({required this.resolution, required this.bandwidth, required this.url});
 
   @override
   String toString() {
@@ -131,9 +124,7 @@ class Format {
 
   @override
   bool operator ==(other) {
-    return other is Format &&
-        other.resolution == resolution &&
-        other.bandwidth == bandwidth;
+    return other is Format && other.resolution == resolution && other.bandwidth == bandwidth;
   }
 }
 
@@ -142,8 +133,7 @@ class Subtitle {
   Uri? url;
   String audioLanguage;
 
-  Subtitle(
-      {required this.name, required this.url, required this.audioLanguage});
+  Subtitle({required this.name, required this.url, required this.audioLanguage});
 }
 
 class LocaleModel with ChangeNotifier {
@@ -224,9 +214,7 @@ class VideoData {
       programId: video['programId'],
       title: video['title'],
       subtitle: video['subtitle']?.trim(),
-      imageUrl: (video['mainImage']['url'])
-          .replaceFirst('__SIZE__', '400x225')
-          .replaceFirst('?type=TEXT', ''),
+      imageUrl: (video['mainImage']['url']).replaceFirst('__SIZE__', '400x225').replaceFirst('?type=TEXT', ''),
       shortDescription: video['shortDescription']?.trim(),
       isCollection: video['kind']['isCollection'],
       label: video['kind']['label']?.trim(),
@@ -308,33 +296,22 @@ class VideoCardState extends State<VideoCard> {
       } else {
         color = null;
       }
-      bottomText = Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: padding),
-            Text(
-                widget.useSubtitle && widget.video.subtitle != null
-                    ? widget.video.subtitle!
-                    : widget.video.title,
-                maxLines: 1,
-                softWrap: false,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: padding / 3),
-            Text(
-              widget.video.teaserText != null
-                  ? widget.video.teaserText!.trim()
-                  : '',
-              maxLines: 3,
-              softWrap: true,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(color: color),
-            ),
-          ]);
+      bottomText = Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+        const SizedBox(height: padding),
+        Text(widget.useSubtitle && widget.video.subtitle != null ? widget.video.subtitle! : widget.video.title,
+            maxLines: 1,
+            softWrap: false,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: padding / 3),
+        Text(
+          widget.video.teaserText != null ? widget.video.teaserText!.trim() : '',
+          maxLines: 3,
+          softWrap: true,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: color),
+        ),
+      ]);
     } else {
       Text? subtitle = null;
       if (widget.size == CarouselListSize.normal) {
@@ -343,8 +320,7 @@ class VideoCardState extends State<VideoCard> {
           overflow: TextOverflow.ellipsis,
           maxLines: 2,
         );
-      } else if (widget.size == CarouselListSize.small &&
-          !widget.withDurationLabel) {
+      } else if (widget.size == CarouselListSize.small && !widget.withDurationLabel) {
         subtitle = Text(widget.video.durationLabel ?? '');
       }
       bottomText = ListTile(
@@ -361,96 +337,77 @@ class VideoCardState extends State<VideoCard> {
     return Card(
         child: Container(
             padding: const EdgeInsets.all(padding),
-            child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Stack(children: [
-                    Image(
-                      errorBuilder: (context, error, stackTrace) =>
-                          SizedBox(width: imageWidth, height: imageHeight),
-                      image: CachedNetworkImageProvider(
-                          widget.video.imageUrl ?? '',
-                          headers: {'User-Agent': AppConfig.userAgent}),
-                      height: imageHeight,
-                      width: imageWidth,
-                    ),
-                    if ((widget.withDurationLabel ||
-                            widget.withShortDescription) &&
-                        widget.video.durationLabel != null &&
-                        !widget.video.isCollection)
-                      Positioned(
-                          bottom: 5,
-                          left: 5,
-                          child: Chip(
-                            labelPadding: const EdgeInsets.only(
-                                left: 0, right: 0, top: 0, bottom: 0),
-                            backgroundColor:
-                                Theme.of(context).colorScheme.surface,
-                            label: Text(widget.video.durationLabel!,
-                                style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface)),
-                          )),
-                    Consumer<AppData>(builder: (context, appData, child) {
-                      isFavorite =
-                          appData.favorites.contains(widget.video.programId);
-                      return Positioned(
-                          right: 0,
-                          top: 0,
-                          child: IconButton(
-                              hoverColor: Theme.of(context).cardColor,
-                              highlightColor: Theme.of(context).cardColor,
-                              splashColor: Theme.of(context).cardColor,
-                              onPressed: () {
-                                setState(() {
-                                  isFavorite = !isFavorite;
-                                  //widget.video.isFavorite = isFavorite;
-                                });
+            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Stack(children: [
+                Image(
+                  errorBuilder: (context, error, stackTrace) => SizedBox(width: imageWidth, height: imageHeight),
+                  image: CachedNetworkImageProvider(widget.video.imageUrl ?? '',
+                      headers: {'User-Agent': AppConfig.userAgent}),
+                  height: imageHeight,
+                  width: imageWidth,
+                ),
+                if ((widget.withDurationLabel || widget.withShortDescription) &&
+                    widget.video.durationLabel != null &&
+                    !widget.video.isCollection)
+                  Positioned(
+                      bottom: 5,
+                      left: 5,
+                      child: Chip(
+                        labelPadding: const EdgeInsets.only(left: 0, right: 0, top: 0, bottom: 0),
+                        backgroundColor: Theme.of(context).colorScheme.surface,
+                        label: Text(widget.video.durationLabel!,
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                      )),
+                Consumer<AppData>(builder: (context, appData, child) {
+                  isFavorite = appData.favorites.contains(widget.video.programId);
+                  return Positioned(
+                      right: 0,
+                      top: 0,
+                      child: IconButton(
+                          hoverColor: Theme.of(context).cardColor,
+                          highlightColor: Theme.of(context).cardColor,
+                          splashColor: Theme.of(context).cardColor,
+                          onPressed: () {
+                            setState(() {
+                              isFavorite = !isFavorite;
+                              //widget.video.isFavorite = isFavorite;
+                            });
 
-                                if (isFavorite) {
-                                  appData.addFavorite(widget.video.programId);
-                                } else {
-                                  appData
-                                      .removeFavorite(widget.video.programId);
-                                }
-                              },
-                              icon: Icon(Icons.favorite,
-                                  color: isFavorite
-                                      ? Colors.deepOrange
-                                      : Theme.of(context).disabledColor)));
-                    }),
-                    if (!widget.video.isCollection)
-                      Consumer<AppData>(builder: (context, appData, child) {
-                        hasBeenPlayed =
-                            appData.watched.contains(widget.video.programId);
-                        return Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: IconButton(
-                                hoverColor: Theme.of(context).cardColor,
-                                highlightColor: Theme.of(context).cardColor,
-                                splashColor: Theme.of(context).cardColor,
-                                onPressed: () {
-                                  setState(() {
-                                    hasBeenPlayed = !hasBeenPlayed;
-                                  });
-                                  if (hasBeenPlayed) {
-                                    appData.addWatched(widget.video.programId);
-                                  } else {
-                                    appData
-                                        .removeWatched(widget.video.programId);
-                                  }
-                                },
-                                icon: Icon(Icons.check_circle_outline,
-                                    color: hasBeenPlayed
-                                        ? Colors.deepOrange
-                                        : Theme.of(context).disabledColor)));
-                      }),
-                  ]),
-                  bottomText,
-                ])));
+                            if (isFavorite) {
+                              appData.addFavorite(widget.video.programId);
+                            } else {
+                              appData.removeFavorite(widget.video.programId);
+                            }
+                          },
+                          icon: Icon(Icons.favorite,
+                              color: isFavorite ? Colors.deepOrange : Theme.of(context).disabledColor)));
+                }),
+                if (!widget.video.isCollection)
+                  Consumer<AppData>(builder: (context, appData, child) {
+                    hasBeenPlayed = appData.watched.contains(widget.video.programId);
+                    return Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: IconButton(
+                            hoverColor: Theme.of(context).cardColor,
+                            highlightColor: Theme.of(context).cardColor,
+                            splashColor: Theme.of(context).cardColor,
+                            onPressed: () {
+                              setState(() {
+                                hasBeenPlayed = !hasBeenPlayed;
+                              });
+                              if (hasBeenPlayed) {
+                                appData.addWatched(widget.video.programId);
+                              } else {
+                                appData.removeWatched(widget.video.programId);
+                              }
+                            },
+                            icon: Icon(Icons.check_circle_outline,
+                                color: hasBeenPlayed ? Colors.deepOrange : Theme.of(context).disabledColor)));
+                  }),
+              ]),
+              bottomText,
+            ])));
   }
 }
 
@@ -502,11 +459,7 @@ class MediaStream {
   int videoSize = 0;
   int audioSize = 0;
   MediaStream(
-      {required this.audio,
-      required this.subtitle,
-      required this.resolution,
-      this.videoSize = 0,
-      this.audioSize = 0});
+      {required this.audio, required this.subtitle, required this.resolution, this.videoSize = 0, this.audioSize = 0});
 
   static Future<MediaStream> getMediaPlaylist(String url) async {
     // get m3u8 playlist for each video, audio and subtitle stream
@@ -515,16 +468,13 @@ class MediaStream {
     String contentString = utf8.decode(resp.bodyBytes);
 
     try {
-      final playlist = await HlsPlaylistParser.create()
-          .parseString(playlistUri, contentString);
+      final playlist = await HlsPlaylistParser.create().parseString(playlistUri, contentString);
       if (playlist is HlsMasterPlaylist) {
         Map<String, Uri> resolution = {};
         Map<String, Uri> audio = {};
         Map<String, Uri> subtitle = {};
         for (var v in playlist.variants) {
-          resolution[
-                  '${v.format.width}x${v.format.height}@${v.format.bitrate}'] =
-              v.url;
+          resolution['${v.format.width}x${v.format.height}@${v.format.bitrate}'] = v.url;
         }
         if (playlist.audios.isNotEmpty) {
           for (var a in playlist.audios) {
@@ -536,8 +486,7 @@ class MediaStream {
             subtitle[s.name!.trim()] = s.url!;
           }
         }
-        return MediaStream(
-            resolution: resolution, audio: audio, subtitle: subtitle);
+        return MediaStream(resolution: resolution, audio: audio, subtitle: subtitle);
       } else {
         // we expect a master paylist m3u8
         return Future.error(Exception('Expecting a master m3u8 playlist'));
@@ -547,8 +496,7 @@ class MediaStream {
     }
   }
 
-  static Future<(Uri?, Uri?, Uri?)> getMediaStream(
-      Uri video, Uri? audio, Uri? subtitle) async {
+  static Future<(Uri?, Uri?, Uri?)> getMediaStream(Uri video, Uri? audio, Uri? subtitle) async {
     // get real stream for video, audio, subtitle
 
     Uri? videoStream, audioStream, subtitleUrl;
@@ -557,16 +505,13 @@ class MediaStream {
     String contentString = utf8.decode(resp.bodyBytes);
 
     try {
-      final playlist =
-          await HlsPlaylistParser.create().parseString(video, contentString);
+      final playlist = await HlsPlaylistParser.create().parseString(video, contentString);
       if (playlist is HlsMediaPlaylist) {
         final _ = playlist.baseUri!.split('/');
         _.removeLast();
         final baseUri = _.join('/');
         videoStream = Uri.parse('$baseUri/${playlist.segments[0].url!}');
-        final count = playlist.segments
-            .where((s) => s.url == playlist.segments[0].url)
-            .length;
+        final count = playlist.segments.where((s) => s.url == playlist.segments[0].url).length;
         if (count != playlist.segments.length) {
           debugPrint('Warning: different urls for video stream segments');
         }
@@ -584,16 +529,13 @@ class MediaStream {
       String contentString = utf8.decode(resp.bodyBytes);
 
       try {
-        final playlist =
-            await HlsPlaylistParser.create().parseString(audio, contentString);
+        final playlist = await HlsPlaylistParser.create().parseString(audio, contentString);
         if (playlist is HlsMediaPlaylist) {
           final _ = playlist.baseUri!.split('/');
           _.removeLast();
           final baseUri = _.join('/');
           audioStream = Uri.parse('$baseUri/${playlist.segments[0].url!}');
-          final count = playlist.segments
-              .where((s) => s.url == playlist.segments[0].url)
-              .length;
+          final count = playlist.segments.where((s) => s.url == playlist.segments[0].url).length;
           if (count != playlist.segments.length) {
             debugPrint('Warning: different urls for audio stream segments');
           }
@@ -614,8 +556,7 @@ class MediaStream {
       String contentString = utf8.decode(resp.bodyBytes);
 
       try {
-        final playlist = await HlsPlaylistParser.create()
-            .parseString(subtitle, contentString);
+        final playlist = await HlsPlaylistParser.create().parseString(subtitle, contentString);
         if (playlist is HlsMediaPlaylist) {
           final _ = playlist.baseUri!.split('/');
           _.removeLast();
