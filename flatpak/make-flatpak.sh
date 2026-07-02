@@ -1,28 +1,29 @@
 #!/bin/bash
-buildtype=${1:-release}
+# build a flatpak from local repo
 
 set -e
+#version=`grep ^version ../pubspec.yaml |cut -f 2 -d ' '|cut -f 1 -d '+'`
+sha=`git rev-parse --short main`
+long_sha=`git rev-parse main`
 
-CWD=`pwd`
-pushd ..
-flutter build linux --${buildtype}
-popd
-
-rm -f flarte
-ln -s ../build/linux/x64/${buildtype}/bundle flarte
+# modify manifest to build local repo
+sed -i '/url:/s|https.*flarte.*$|file:///home/solstice/prog/dvcs/flarte|' io.github.solsticedhiver.flarte.yml
+sed -i "/commit:/s|: .*$|: $long_sha|" io.github.solsticedhiver.flarte.yml
 
 # build flatpak
 echo ':: running flatpak-builder'
-flatpak-builder --ccache --force-clean build-dir io.github.solsticedhiver.flarte.yml
+flatpak-builder --force-clean --repo=repo.d build.d io.github.solsticedhiver.flarte.yml
 
-#version=`grep ^version ../pubspec.yaml |cut -f 2 -d ' '|cut -f 1 -d '+'`
-sha=`git rev-parse --short main`
 rm -f flarte-*.flatpak
+# check for llvm20 extension
+if ! flatpak list |grep -q org.freedesktop.Sdk.Extension.llvm20 ;then
+	flatpak install --user org.freedesktop.Sdk.Extension.llvm20
+fi
 # build flatpak single-file bundle
-echo ":: making flatpak single-file bundle: flarte-${version}-${sha}-x86_64.flatpak"
-flatpak build-export repo.d build-dir
+echo ":: making flatpak single-file bundle: flarte-${sha}-x86_64.flatpak"
 flatpak build-bundle repo.d flarte-${sha}-x86_64.flatpak io.github.solsticedhiver.flarte
 
+# restore manifest
+git restore io.github.solsticedhiver.flarte.yml
 rm -rf repo.d
-rm -rf build-dir
-rm -f flarte
+rm -rf build.d
