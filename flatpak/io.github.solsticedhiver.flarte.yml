@@ -49,7 +49,7 @@ modules:
     sources:
       - type: archive
         url: https://github.com/libass/libass/archive/refs/tags/0.17.5.tar.gz
-        sha256: caab4b993dd7be6187c55623b789ed75dddefea6e65938af134637c732fe094a
+        sha256: fa286fc9ee1ba3b932703a3df7b8474d01dc8abe29ec69b6fa68781dc4bf7acc
 
   # Dependency for libplacebo; generated with uvx --from flatpak-pip-generator flatpak_pip_generator --runtime=org.freedesktop.Sdk//25.08 --yaml jinja2
   - name: python3-jinja2
@@ -140,8 +140,8 @@ modules:
       - '/lib/pkgconfig'
     sources:
       - type: git
-        url: https://github.com/solsticedhiver/flarte.git
-        commit: 7e06ea51a615c5b2342778f89a8d17048bb3ae45
+        url: file:///home/solstice/prog/dvcs/flarte
+        commit: e35b5dd2a2fb89f2d2b815946c58eb160a80fa05
       - generated/sources/pubspec.json
     modules:
       - generated/modules/flutter-sdk-3.44.4.json
