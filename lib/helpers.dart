@@ -15,7 +15,7 @@ class Cache extends ChangeNotifier {
 
   static List<dynamic> parseJson(Map<String, dynamic> data) {
     List<dynamic> result = [];
-    final List<dynamic> zones = data['value']['zones'];
+    final List<dynamic> zones = data['zones'];
     for (var z in zones) {
       List<dynamic> videos = z['content']['data'];
       videos.retainWhere((v) => v['programId'] != null);
