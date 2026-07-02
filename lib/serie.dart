@@ -35,7 +35,7 @@ class _SerieScreenState extends State<SerieScreen> {
     super.initState();
     Future.microtask(() async {
       final cache = Provider.of<Cache>(context, listen: false);
-      final url = 'https://www.arte.tv${widget.url}';
+      final url = widget.url;
       final resp = await cache.get(url, isJson: false);
       final document = parser.parse(resp['body']);
       final script = document.querySelector('script#__NEXT_DATA__');

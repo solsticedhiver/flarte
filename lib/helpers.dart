@@ -240,7 +240,7 @@ class VideoData {
 
   @override
   String toString() {
-    return 'VideoData($programId, $title)';
+    return 'VideoData(programId: $programId, title: $title)';
   }
 }
 

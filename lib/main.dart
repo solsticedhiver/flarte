@@ -335,7 +335,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                   data: snapshot.data!,
                                   size: carSize);
                             } else {
-                              debugPrint(snapshot.data.toString());
+                              //debugPrint(snapshot.data.toString());
                               return CarouselList(
                                   // or ZoneList()
                                   data: snapshot.data!,
