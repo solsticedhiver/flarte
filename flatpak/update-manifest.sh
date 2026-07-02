@@ -4,7 +4,7 @@
 #set -e
 long_sha=`git rev-parse main`
 # modify manifest to use local repo
-sed -i '/url:/s|https.*$|file:///home/solstice/prog/dvcs/flarte|' io.github.solsticedhiver.flarte.yml
+sed -i '/url:/s|https.*flarte.*$|file:///home/solstice/prog/dvcs/flarte|' io.github.solsticedhiver.flarte.yml
 sed -i "/commit:/s|: .*$|: $long_sha|" io.github.solsticedhiver.flarte.yml
 
 pushd ~/prog/dvcs/flatpak-flutter
@@ -17,14 +17,17 @@ sed -i '/url:/s|file:///home/solstice/prog/dvcs/flarte.git|https://github.com/so
 flutter_version=`cat ~/Applications/flutter/.dart_tool/version`
 sed -i "/tag:/s|: .*$|: ${flutter_version}|" flatpak-flutter.yml
 echo ":: flatpak-flutter #2: generate final yml"
+# add missing separate-locales
+sed -i "/command: flarte/a\separate-locales: false" flatpak-flutter.yml
 # add missing finish-args
-#sed -i "/dri/a\  - --socket=pulseaudio\\
-#  - --share=network" flatpak-flutter.yml
+sed -i "/dri/a\  - --socket=pulseaudio\\
+  - --share=network\\
+  - --filesystem=xdg-download" flatpak-flutter.yml
 # add missing  install commands
-#sed -i "/\/app\/bin\/data/a\      - install -Dm0644 flatpak/io.github.solsticedhiver.flarte.png /app/share/icons/hicolor/256x256/apps/io.github.solsticedhiver.flarte.png\\
-#      - install -Dm0644 flatpak/io.github.solsticedhiver.flarte.desktop /app/share/applications/io.github.solsticedhiver.flarte.desktop\\
-#      - install -Dm0644 flatpak/io.github.solsticedhiver.flarte.metainfo.xml /app/share/metainfo/io.github.solsticedhiver.flarte.metainfo.xml" flatpak-flutter.yml
-rm io.github.solsticedhiver.flarte.yml
+sed -i "/\/app\/bin/a\      - install -Dm0644 flatpak/io.github.solsticedhiver.flarte.png /app/share/icons/hicolor/256x256/apps/io.github.solsticedhiver.flarte.png\\
+      - install -Dm0644 flatpak/io.github.solsticedhiver.flarte.desktop /app/share/applications/io.github.solsticedhiver.flarte.desktop\\
+      - install -Dm0644 flatpak/io.github.solsticedhiver.flarte.metainfo.xml /app/share/metainfo/io.github.solsticedhiver.flarte.metainfo.xml" flatpak-flutter.yml
+rm -f io.github.solsticedhiver.flarte.yml
 uv run flatpak-flutter.py flatpak-flutter.yml
 sed -i 's|file:///home/solstice/prog/dvcs/flarte/.git|https://github.com/solsticedhiver/flarte.git|' io.github.solsticedhiver.flarte.yml
 # add snippet about latest commit

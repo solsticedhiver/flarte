@@ -118,8 +118,9 @@ modules:
       - cp io.github.solsticedhiver.flarte.desktop /app/share/applications/
       - cp io.github.solsticedhiver.flarte.metainfo.xml /app/share/metainfo/
     sources:
-      - type: dir
-        path: flarte
+      - type: git
+        url: https://github.com/solsticedhiver/flarte.git
+        commit: 46f38684f1358d385a45759bb8f09917e5c07666
       - type: file
         path: io.github.solsticedhiver.flarte.png
       - type: file
