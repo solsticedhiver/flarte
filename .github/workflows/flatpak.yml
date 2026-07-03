@@ -7,14 +7,12 @@ jobs:
   flatpak:
     name: "Flatpak"
     runs-on: ubuntu-latest
-    outputs:
-      output1: ${{ steps.version.outputs.version }}
     container:
-      image: bilelmoussaoui/flatpak-github-actions:freedesktop-24.08
-      options: --privileged
+      image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-25.08
+      options: ${{ vars.ACT != 'jqbMdBDRwb' && '--privileged' || '' }}
     steps:
     - name: Checkout repo
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - name: Create version
       id: version
       run: echo "version=v$(grep ^version pubspec.yaml |cut -f 2 -d ' '|cut -f 1 -d '+')" >> $GITHUB_OUTPUT
@@ -25,37 +23,18 @@ jobs:
     - name: set HEAD git short sha in config.dart
       run: sed -i "/commit/s/HEAD/${{ steps.short_sha.outputs.short_sha }}/" lib/config.dart
       shell: bash
-    - name: Update packages first (FORCE_COLMUNS to work around dnf/rpm coredump see https://github.com/rpm-software-management/dnf5/issues/2085)
-      run: FORCE_COLUMNS=100 dnf update -y
-    - name: Install missing package to build with flutter
-      run: dnf install -y ninja-build gtk3-devel cmake clang jq curl pkgconf mpv-devel mpv-libs mpv lzma-sdk which
-    - name: Install missing nodejs and other packages [for act run]
-      if: ${{ env.ACT }}
-      run: dnf install -y nodejs tar zstd
-    - uses: subosito/flutter-action@v2
+    - uses: flatpak/flatpak-github-actions/flatpak-builder@v6.6
       with:
-        channel : 'stable'
-        cache: true
-    - name: Trust flutter git repo
-      run: git config --global --add safe.directory /__t/flutter/stable-*
-    - if: ${{ env.ACT }}
-      run: flutter clean
-    - run: flutter config --enable-linux-desktop
-    - run: flutter pub get
-    - run: flutter build linux --release
-    - run: rm -rf flatpak/flarte
-    - run: mv build/linux/x64/release/bundle/ flatpak/flarte
-    - uses: flatpak/flatpak-github-actions/flatpak-builder@v6.4
-      with:
-        bundle: flarte-${{ steps.version.outputs.version }}-x86_64.flatpak
+        bundle: flarte-linux-x86_64.flatpak
         manifest-path: flatpak/io.github.solsticedhiver.flarte.yml
         cache-key: flatpak-builder-${{ github.sha }}
+        upload-artifact: false
     - name: Create a release in GitHub
-      if: ${{ !env.ACT }}
       uses: ncipollo/release-action@v1
+      if: ${{ vars.ACT != 'jqbMdBDRwb' }}
       with:
         allowUpdates: true
-        artifacts: "flarte-${{ steps.version.outputs.version }}-x86_64.flatpak"
+        artifacts: "flarte-linux-x86_64.flatpak"
         token: "${{ secrets.GH_TOKEN }}"
         tag: "${{ steps.version.outputs.version }}"
         commit: "${{ github.sha }}"
