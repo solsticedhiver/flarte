@@ -141,7 +141,7 @@ modules:
     sources:
       - type: git
         url: file:///home/solstice/prog/dvcs/flarte
-        commit: e35b5dd2a2fb89f2d2b815946c58eb160a80fa05
+        commit: abf4fb25c3bf620e6bae3b3e63a90ce042299e47
       - generated/sources/pubspec.json
     modules:
       - generated/modules/flutter-sdk-3.44.4.json
