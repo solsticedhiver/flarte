@@ -15,9 +15,9 @@ echo ':: running flatpak-builder'
 flatpak-builder --force-clean --repo=repo.d build.d io.github.solsticedhiver.flarte.yml
 
 rm -f flarte-*.flatpak
-# check for llvm20 extension
-if ! flatpak list |grep -q org.freedesktop.Sdk.Extension.llvm20 ;then
-	flatpak install --user org.freedesktop.Sdk.Extension.llvm20
+# check for llvm22 extension
+if ! flatpak list |grep -q org.freedesktop.Sdk.Extension.llvm22 ;then
+	flatpak install --user org.freedesktop.Sdk.Extension.llvm22
 fi
 # build flatpak single-file bundle
 echo ":: making flatpak single-file bundle: flarte-${sha}-x86_64.flatpak"
