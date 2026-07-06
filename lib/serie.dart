@@ -37,33 +37,36 @@ class _SerieScreenState extends State<SerieScreen> {
       final cache = Provider.of<Cache>(context, listen: false);
       final url = widget.url;
       final resp = await cache.get(url, isJson: false);
-      final document = parser.parse(resp['body']);
-      final script = document.querySelector('script#__NEXT_DATA__');
-      if (script != null) {
-        final Map<String, dynamic> jd = json.decode(script.text);
-        setState(() {
-          data = jd['props']['pageProps']['props']['page'];
-        });
-        final zones = data['value']['zones'];
-        //debugPrint(zones);
+      RegExp exp = RegExp(r'({\\\"page\\\":{\\\"code\\\":.*}})],\\\"\$L');
+      RegExpMatch? match = exp.firstMatch(resp['body']);
+      final Map<String, dynamic> jd = json.decode(match![1]!
+          .replaceAll('\\\\\\"', 'zzzzz')
+          .replaceAll('\\"', '"')
+          .replaceAll('zzzzz', '\\"'));
+      setState(() {
+        data = jd['page'];
+      });
+      final zones = data['zones'];
+      //debugPrint(zones);
+      for (var z in zones) {
+        if (z['code'].startsWith('collection_videos') &&
+            z['content']['data'] != null) {
+          setState(() {
+            teasers.clear();
+            teasers.addAll(z['content']['data']);
+          });
+          break;
+        }
+        //debugPrint(teasers);
+      }
+      if (teasers.isEmpty) {
+        // use the collection_subcollection instead
         for (var z in zones) {
-          if (z['code'].startsWith('collection_videos')) {
+          if (z['code'].startsWith('collection_subcollection_') &&
+              z['content']['data'] != null) {
             setState(() {
-              teasers.clear();
               teasers.addAll(z['content']['data']);
             });
-            break;
-          }
-          //debugPrint(teasers);
-        }
-        if (teasers.isEmpty) {
-          // use the collection_subcollection instead
-          for (var z in zones) {
-            if (z['code'].startsWith('collection_subcollection_')) {
-              setState(() {
-                teasers.addAll(z['content']['data']);
-              });
-            }
           }
         }
       }
@@ -99,8 +102,8 @@ class _SerieScreenState extends State<SerieScreen> {
     Widget body;
     if (data.isNotEmpty) {
       int zoneCount = 0;
-      for (var z in data['value']['zones']) {
-        if (z['content']['data'].length > 1) {
+      for (var z in data['zones']) {
+        if (z['content']['data'] != null && z['content']['data'].length > 1) {
           zoneCount++;
         }
       }
