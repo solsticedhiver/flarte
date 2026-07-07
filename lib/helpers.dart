@@ -17,6 +17,9 @@ class Cache extends ChangeNotifier {
     List<dynamic> result = [];
     final List<dynamic> zones = data['zones'];
     for (var z in zones) {
+      if (z['content']['data'] == null) {
+        continue;
+      }
       List<dynamic> videos = z['content']['data'];
       videos.retainWhere((v) => v['programId'] != null);
       if (videos.length <= 1 ||

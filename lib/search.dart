@@ -52,9 +52,9 @@ class _SearchScreenState extends State<SearchScreen> {
         .getCurrentLocale(context)
         .languageCode;
     final resp = await http.get(Uri.parse(
-        'https://www.arte.tv/api/rproxy/emac/v4/$lang/web/pages/SEARCH/?page=1&query=${Uri.encodeComponent(search)}'));
+        'https://api.arte.tv/api/emac/v4/$lang/web/pages/SEARCH/?page=1&query=${Uri.encodeComponent(search)}'));
     final Map<String, dynamic> jr = json.decode(resp.body);
-    final List<dynamic> zones = jr['value']['zones'];
+    final List<dynamic> zones = jr['zones'];
     for (var z in zones) {
       if (z['code'] == 'listing_SEARCH') {
         setState(() {

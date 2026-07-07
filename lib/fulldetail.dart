@@ -41,14 +41,14 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
       final cache = Provider.of<Cache>(context, listen: false);
       Map<String, dynamic> jr;
       final url =
-          'https://www.arte.tv/api/rproxy/emac/v4/$lang/web/programs/${video.programId}';
+          'https://api.arte.tv/api/emac/v4/$lang/web/programs/${video.programId}';
       jr = await cache.get(url);
       if (mounted && jr.isNotEmpty) {
         setState(() {
           final imageUrl = data['mainImage']['url'];
           final title = data['title'];
           final subtitle = data['subtitle'];
-          data = jr['value']['zones'][0]['content']['data'][0];
+          data = jr['zones'][0]['content']['data'][0];
           // keep the old url to avoid redownloading the same image at a new url
           data['mainImage']['url'] = imageUrl;
           data['title'] = title;
