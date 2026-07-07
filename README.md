@@ -42,6 +42,7 @@ To build and run yourself the app, once the flutter SDK is installed, you simply
 ## TODO
 
 - add a downloads manager
+- use native flutter carousel widget
 - better control for embedded player (sound ?)
 - cast to chromecast on android
 - add france.tv and other network?
