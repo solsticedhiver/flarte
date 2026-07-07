@@ -23,7 +23,7 @@ jobs:
     - name: set HEAD git short sha in config.dart
       run: sed -i "/commit/s/HEAD/${{ steps.short_sha.outputs.short_sha }}/" lib/config.dart
       shell: bash
-    - uses: flatpak/flatpak-github-actions/flatpak-builder@v6.6
+    - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
       with:
         bundle: flarte-linux-x86_64.flatpak
         manifest-path: flatpak/io.github.solsticedhiver.flarte.yml

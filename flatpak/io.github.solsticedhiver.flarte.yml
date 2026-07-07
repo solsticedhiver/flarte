@@ -140,8 +140,8 @@ modules:
       - '/lib/pkgconfig'
     sources:
       - type: git
-        url: file:///home/solstice/prog/dvcs/flarte
-        commit: abf4fb25c3bf620e6bae3b3e63a90ce042299e47
+        url: https://github.com/solsticedhiver/flarte.git
+        commit: 2750eb1ec56ddbedbcc46dd49fdfa044cf6d6e34
       - generated/sources/pubspec.json
     modules:
       - generated/modules/flutter-sdk-3.44.4.json
