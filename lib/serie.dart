@@ -62,13 +62,22 @@ class _SerieScreenState extends State<SerieScreen> {
       if (teasers.isEmpty) {
         // use the collection_subcollection instead
         for (var z in zones) {
-          if (z['code'].startsWith('collection_subcollection_') &&
-              z['content']['data'] != null) {
-            setState(() {
-              teasers.addAll(z['content']['data']);
-            });
+          if (z['code'].startsWith('collection_subcollection_')) {
+            if (z['content']['data'] != null) {
+              setState(() {
+                teasers.addAll(z['content']['data']);
+              });
+            } else {
+              // get data for other seasons
+              final url = "https://api.arte.tv${z['content']['esiInclude']}";
+              final jd = await cache.get(url, isJson: true);
+              z['content'] = jd;
+            }
           }
         }
+        setState(() {
+          data['zones'] = zones;
+        });
       }
     });
   }
