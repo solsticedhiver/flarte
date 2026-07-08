@@ -342,7 +342,7 @@ class VideoCardState extends State<VideoCard> {
       Text? subtitle = null;
       if (widget.size == CarouselListSize.normal) {
         subtitle = Text(
-          widget.video.subtitle ?? '',
+          widget.video.subtitle ?? widget.video.teaserText ?? '',
           overflow: TextOverflow.ellipsis,
           maxLines: 2,
         );

@@ -33,29 +33,6 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
     super.initState();
 
     //debugPrint('in _FullDetailScreeState.initState()');
-
-    Future.microtask(() async {
-      final lang = Provider.of<LocaleModel>(context, listen: false)
-          .getCurrentLocale(context)
-          .languageCode;
-      final cache = Provider.of<Cache>(context, listen: false);
-      Map<String, dynamic> jr;
-      final url =
-          'https://api.arte.tv/api/emac/v4/$lang/web/programs/${video.programId}';
-      jr = await cache.get(url);
-      if (mounted && jr.isNotEmpty) {
-        setState(() {
-          final imageUrl = data['mainImage']['url'];
-          final title = data['title'];
-          final subtitle = data['subtitle'];
-          data = jr['zones'][0]['content']['data'][0];
-          // keep the old url to avoid redownloading the same image at a new url
-          data['mainImage']['url'] = imageUrl;
-          data['title'] = title;
-          data['subtitle'] = subtitle;
-        });
-      }
-    });
   }
 
   @override
