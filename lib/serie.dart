@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:flarte/helpers.dart';
 import 'package:flarte/main.dart';
 import 'package:flutter/material.dart';
-import 'package:html/parser.dart' as parser;
 import 'l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
@@ -43,42 +42,39 @@ class _SerieScreenState extends State<SerieScreen> {
           .replaceAll('\\\\\\"', 'zzzzz')
           .replaceAll('\\"', '"')
           .replaceAll('zzzzz', '\\"'));
-      setState(() {
-        data = jd['page'];
-      });
+      data = jd['page'];
       final zones = data['zones'];
       //debugPrint(zones);
       for (var z in zones) {
         if (z['code'].startsWith('collection_videos') &&
             z['content']['data'] != null) {
-          setState(() {
-            teasers.clear();
-            teasers.addAll(z['content']['data']);
-          });
+          teasers.clear();
+          teasers.addAll(z['content']['data']);
           break;
         }
         //debugPrint(teasers);
       }
       if (teasers.isEmpty) {
-        // use the collection_subcollection instead
+        // use the collection_subcollection_ instead
         for (var z in zones) {
           if (z['code'].startsWith('collection_subcollection_')) {
             if (z['content']['data'] != null) {
-              setState(() {
-                teasers.addAll(z['content']['data']);
-              });
+              teasers.addAll(z['content']['data']);
             } else {
               // get data for other seasons
               final url = "https://api.arte.tv${z['content']['esiInclude']}";
               final jd = await cache.get(url, isJson: true);
               z['content'] = jd;
+              teasers.addAll(z['content']['data']);
             }
           }
         }
-        setState(() {
-          data['zones'] = zones;
-        });
+        data['zones'] = zones;
       }
+      setState(() {
+        data;
+        teasers;
+      });
     });
   }
 
