@@ -48,8 +48,8 @@ class _FlarteSettingsState extends State<FlarteSettings> {
       'it': AppLocalizations.of(context)!.strItalian,
       'es': AppLocalizations.of(context)!.strSpanish,
       'pl': AppLocalizations.of(context)!.strPolish,
+      'ro': AppLocalizations.of(context)!.strRomanian,
     };
-    final notImplementedLocales = ['it', 'es', 'pl'];
     Locale? locale = Provider.of<LocaleModel>(context, listen: false).locale;
 
     final Map<ThemeMode, String> themeModeString = {
@@ -105,34 +105,24 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                       builder: (context) {
                         return AlertDialog(content:
                             StatefulBuilder(builder: (context, setState) {
-                          final supportedLocales = AppLocalizations
-                                  .supportedLocales +
-                              [
-                                const Locale.fromSubtags(languageCode: 'it'),
-                                const Locale.fromSubtags(languageCode: 'es'),
-                                const Locale.fromSubtags(languageCode: 'pl')
-                              ];
-                          return Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: supportedLocales.map((l) {
-                                final isSupported = !notImplementedLocales
-                                    .contains(l.languageCode);
-                                return ListTile(
-                                    enabled: isSupported,
-                                    title: Text(localeName[l.languageCode]!),
-                                    leading: Radio<Locale>(
-                                      toggleable: isSupported,
-                                      value: l,
-                                      groupValue: locale,
-                                      onChanged: isSupported
-                                          ? (value) {
-                                              setState(() {
-                                                locale = value!;
-                                              });
-                                            }
-                                          : null,
-                                    ));
-                              }).toList());
+                          return RadioGroup<Locale>(
+                              groupValue: locale,
+                              onChanged: (value) {
+                                setState(() {
+                                  locale = value!;
+                                });
+                              },
+                              child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: AppLocalizations.supportedLocales
+                                      .map((l) {
+                                    return ListTile(
+                                        title:
+                                            Text(localeName[l.languageCode]!),
+                                        leading: Radio<Locale>(
+                                          value: l,
+                                        ));
+                                  }).toList()));
                         }));
                       });
                   if (!context.mounted) return;

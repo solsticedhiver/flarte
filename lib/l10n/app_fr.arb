@@ -70,5 +70,6 @@
     "strCancel": "Annuler",
     "strContinue": "Continuer",
     "strWarning": "Avertissement",
-    "strNone": "Aucun"
+    "strNone": "Aucun",
+    "strRomanian": "Roumain"
 }

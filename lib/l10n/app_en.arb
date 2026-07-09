@@ -70,5 +70,6 @@
     "strCancel": "Cancel",
     "strContinue": "Continue",
     "strWarning": "Warning",
-    "strNone": "None"
+    "strNone": "None",
+    "strRomanian": "Romanian"
 }
