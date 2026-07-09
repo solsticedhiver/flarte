@@ -106,7 +106,14 @@ class Version {
       required this.label,
       required this.url,
       required this.audioLanguage,
-      this.subtitleLanguage});
+      this.subtitleLanguage}) {
+    label = label
+        .replaceAll('audiodescription', 'AD')
+        .replaceAll('Audiodeskription', 'AD')
+        .replaceAll('audio description', 'AD');
+    // capitalize string
+    label = '${label[0].toUpperCase()}${label.substring(1)}';
+  }
 
   @override
   String toString() {
@@ -156,7 +163,18 @@ class Subtitle {
   String audioLanguage;
 
   Subtitle(
-      {required this.name, required this.url, required this.audioLanguage});
+      {required this.name, required this.url, required this.audioLanguage}) {
+    name = name
+        .replaceAll('sourds et malentendants', 'S/M')
+        .replaceAll('deaf and hard of hearing', 'DHH')
+        .replaceAll('automatische Untertitel', 'aUT')
+        .replaceAll('Für Gehörlose und Schwerhörige', 'G/S');
+  }
+
+  @override
+  String toString() {
+    return name;
+  }
 }
 
 class LocaleModel with ChangeNotifier {

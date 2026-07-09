@@ -520,7 +520,7 @@ class CarouselList extends StatelessWidget {
           return Dialog(
               elevation: 8.0,
               child: SizedBox(
-                  width: min(MediaQuery.sizeOf(context).width, 650),
+                  width: min(MediaQuery.sizeOf(context).width, 750),
                   child: ShowDetail(videos: videos, index: index)));
         });
   }

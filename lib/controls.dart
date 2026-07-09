@@ -635,7 +635,7 @@ class _VideoButtonsState extends State<VideoButtons> {
                   return Container(
                     padding: const EdgeInsets.only(left: 10),
                     alignment: Alignment.centerLeft,
-                    //constraints: const BoxConstraints(minWidth: 100),
+                    constraints: const BoxConstraints(maxWidth: 100),
                     child: Text(
                       s.name,
                     ),
