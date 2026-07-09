@@ -448,7 +448,7 @@ class _VideoButtonsState extends State<VideoButtons> {
         }
         return MyScreen(
             title:
-                '$title [${selectedVersion.shortLabel}, ${selectedFormat.resolution}]',
+                '$title [${selectedVersion.label}, ${selectedFormat.resolution}]',
             videoStream: videoStreamString,
             audioStream: audioStreamString,
             subtitleData: subtitleData,
