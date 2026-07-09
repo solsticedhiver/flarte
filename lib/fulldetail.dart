@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flarte/controls.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +35,53 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
     super.initState();
 
     //debugPrint('in _FullDetailScreeState.initState()');
+
+    Future.microtask(() async {
+      final lang = Provider.of<LocaleModel>(context, listen: false)
+          .getCurrentLocale(context)
+          .languageCode;
+      final cache = Provider.of<Cache>(context, listen: false);
+      String url = video.url;
+      if (!url.startsWith('https')) {
+        url = 'https://www.arte.tv${video.url}';
+      }
+      final resp = await cache.get(url, isJson: false);
+      RegExp exp = RegExp(r'({\\\"data\\\":{\\\"code\\\":.*?})]\\n"]\)');
+      RegExpMatch? match = exp.firstMatch(resp['body']);
+      if (match == null) return;
+      Map<String, dynamic>? jd;
+      try {
+        jd = json.decode(match![1]!
+            .replaceAll('\\\\\\"', 'zzzzz')
+            .replaceAll('\\"', '"')
+            .replaceAll('zzzzz', '\\"'));
+      } on FormatException {
+        debugPrint('Invalid json: ${match![1]}');
+      }
+      if (mounted && jd != null) {
+        setState(() {
+          final imageUrl = data['mainImage']['url'];
+          final title = data['title'];
+          final subtitle = data['subtitle'];
+          // look for the zone matching the programId
+          for (var z in jd!['data']['zones']) {
+            if (z['code'].startsWith('program_content_')) {
+              data = z['content']['data'][0];
+              break;
+            }
+          }
+          // keep the old url to avoid redownloading the same image at a new url
+          data['mainImage']['url'] = imageUrl;
+          data['title'] = title;
+          data['subtitle'] = subtitle;
+          // remove remnant from our dirty parsing
+          if (data['fullDescription'] != null &&
+              data['fullDescription'].startsWith('\$')) {
+            data['fullDescription'] = '';
+          }
+        });
+      }
+    });
   }
 
   @override

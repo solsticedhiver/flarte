@@ -36,7 +36,7 @@ class _SerieScreenState extends State<SerieScreen> {
       final cache = Provider.of<Cache>(context, listen: false);
       final url = widget.url;
       final resp = await cache.get(url, isJson: false);
-      RegExp exp = RegExp(r'({\\\"page\\\":{\\\"code\\\":.*}})],\\\"\$L');
+      RegExp exp = RegExp(r'({\\\"page\\\":{\\\"code\\\":.*?}})],\\\"\$L');
       RegExpMatch? match = exp.firstMatch(resp['body']);
       final Map<String, dynamic> jd = json.decode(match![1]!
           .replaceAll('\\\\\\"', 'zzzzz')
