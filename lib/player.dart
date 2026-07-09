@@ -124,19 +124,21 @@ class MyScreenState extends State<MyScreen> {
   Widget build(BuildContext context) {
     final List<double> availableSpeed = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
     final themeData = Theme.of(context);
-    final List<PopupMenuItem<double>> availableSpeedItems = availableSpeed
-        .map((s) => PopupMenuItem<double>(
-            onTap: () {
-              setState(() {
-                playSpeed = s;
-              });
-              player.setRate(playSpeed);
-            },
-            value: s,
-            child: Text('x$s',
-                style:
-                    TextStyle(color: Theme.of(context).colorScheme.onSurface))))
-        .toList();
+    final List<CheckedPopupMenuItem<double>> availableSpeedItems =
+        availableSpeed
+            .map((s) => CheckedPopupMenuItem<double>(
+                onTap: () {
+                  setState(() {
+                    playSpeed = s;
+                  });
+                  player.setRate(playSpeed);
+                },
+                checked: playSpeed == s,
+                value: s,
+                child: Text('x$s',
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface))))
+            .toList();
     Widget themeVideo = SizedBox.shrink(); // to make the compiler happy
     const subtitleViewConfigutation = SubtitleViewConfiguration(
       style: TextStyle(
