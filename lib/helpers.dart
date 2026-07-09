@@ -138,6 +138,16 @@ class Format {
         other.resolution == resolution &&
         other.bandwidth == bandwidth;
   }
+
+  String shortLabel() {
+    double b = int.parse(bandwidth) / 1024;
+    String u = '${b.toStringAsFixed(0)}k';
+    if (b > 1024) {
+      b = b / 1024;
+      u = '${b.toStringAsFixed(2)}M';
+    }
+    return '${resolution.split('x').last}p@$u';
+  }
 }
 
 class Subtitle {

@@ -85,7 +85,7 @@ class _VideoButtonsState extends State<VideoButtons> {
             }
             formatItems = formats
                 .map((e) => DropdownMenuItem<Format>(
-                    value: e, child: Text('${e.resolution.split('x').last}p')))
+                    value: e, child: Text(e.shortLabel())))
                 .toList();
           });
         }
@@ -125,7 +125,7 @@ class _VideoButtonsState extends State<VideoButtons> {
     final cache = Provider.of<Cache>(context, listen: false);
 
     final url = 'https://api.arte.tv/api/player/v2/config/$lang/$programId';
-    debugPrint(url);
+    //debugPrint(url);
     Map<String, dynamic>? jr;
     List<Version> cv = [];
     List<Format> tf = [];
@@ -595,7 +595,7 @@ class _VideoButtonsState extends State<VideoButtons> {
               onChanged: (value) async {
                 setState(() {
                   selectedVersion = value!;
-                  debugPrint(selectedVersion.url.toString());
+                  //debugPrint(selectedVersion.url.toString());
                 });
               })
           : const SizedBox(height: 24),
@@ -610,7 +610,7 @@ class _VideoButtonsState extends State<VideoButtons> {
                   return Container(
                     padding: const EdgeInsets.only(left: 10),
                     alignment: Alignment.centerLeft,
-                    //constraints: const BoxConstraints(minWidth: 100),
+                    constraints: const BoxConstraints(minWidth: 80),
                     child: Text(
                       '${f.resolution.split('x').last}p',
                     ),
