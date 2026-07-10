@@ -78,10 +78,13 @@ class _VideoButtonsState extends State<VideoButtons> {
         if (tf.isNotEmpty && mounted) {
           setState(() {
             formats = tf;
-            if (formats.length - 1 >= AppConfig.playerIndexQuality) {
-              selectedFormat = formats[AppConfig.playerIndexQuality];
-            } else {
-              selectedFormat = formats.last;
+            selectedFormat = tf.first;
+            for (var t in tf) {
+              if (t.shortLabel().split('@').first ==
+                  AppConfig.playerQuality.name) {
+                selectedFormat = t;
+                break;
+              }
             }
             formatItems = formats
                 .map((e) => DropdownMenuItem<Format>(

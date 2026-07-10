@@ -13,9 +13,7 @@ import 'package:settings_ui/settings_ui.dart';
 import 'package:path/path.dart' as path;
 
 class FlarteSettings extends StatefulWidget {
-  const FlarteSettings({
-    super.key,
-  });
+  const FlarteSettings({super.key});
 
   @override
   State<FlarteSettings> createState() => _FlarteSettingsState();
@@ -24,14 +22,15 @@ class FlarteSettings extends StatefulWidget {
 class _FlarteSettingsState extends State<FlarteSettings> {
   PlayerTypeName _playerTypeName = AppConfig.player;
   late String _playerString;
-  late String _qualityString;
   late ThemeMode _themeMode;
 
   @override
   void initState() {
     super.initState();
-    _themeMode =
-        Provider.of<ThemeModeProvider>(context, listen: false).themeMode;
+    _themeMode = Provider.of<ThemeModeProvider>(
+      context,
+      listen: false,
+    ).themeMode;
   }
 
   @override
@@ -65,30 +64,33 @@ class _FlarteSettingsState extends State<FlarteSettings> {
     };
     _playerString = playerString[_playerTypeName]!;
 
-    final qualityStringList = ['216p', '360p', '432p', '720p', '1080p'];
-    int qualityIndex = AppConfig.playerIndexQuality;
-    _qualityString = qualityStringList[qualityIndex];
+    PlayerQuality playerQuality = AppConfig.playerQuality;
 
     debugPrint(AppLocalizations.supportedLocales.toString());
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Colors.deepOrange,
-          foregroundColor: Colors.white,
-          leading: BackButton(
-            onPressed: () {
-              Map<String, dynamic> settings = {
-                'locale': Provider.of<LocaleModel>(context, listen: false)
-                    .getCurrentLocale(context),
-                'theme': _themeMode,
-                'quality': qualityIndex,
-                'player': _playerTypeName,
-              };
-              Navigator.of(context).pop(settings);
-            },
-          ),
-          title: Text(AppLocalizations.of(context)!.strSettings)),
-      body: SettingsList(applicationType: ApplicationType.material, sections: [
-        SettingsSection(
+        backgroundColor: Colors.deepOrange,
+        foregroundColor: Colors.white,
+        leading: BackButton(
+          onPressed: () {
+            Map<String, dynamic> settings = {
+              'locale': Provider.of<LocaleModel>(
+                context,
+                listen: false,
+              ).getCurrentLocale(context),
+              'theme': _themeMode,
+              'quality': playerQuality,
+              'player': _playerTypeName,
+            };
+            Navigator.of(context).pop(settings);
+          },
+        ),
+        title: Text(AppLocalizations.of(context)!.strSettings),
+      ),
+      body: SettingsList(
+        applicationType: ApplicationType.material,
+        sections: [
+          SettingsSection(
             title: Text(AppLocalizations.of(context)!.strInterface),
             tiles: [
               SettingsTile.navigation(
@@ -101,11 +103,12 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                 onPressed: (context) async {
                   // test
                   await showDialog<ThemeMode>(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(content:
-                            StatefulBuilder(builder: (context, setState) {
-                          return RadioGroup<Locale>(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        content: StatefulBuilder(
+                          builder: (context, setState) {
+                            return RadioGroup<Locale>(
                               groupValue: locale,
                               onChanged: (value) {
                                 setState(() {
@@ -113,19 +116,27 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                                 });
                               },
                               child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: AppLocalizations.supportedLocales
-                                      .map((l) {
+                                mainAxisSize: MainAxisSize.min,
+                                children: AppLocalizations.supportedLocales.map(
+                                  (l) {
                                     return RadioListTile<Locale>(
                                       title: Text(localeName[l.languageCode]!),
                                       value: l,
                                     );
-                                  }).toList()));
-                        }));
-                      });
+                                  },
+                                ).toList(),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  );
                   if (!context.mounted) return;
-                  Provider.of<LocaleModel>(context, listen: false)
-                      .changeLocale(locale);
+                  Provider.of<LocaleModel>(
+                    context,
+                    listen: false,
+                  ).changeLocale(locale);
                 },
               ),
               SettingsTile.navigation(
@@ -135,11 +146,12 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                 onPressed: (context) async {
                   ThemeMode themeMode = _themeMode;
                   await showDialog<ThemeMode>(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(content:
-                            StatefulBuilder(builder: (context, setState) {
-                          return RadioGroup<ThemeMode>(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        content: StatefulBuilder(
+                          builder: (context, setState) {
+                            return RadioGroup<ThemeMode>(
                               groupValue: themeMode,
                               onChanged: (ThemeMode? value) {
                                 setState(() {
@@ -151,26 +163,35 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                                 children: [
                                   RadioListTile<ThemeMode>(
                                     title: Text(
-                                        AppLocalizations.of(context)!.strDark),
+                                      AppLocalizations.of(context)!.strDark,
+                                    ),
                                     value: ThemeMode.dark,
                                   ),
                                   RadioListTile<ThemeMode>(
                                     title: Text(
-                                        AppLocalizations.of(context)!.strLight),
+                                      AppLocalizations.of(context)!.strLight,
+                                    ),
                                     value: ThemeMode.light,
                                   ),
                                   RadioListTile<ThemeMode>(
-                                    title: Text(AppLocalizations.of(context)!
-                                        .strSystem),
+                                    title: Text(
+                                      AppLocalizations.of(context)!.strSystem,
+                                    ),
                                     value: ThemeMode.system,
                                   ),
                                 ],
-                              ));
-                        }));
-                      });
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  );
                   if (!context.mounted) return;
-                  Provider.of<ThemeModeProvider>(context, listen: false)
-                      .changeTheme(themeMode);
+                  Provider.of<ThemeModeProvider>(
+                    context,
+                    listen: false,
+                  ).changeTheme(themeMode);
                   setState(() {
                     _themeMode = themeMode;
                   });
@@ -185,60 +206,72 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                   setState(() {
                     AppConfig.textMode = value;
                   });
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(
-                        AppLocalizations.of(context)!
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        AppLocalizations.of(
+                          context,
+                        )!
                             .strYouNeedToChangeCategory,
                         style: TextStyle(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onInverseSurface)),
-                    // showCloseIcon: true,
-                    duration: const Duration(seconds: 30),
-                    behavior: SnackBarBehavior.floating,
-                    backgroundColor:
-                        Theme.of(context).colorScheme.inverseSurface,
-                    showCloseIcon: true,
-                    closeIconColor:
-                        Theme.of(context).colorScheme.onInverseSurface,
-                  ));
+                          color: Theme.of(context).colorScheme.onInverseSurface,
+                        ),
+                      ),
+                      // showCloseIcon: true,
+                      duration: const Duration(seconds: 30),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.inverseSurface,
+                      showCloseIcon: true,
+                      closeIconColor: Theme.of(
+                        context,
+                      ).colorScheme.onInverseSurface,
+                    ),
+                  );
                 },
               ),
-            ]),
-        SettingsSection(
+            ],
+          ),
+          SettingsSection(
             title: Text(AppLocalizations.of(context)!.strPlayback),
             tiles: [
               SettingsTile.navigation(
                 leading: const Icon(Icons.width_normal),
                 title: Text(AppLocalizations.of(context)!.strDefRes),
-                value: Text(_qualityString.split(' ').last),
+                value: Text(playerQuality.name),
                 onPressed: (context) async {
                   await showDialog<int>(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(content:
-                            StatefulBuilder(builder: (context, setState) {
-                          return RadioGroup<int>(
-                              groupValue: qualityIndex,
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        content: StatefulBuilder(
+                          builder: (context, setState) {
+                            return RadioGroup<PlayerQuality>(
+                              groupValue: playerQuality,
                               onChanged: (value) {
                                 setState(() {
-                                  qualityIndex = value!;
+                                  playerQuality = value!;
                                 });
                               },
                               child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: qualityStringList.map((p) {
-                                    return RadioListTile<int>(
-                                      title: Text(p),
-                                      value: qualityStringList.indexOf(p),
-                                    );
-                                  }).toList()));
-                        }));
-                      });
+                                mainAxisSize: MainAxisSize.min,
+                                children: PlayerQuality.values.map((p) {
+                                  return RadioListTile<PlayerQuality>(
+                                    title: Text(p.name),
+                                    value: p,
+                                  );
+                                }).toList(),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  );
                   setState(() {
-                    _qualityString = qualityStringList[qualityIndex];
+                    AppConfig.playerQuality = playerQuality;
                   });
-                  AppConfig.playerIndexQuality = qualityIndex;
                 },
               ),
               SettingsTile.navigation(
@@ -247,32 +280,33 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                 value: Text(_playerString),
                 onPressed: (context) async {
                   await showDialog<PlayerTypeName>(
-                      context: context,
-                      builder: (context) {
-                        final Map<PlayerTypeName, Map<String, dynamic>> ptn = {
-                          PlayerTypeName.embedded: {
-                            'str': AppLocalizations.of(context)!.strEmbedded,
-                            'disabled': false
-                          },
-                          PlayerTypeName.vlc: {
-                            'str': 'VLC',
-                            // disable VLC choice when in flatpak/snap or android
-                            'disabled': kIsWeb ||
-                                Platform.environment['FLATPAK_ID'] != null ||
-                                Platform.environment['SNAP'] != null ||
-                                Platform.isAndroid
-                          },
-                          /*
+                    context: context,
+                    builder: (context) {
+                      final Map<PlayerTypeName, Map<String, dynamic>> ptn = {
+                        PlayerTypeName.embedded: {
+                          'str': AppLocalizations.of(context)!.strEmbedded,
+                          'disabled': false,
+                        },
+                        PlayerTypeName.vlc: {
+                          'str': 'VLC',
+                          // disable VLC choice when in flatpak/snap or android
+                          'disabled': kIsWeb ||
+                              Platform.environment['FLATPAK_ID'] != null ||
+                              Platform.environment['SNAP'] != null ||
+                              Platform.isAndroid,
+                        },
+                        /*
                           PlayerTypeName.custom: {
                             'str': AppLocalizations.of(context)!.strCustom,
                             'disabled': true
                             //Platform.environment['FLATPAK_ID'] != null
                           },
                           */
-                        };
-                        return AlertDialog(content:
-                            StatefulBuilder(builder: (context, setState) {
-                          return RadioGroup<PlayerTypeName>(
+                      };
+                      return AlertDialog(
+                        content: StatefulBuilder(
+                          builder: (context, setState) {
+                            return RadioGroup<PlayerTypeName>(
                               groupValue: _playerTypeName,
                               onChanged: (value) {
                                 setState(() {
@@ -280,24 +314,30 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                                 });
                               },
                               child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: ptn.entries.map((p) {
-                                    return RadioListTile<PlayerTypeName>(
-                                      enabled: !p.value['disabled'],
-                                      title: Text(p.value['str']),
-                                      value: p.key,
-                                    );
-                                  }).toList()));
-                        }));
-                      });
+                                mainAxisSize: MainAxisSize.min,
+                                children: ptn.entries.map((p) {
+                                  return RadioListTile<PlayerTypeName>(
+                                    enabled: !p.value['disabled'],
+                                    title: Text(p.value['str']),
+                                    value: p.key,
+                                  );
+                                }).toList(),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  );
                   setState(() {
                     _playerString = playerString[_playerTypeName]!;
                   });
                   AppConfig.player = _playerTypeName;
                 },
               ),
-            ]),
-        SettingsSection(
+            ],
+          ),
+          SettingsSection(
             title: Text(AppLocalizations.of(context)!.strDownloads),
             tiles: [
               SettingsTile(
@@ -316,14 +356,20 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                     }
                   } else if (Platform.isWindows) {
                     home = Platform.environment['USERPROFILE'] ??
-                        path.join(Platform.environment['SYSTEMDRIVE']!,
-                            'Windows', 'Temp');
+                        path.join(
+                          Platform.environment['SYSTEMDRIVE']!,
+                          'Windows',
+                          'Temp',
+                        );
                   }
                   if (!mounted) return;
                   String? dlDir = await FilePicker.getDirectoryPath(
-                      initialDirectory: home,
-                      dialogTitle:
-                          AppLocalizations.of(context)!.strChooseDirectory);
+                    initialDirectory: home,
+                    dialogTitle: AppLocalizations.of(
+                      context,
+                    )!
+                        .strChooseDirectory,
+                  );
 
                   if (dlDir != null) {
                     setState(() {
@@ -332,8 +378,9 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                   }
                 },
               ),
-            ]),
-        SettingsSection(
+            ],
+          ),
+          SettingsSection(
             title: Text(AppLocalizations.of(context)!.strCache),
             tiles: [
               SettingsTile.navigation(
@@ -345,15 +392,19 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                     builder: (context) {
                       return AlertDialog(
                         title: Text(
-                            AppLocalizations.of(context)!.strClearTheCacheNow),
+                          AppLocalizations.of(context)!.strClearTheCacheNow,
+                        ),
                         content: Text(
-                            AppLocalizations.of(context)!.strClearingTheCache),
+                          AppLocalizations.of(context)!.strClearingTheCache,
+                        ),
                         actions: [
                           TextButton(
                             child: Text(AppLocalizations.of(context)!.strYes),
                             onPressed: () {
-                              final cache =
-                                  Provider.of<Cache>(context, listen: false);
+                              final cache = Provider.of<Cache>(
+                                context,
+                                listen: false,
+                              );
                               for (var key in cache.data.keys) {
                                 final k = key.split('-')[0];
                                 if (CategoriesList.codes.contains(k)) {
@@ -368,31 +419,38 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
-                          )
+                          ),
                         ],
                       );
                     },
                   );
                 },
               ),
-            ]),
-        SettingsSection(
+            ],
+          ),
+          SettingsSection(
             title: Text(
-                '${AppLocalizations.of(context)!.strAbout} ${AppConfig.name}'),
+              '${AppLocalizations.of(context)!.strAbout} ${AppConfig.name}',
+            ),
             tiles: [
               SettingsTile(
                 leading: const Icon(Icons.info),
                 title: const Text(
-                    'version ${AppConfig.version} (${AppConfig.commit})'),
+                  'version ${AppConfig.version} (${AppConfig.commit})',
+                ),
                 onPressed: (context) async {
                   // ignore: non_constant_identifier_names
-                  String GPL3 =
-                      await PlatformAssetBundle().loadString('assets/GPL3.txt');
+                  String GPL3 = await PlatformAssetBundle().loadString(
+                    'assets/GPL3.txt',
+                  );
                   if (!context.mounted) return;
                   showAboutDialog(
                     context: context,
-                    applicationIcon: Image.asset('assets/flarte.png',
-                        width: 128, height: 128),
+                    applicationIcon: Image.asset(
+                      'assets/flarte.png',
+                      width: 128,
+                      height: 128,
+                    ),
                     applicationName: AppConfig.name,
                     applicationVersion:
                         '${AppConfig.version} (${AppConfig.commit})',
@@ -401,13 +459,15 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                     children: [
                       const SizedBox(height: 10),
                       // ignore: sized_box_for_whitespace
-                      Container(width: 600, child: Text(GPL3))
+                      Container(width: 600, child: Text(GPL3)),
                     ],
                   );
                 },
               ),
-            ])
-      ]),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

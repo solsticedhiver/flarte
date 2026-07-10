@@ -66,8 +66,30 @@ void main() async {
         break;
     }
   }
-  AppConfig.playerIndexQuality =
-      prefs.getInt('quality') ?? AppConfig.playerIndexQuality;
+  try {
+    String? ql = prefs.getString('quality');
+    if (ql != null) {
+      switch (ql) {
+        case '216p':
+          AppConfig.playerQuality = PlayerQuality.r216p;
+          break;
+        case '360p':
+          AppConfig.playerQuality = PlayerQuality.r360p;
+          break;
+        case '432p':
+          AppConfig.playerQuality = PlayerQuality.r432p;
+          break;
+        case '720p':
+          AppConfig.playerQuality = PlayerQuality.r720p;
+          break;
+        case '1080p':
+          AppConfig.playerQuality = PlayerQuality.r1080p;
+          break;
+      }
+    }
+  } on TypeError {
+    // old int value => do nothing, new value will be saved, eventually
+  }
   String? ptn = prefs.getString('player');
   if (ptn != null) {
     switch (ptn) {
@@ -362,7 +384,7 @@ void _saveSettings(Map<String, dynamic>? settings) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setString('locale', settings['locale'].languageCode);
   prefs.setString('theme', settings['theme'].toString().split('.').last);
-  prefs.setInt('quality', settings['quality']);
+  prefs.setString('quality', settings['quality'].name);
   prefs.setString('player', settings['player'].toString().split('.').last);
   prefs.setBool('textMode', AppConfig.textMode);
   prefs.setString('dlDirectory', AppConfig.dlDirectory);
