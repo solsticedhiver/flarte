@@ -327,7 +327,7 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                             'Windows', 'Temp');
                   }
                   if (!mounted) return;
-                  String? dlDir = await FilePicker.platform.getDirectoryPath(
+                  String? dlDir = await FilePicker.getDirectoryPath(
                       initialDirectory: home,
                       dialogTitle:
                           AppLocalizations.of(context)!.strChooseDirectory);

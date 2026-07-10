@@ -37,9 +37,6 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
     //debugPrint('in _FullDetailScreeState.initState()');
 
     Future.microtask(() async {
-      final lang = Provider.of<LocaleModel>(context, listen: false)
-          .getCurrentLocale(context)
-          .languageCode;
       final cache = Provider.of<Cache>(context, listen: false);
       String url = video.url;
       if (!url.startsWith('https')) {
@@ -51,12 +48,12 @@ class _FullDetailScreenState extends State<FullDetailScreen> {
       if (match == null) return;
       Map<String, dynamic>? jd;
       try {
-        jd = json.decode(match![1]!
+        jd = json.decode(match[1]!
             .replaceAll('\\\\\\"', 'zzzzz')
             .replaceAll('\\"', '"')
             .replaceAll('zzzzz', '\\"'));
       } on FormatException {
-        debugPrint('Invalid json: ${match![1]}');
+        debugPrint('Invalid json: ${match[1]}');
       }
       if (mounted && jd != null) {
         setState(() {

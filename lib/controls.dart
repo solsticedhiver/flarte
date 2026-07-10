@@ -169,9 +169,11 @@ class _VideoButtonsState extends State<VideoButtons> {
     return (cv, tf, ss);
   }
 
+  /*
   String _outputFilename() {
     return "${video.programId}_${selectedVersion.shortLabel.replaceAll(' ', '_')}_${selectedFormat.resolution}.mp4";
   }
+  */
 
   Future<String> _webvtt(Uri url) async {
     final req = await http.get(url);
