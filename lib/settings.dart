@@ -141,47 +141,36 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                       builder: (context) {
                         return AlertDialog(content:
                             StatefulBuilder(builder: (context, setState) {
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              ListTile(
-                                  title: Text(
-                                      AppLocalizations.of(context)!.strDark),
-                                  leading: Radio<ThemeMode>(
-                                    value: ThemeMode.dark,
-                                    groupValue: themeMode,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        themeMode = value!;
-                                      });
-                                    },
-                                  )),
-                              ListTile(
-                                  title: Text(
-                                      AppLocalizations.of(context)!.strLight),
-                                  leading: Radio<ThemeMode>(
-                                    value: ThemeMode.light,
-                                    groupValue: themeMode,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        themeMode = value!;
-                                      });
-                                    },
-                                  )),
-                              ListTile(
-                                  title: Text(
-                                      AppLocalizations.of(context)!.strSystem),
-                                  leading: Radio<ThemeMode>(
-                                    value: ThemeMode.system,
-                                    groupValue: themeMode,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        themeMode = value!;
-                                      });
-                                    },
-                                  )),
-                            ],
-                          );
+                          return RadioGroup<ThemeMode>(
+                              groupValue: themeMode,
+                              onChanged: (ThemeMode? value) {
+                                setState(() {
+                                  themeMode = value!;
+                                });
+                              },
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  ListTile(
+                                      title: Text(AppLocalizations.of(context)!
+                                          .strDark),
+                                      leading: Radio<ThemeMode>(
+                                        value: ThemeMode.dark,
+                                      )),
+                                  ListTile(
+                                      title: Text(AppLocalizations.of(context)!
+                                          .strLight),
+                                      leading: Radio<ThemeMode>(
+                                        value: ThemeMode.light,
+                                      )),
+                                  ListTile(
+                                      title: Text(AppLocalizations.of(context)!
+                                          .strSystem),
+                                      leading: Radio<ThemeMode>(
+                                        value: ThemeMode.system,
+                                      )),
+                                ],
+                              ));
                         }));
                       });
                   if (!context.mounted) return;
@@ -234,21 +223,22 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                       builder: (context) {
                         return AlertDialog(content:
                             StatefulBuilder(builder: (context, setState) {
-                          return Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: qualityStringList.map((p) {
-                                return ListTile(
-                                    title: Text(p),
-                                    leading: Radio<int>(
-                                      value: qualityStringList.indexOf(p),
-                                      groupValue: qualityIndex,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          qualityIndex = value!;
-                                        });
-                                      },
-                                    ));
-                              }).toList());
+                          return RadioGroup<int>(
+                              groupValue: qualityIndex,
+                              onChanged: (value) {
+                                setState(() {
+                                  qualityIndex = value!;
+                                });
+                              },
+                              child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: qualityStringList.map((p) {
+                                    return ListTile(
+                                        title: Text(p),
+                                        leading: Radio<int>(
+                                          value: qualityStringList.indexOf(p),
+                                        ));
+                                  }).toList()));
                         }));
                       });
                   setState(() {
@@ -278,32 +268,33 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                                 Platform.environment['SNAP'] != null ||
                                 Platform.isAndroid
                           },
+                          /*
                           PlayerTypeName.custom: {
                             'str': AppLocalizations.of(context)!.strCustom,
                             'disabled': true
                             //Platform.environment['FLATPAK_ID'] != null
                           },
+                          */
                         };
                         return AlertDialog(content:
                             StatefulBuilder(builder: (context, setState) {
-                          return Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: ptn.entries.map((p) {
-                                return ListTile(
-                                    enabled: !p.value['disabled'],
-                                    title: Text(p.value['str']),
-                                    leading: Radio<PlayerTypeName>(
-                                      value: p.key,
-                                      groupValue: _playerTypeName,
-                                      onChanged: (!p.value['disabled'])
-                                          ? (value) {
-                                              setState(() {
-                                                _playerTypeName = value!;
-                                              });
-                                            }
-                                          : null,
-                                    ));
-                              }).toList());
+                          return RadioGroup<PlayerTypeName>(
+                              groupValue: _playerTypeName,
+                              onChanged: (value) {
+                                setState(() {
+                                  _playerTypeName = value!;
+                                });
+                              },
+                              child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: ptn.entries.map((p) {
+                                    return ListTile(
+                                        enabled: !p.value['disabled'],
+                                        title: Text(p.value['str']),
+                                        leading: Radio<PlayerTypeName>(
+                                          value: p.key,
+                                        ));
+                                  }).toList()));
                         }));
                       });
                   setState(() {
