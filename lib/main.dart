@@ -121,12 +121,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     PageTransitionsTheme pageTransitionsTheme = const PageTransitionsTheme(
       builders: {
-        // TODO: change transition to ZoomPageTransitionsBuilder() when media_kit fixes their issue#64
-        TargetPlatform.android: OpenUpwardsPageTransitionsBuilder(),
-        TargetPlatform.iOS: OpenUpwardsPageTransitionsBuilder(),
-        TargetPlatform.linux: OpenUpwardsPageTransitionsBuilder(),
-        TargetPlatform.macOS: OpenUpwardsPageTransitionsBuilder(),
-        TargetPlatform.windows: OpenUpwardsPageTransitionsBuilder(),
+        TargetPlatform.android: ZoomPageTransitionsBuilder(),
+        TargetPlatform.iOS: ZoomPageTransitionsBuilder(),
+        TargetPlatform.linux: ZoomPageTransitionsBuilder(),
+        TargetPlatform.macOS: ZoomPageTransitionsBuilder(),
+        TargetPlatform.windows: ZoomPageTransitionsBuilder(),
       },
     );
 
