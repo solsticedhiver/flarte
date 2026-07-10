@@ -157,26 +157,23 @@ class MyApp extends StatelessWidget {
               }
               return defaultLocale;
             },
-            //theme: ThemeData(
-            //  primarySwatch: Colors.deepOrange,
-            //),
             theme: ThemeData(
-              primarySwatch: Colors.deepOrange,
+              colorSchemeSeed: Colors.deepOrange,
               brightness: Brightness.light,
               pageTransitionsTheme: pageTransitionsTheme,
               /* light theme settings */
             ),
             darkTheme: ThemeData(
-              primarySwatch: Colors.deepOrange,
+              colorSchemeSeed: Colors.deepOrange,
               brightness: Brightness.dark,
               pageTransitionsTheme: pageTransitionsTheme,
               /* dark theme settings */
             ),
             themeMode: themeModeProvider.themeMode,
             /* ThemeMode.system to follow system theme,
-         ThemeMode.light for light theme,
-         ThemeMode.dark for dark theme
-      */
+              ThemeMode.light for light theme,
+              ThemeMode.dark for dark theme
+            */
             home: const MyHomePage(title: 'arte.tv'),
           ));
     });
@@ -733,13 +730,16 @@ class _CategoriesListState extends State<CategoriesList> {
           title = null;
         } else {
           leading = avatar;
-          title =
-              Text(text, style: const TextStyle(fontWeight: FontWeight.w500));
+          title = Text(
+            text,
+            style: const TextStyle(fontWeight: FontWeight.w500),
+          );
         }
         return Material(
             child: ListTile(
           selected: index == selectedIndex,
           leading: leading,
+          selectedColor: Colors.deepOrange,
           onTap: () async {
             setState(() {
               selectedIndex = index;
@@ -788,7 +788,7 @@ class _ZoneListState extends State<ZoneList> {
     return Row(mainAxisSize: MainAxisSize.max, children: [
       Expanded(
           flex: 1,
-          child: Container(
+          child: SizedBox(
               height: MediaQuery.sizeOf(context).height,
               child: ListView.builder(
                 //padding: const EdgeInsets.symmetric(vertical: 10),

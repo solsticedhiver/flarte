@@ -367,7 +367,7 @@ class VideoCardState extends State<VideoCard> {
             ),
           ]);
     } else {
-      Text? subtitle = null;
+      Text? subtitle;
       if (widget.size == CarouselListSize.normal) {
         subtitle = Text(
           widget.video.subtitle ?? widget.video.teaserText ?? '',

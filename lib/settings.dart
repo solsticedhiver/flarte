@@ -116,12 +116,10 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: AppLocalizations.supportedLocales
                                       .map((l) {
-                                    return ListTile(
-                                        title:
-                                            Text(localeName[l.languageCode]!),
-                                        leading: Radio<Locale>(
-                                          value: l,
-                                        ));
+                                    return RadioListTile<Locale>(
+                                      title: Text(localeName[l.languageCode]!),
+                                      value: l,
+                                    );
                                   }).toList()));
                         }));
                       });
@@ -151,24 +149,21 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  ListTile(
-                                      title: Text(AppLocalizations.of(context)!
-                                          .strDark),
-                                      leading: Radio<ThemeMode>(
-                                        value: ThemeMode.dark,
-                                      )),
-                                  ListTile(
-                                      title: Text(AppLocalizations.of(context)!
-                                          .strLight),
-                                      leading: Radio<ThemeMode>(
-                                        value: ThemeMode.light,
-                                      )),
-                                  ListTile(
-                                      title: Text(AppLocalizations.of(context)!
-                                          .strSystem),
-                                      leading: Radio<ThemeMode>(
-                                        value: ThemeMode.system,
-                                      )),
+                                  RadioListTile<ThemeMode>(
+                                    title: Text(
+                                        AppLocalizations.of(context)!.strDark),
+                                    value: ThemeMode.dark,
+                                  ),
+                                  RadioListTile<ThemeMode>(
+                                    title: Text(
+                                        AppLocalizations.of(context)!.strLight),
+                                    value: ThemeMode.light,
+                                  ),
+                                  RadioListTile<ThemeMode>(
+                                    title: Text(AppLocalizations.of(context)!
+                                        .strSystem),
+                                    value: ThemeMode.system,
+                                  ),
                                 ],
                               ));
                         }));
@@ -233,11 +228,10 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                               child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: qualityStringList.map((p) {
-                                    return ListTile(
-                                        title: Text(p),
-                                        leading: Radio<int>(
-                                          value: qualityStringList.indexOf(p),
-                                        ));
+                                    return RadioListTile<int>(
+                                      title: Text(p),
+                                      value: qualityStringList.indexOf(p),
+                                    );
                                   }).toList()));
                         }));
                       });
@@ -288,12 +282,11 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                               child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: ptn.entries.map((p) {
-                                    return ListTile(
-                                        enabled: !p.value['disabled'],
-                                        title: Text(p.value['str']),
-                                        leading: Radio<PlayerTypeName>(
-                                          value: p.key,
-                                        ));
+                                    return RadioListTile<PlayerTypeName>(
+                                      enabled: !p.value['disabled'],
+                                      title: Text(p.value['str']),
+                                      value: p.key,
+                                    );
                                   }).toList()));
                         }));
                       });
