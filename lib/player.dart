@@ -38,7 +38,7 @@ class MyScreenState extends State<MyScreen> {
   late final controller = VideoController(player);
   late StreamSubscription subscription;
   bool isVideoPlayalable = false;
-  double playSpeed = 1.0;
+  double _playSpeed = 1.0;
   // A [GlobalKey<VideoState>] is required to access the programmatic fullscreen interface.
   late final GlobalKey<VideoState> key = GlobalKey<VideoState>();
 
@@ -56,7 +56,7 @@ class MyScreenState extends State<MyScreen> {
         }
       }
     });
-    player.setRate(playSpeed);
+    player.setRate(_playSpeed);
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       if (kIsWeb || Platform.isAndroid) {
@@ -124,21 +124,20 @@ class MyScreenState extends State<MyScreen> {
   Widget build(BuildContext context) {
     final List<double> availableSpeed = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
     final themeData = Theme.of(context);
-    final List<CheckedPopupMenuItem<double>> availableSpeedItems =
-        availableSpeed
-            .map((s) => CheckedPopupMenuItem<double>(
-                onTap: () {
-                  setState(() {
-                    playSpeed = s;
-                  });
-                  player.setRate(playSpeed);
-                },
-                checked: playSpeed == s,
-                value: s,
-                child: Text('x$s',
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface))))
-            .toList();
+    final List<PopupMenuItem<double>> availableSpeedItems = availableSpeed
+        .map((s) => CheckedPopupMenuItem<double>(
+            onTap: () {
+              setState(() {
+                _playSpeed = s;
+              });
+              player.setRate(_playSpeed);
+            },
+            checked: _playSpeed == s,
+            value: s,
+            child: Text('x$s',
+                style:
+                    TextStyle(color: Theme.of(context).colorScheme.onSurface))))
+        .toList();
     Widget themeVideo = SizedBox.shrink(); // to make the compiler happy
     const subtitleViewConfigutation = SubtitleViewConfiguration(
       style: TextStyle(
@@ -183,22 +182,25 @@ class MyScreenState extends State<MyScreen> {
             child: PopupMenuButton<double>(
                 enableFeedback: false,
                 /*
-              onSelected: (value) {
-                debugPrint('rate play speed set to $value');
-                player.setRate(value);
-              },
-              */
+                onSelected: (value) {
+                  debugPrint('rate play speed set to $value');
+                  setState(() {
+                    _playSpeed = value;
+                  });
+                  player.setRate(value);
+                },
+                */
                 color: Theme.of(context).colorScheme.surface,
-                initialValue: playSpeed,
-                // no tooltip because other buttons don't have one for now
+                initialValue: _playSpeed,
                 splashRadius: 20,
+                // no tooltip because other buttons don't have one for now
                 tooltip: '',
                 itemBuilder: (context) {
                   return availableSpeedItems;
                 },
                 icon: Icon(
                   Icons.speed,
-                  color: Theme.of(context).colorScheme.onBackground,
+                  color: Colors.white,
                 ))),
       ];
 
@@ -248,7 +250,7 @@ class MyScreenState extends State<MyScreen> {
               },
               */
                 color: Theme.of(context).colorScheme.surface,
-                initialValue: playSpeed,
+                initialValue: _playSpeed,
                 // no tooltip because other buttons don't have one for now
                 splashRadius: 20,
                 tooltip: '',
@@ -257,7 +259,7 @@ class MyScreenState extends State<MyScreen> {
                 },
                 icon: Icon(
                   Icons.speed,
-                  color: Theme.of(context).colorScheme.onBackground,
+                  color: Colors.white,
                 ))),
         const MaterialDesktopFullscreenButton(),
       ];
