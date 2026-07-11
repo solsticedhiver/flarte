@@ -56,26 +56,25 @@ class _SerieScreenState extends State<SerieScreen> {
       }
       if (teasers.isEmpty) {
         // use the collection_subcollection_ instead
+        Map<String, dynamic> jdNext;
         for (var z in zones) {
           if (z['code'].startsWith('collection_subcollection_')) {
-            if (z['content']['data'] != null) {
-              Map<String, dynamic> jd_next = z['content'];
-              // get any missing data if multiple page
-              while (jd_next['pagination'] != null &&
-                  jd_next['pagination']['page'] <
-                      jd_next['pagination']['pages']) {
-                jd_next = await cache
-                    .get(jd_next['pagination']['links']['next'], isJson: true);
-                z['content']['data'].addAll(jd_next['data']);
-              }
-              teasers.addAll(z['content']['data']);
-            } else {
+            if (z['content']['data'] == null) {
               // get data for other seasons
               final url = "https://api.arte.tv${z['content']['esiInclude']}";
               final jd = await cache.get(url, isJson: true);
               z['content'] = jd;
               teasers.addAll(z['content']['data']);
             }
+            jdNext = z['content'];
+            // get any missing data if multiple page
+            while (jdNext['pagination'] != null &&
+                jdNext['pagination']['page'] < jdNext['pagination']['pages']) {
+              jdNext = await cache.get(jdNext['pagination']['links']['next'],
+                  isJson: true);
+              z['content']['data'].addAll(jdNext['data']);
+            }
+            teasers.addAll(z['content']['data']);
           }
         }
         data['zones'] = zones;
