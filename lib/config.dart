@@ -20,7 +20,7 @@ enum PlayerQuality {
 
 class AppConfig {
   static const String name = 'Flarte';
-  static const String version = '0.3.4';
+  static const String version = '0.3.5';
   static const String commit = 'HEAD/main';
   static const String url = 'https://github.com/solsticedhiver/flarte';
   static PlayerTypeName player = PlayerTypeName.embedded;
