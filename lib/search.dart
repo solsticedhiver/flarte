@@ -85,8 +85,7 @@ class _SearchScreenState extends State<SearchScreen> {
     Widget results;
 
     if (data.isNotEmpty) {
-      // ignore: sized_box_for_whitespace
-      results = Container(
+      results = SizedBox(
           width: width,
           child: GridView.count(
             childAspectRatio: 0.95,
@@ -130,8 +129,7 @@ class _SearchScreenState extends State<SearchScreen> {
       } else {
         text = AppLocalizations.of(context)!.strNoResults;
       }
-      // ignore: sized_box_for_whitespace
-      results = Container(width: width, child: Center(child: Text(text)));
+      results = SizedBox(width: width, child: Center(child: Text(text)));
     }
 
     if (search.isNotEmpty) {

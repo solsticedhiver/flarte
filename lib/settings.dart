@@ -468,8 +468,7 @@ class _FlarteSettingsState extends State<FlarteSettings> {
                         "Copyright © 2023\nsolsTiCe d'Hiver <solstice.dhiver@gmail.com>\nGPL-3+",
                     children: [
                       const SizedBox(height: 10),
-                      // ignore: sized_box_for_whitespace
-                      Container(width: 600, child: Text(GPL3)),
+                      SizedBox(width: 600, child: Text(GPL3)),
                     ],
                   );
                 },
