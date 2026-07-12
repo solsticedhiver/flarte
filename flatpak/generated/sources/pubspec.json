@@ -254,6 +254,20 @@
     {
         "type": "archive",
         "archive-type": "tar-gzip",
+        "url": "https://pub.dev/api/archives/ffi_leak_tracker-0.1.2.tar.gz",
+        "sha256": "4093d4ef9ca06ffe2786e73bfb25e22aa92112b9bb4ec941f11e3e6b61489a97",
+        "strip-components": 0,
+        "dest": ".pub-cache/hosted/pub.dev/ffi_leak_tracker-0.1.2"
+    },
+    {
+        "type": "inline",
+        "contents": "4093d4ef9ca06ffe2786e73bfb25e22aa92112b9bb4ec941f11e3e6b61489a97",
+        "dest": ".pub-cache/hosted-hashes/pub.dev",
+        "dest-filename": "ffi_leak_tracker-0.1.2.sha256"
+    },
+    {
+        "type": "archive",
+        "archive-type": "tar-gzip",
         "url": "https://pub.dev/api/archives/file-7.0.1.tar.gz",
         "sha256": "a3b4f84adafef897088c160faf7dfffb7696046cb13ae90b508c2cbc95d3b8d4",
         "strip-components": 0,
@@ -268,16 +282,16 @@
     {
         "type": "archive",
         "archive-type": "tar-gzip",
-        "url": "https://pub.dev/api/archives/file_picker-10.3.10.tar.gz",
-        "sha256": "57d9a1dd5063f85fa3107fb42d1faffda52fdc948cefd5fe5ea85267a5fc7343",
+        "url": "https://pub.dev/api/archives/file_picker-12.0.0-beta.7.tar.gz",
+        "sha256": "fdc6a37f715d19f35b131decf1ce39242eeed5ddae18c0818c3eccb731ab76be",
         "strip-components": 0,
-        "dest": ".pub-cache/hosted/pub.dev/file_picker-10.3.10"
+        "dest": ".pub-cache/hosted/pub.dev/file_picker-12.0.0-beta.7"
     },
     {
         "type": "inline",
-        "contents": "57d9a1dd5063f85fa3107fb42d1faffda52fdc948cefd5fe5ea85267a5fc7343",
+        "contents": "fdc6a37f715d19f35b131decf1ce39242eeed5ddae18c0818c3eccb731ab76be",
         "dest": ".pub-cache/hosted-hashes/pub.dev",
-        "dest-filename": "file_picker-10.3.10.sha256"
+        "dest-filename": "file_picker-12.0.0-beta.7.sha256"
     },
     {
         "type": "archive",
@@ -744,30 +758,30 @@
     {
         "type": "archive",
         "archive-type": "tar-gzip",
-        "url": "https://pub.dev/api/archives/package_info_plus-9.0.1.tar.gz",
-        "sha256": "468c26b4254ab01979fa5e4a98cb343ea3631b9acee6f21028997419a80e1a20",
+        "url": "https://pub.dev/api/archives/package_info_plus-10.2.0.tar.gz",
+        "sha256": "f5c435dc0e0d461e5b32471a870f769b6a1cc46930637efe24fbc535314e78ad",
         "strip-components": 0,
-        "dest": ".pub-cache/hosted/pub.dev/package_info_plus-9.0.1"
+        "dest": ".pub-cache/hosted/pub.dev/package_info_plus-10.2.0"
     },
     {
         "type": "inline",
-        "contents": "468c26b4254ab01979fa5e4a98cb343ea3631b9acee6f21028997419a80e1a20",
+        "contents": "f5c435dc0e0d461e5b32471a870f769b6a1cc46930637efe24fbc535314e78ad",
         "dest": ".pub-cache/hosted-hashes/pub.dev",
-        "dest-filename": "package_info_plus-9.0.1.sha256"
+        "dest-filename": "package_info_plus-10.2.0.sha256"
     },
     {
         "type": "archive",
         "archive-type": "tar-gzip",
-        "url": "https://pub.dev/api/archives/package_info_plus_platform_interface-3.2.1.tar.gz",
-        "sha256": "202a487f08836a592a6bd4f901ac69b3a8f146af552bbd14407b6b41e1c3f086",
+        "url": "https://pub.dev/api/archives/package_info_plus_platform_interface-4.1.0.tar.gz",
+        "sha256": "db762cb2f4f25ee60fb6359773861b0f199e00b90d237bd85a76a1e806b46ef4",
         "strip-components": 0,
-        "dest": ".pub-cache/hosted/pub.dev/package_info_plus_platform_interface-3.2.1"
+        "dest": ".pub-cache/hosted/pub.dev/package_info_plus_platform_interface-4.1.0"
     },
     {
         "type": "inline",
-        "contents": "202a487f08836a592a6bd4f901ac69b3a8f146af552bbd14407b6b41e1c3f086",
+        "contents": "db762cb2f4f25ee60fb6359773861b0f199e00b90d237bd85a76a1e806b46ef4",
         "dest": ".pub-cache/hosted-hashes/pub.dev",
-        "dest-filename": "package_info_plus_platform_interface-3.2.1.sha256"
+        "dest-filename": "package_info_plus_platform_interface-4.1.0.sha256"
     },
     {
         "type": "archive",
@@ -1024,16 +1038,16 @@
     {
         "type": "archive",
         "archive-type": "tar-gzip",
-        "url": "https://pub.dev/api/archives/settings_ui-2.0.2.tar.gz",
-        "sha256": "d9838037cb554b24b4218b2d07666fbada3478882edefae375ee892b6c820ef3",
+        "url": "https://pub.dev/api/archives/settings_ui-3.0.1.tar.gz",
+        "sha256": "7437c9c867f331ff6c90e951f2333441eab5cf5e654c3a7f3e4aad0c01db51ef",
         "strip-components": 0,
-        "dest": ".pub-cache/hosted/pub.dev/settings_ui-2.0.2"
+        "dest": ".pub-cache/hosted/pub.dev/settings_ui-3.0.1"
     },
     {
         "type": "inline",
-        "contents": "d9838037cb554b24b4218b2d07666fbada3478882edefae375ee892b6c820ef3",
+        "contents": "7437c9c867f331ff6c90e951f2333441eab5cf5e654c3a7f3e4aad0c01db51ef",
         "dest": ".pub-cache/hosted-hashes/pub.dev",
-        "dest-filename": "settings_ui-2.0.2.sha256"
+        "dest-filename": "settings_ui-3.0.1.sha256"
     },
     {
         "type": "archive",
@@ -1388,16 +1402,16 @@
     {
         "type": "archive",
         "archive-type": "tar-gzip",
-        "url": "https://pub.dev/api/archives/wakelock_plus-1.5.2.tar.gz",
-        "sha256": "ddf3db70eaa10c37558ff817519b85d527dbd21034fd5d8e1c2e85f31588f1c1",
+        "url": "https://pub.dev/api/archives/wakelock_plus-1.6.1.tar.gz",
+        "sha256": "824c5bba0f800e86d32e57d3d1843c531f090005cc89d9a837933e6601093d53",
         "strip-components": 0,
-        "dest": ".pub-cache/hosted/pub.dev/wakelock_plus-1.5.2"
+        "dest": ".pub-cache/hosted/pub.dev/wakelock_plus-1.6.1"
     },
     {
         "type": "inline",
-        "contents": "ddf3db70eaa10c37558ff817519b85d527dbd21034fd5d8e1c2e85f31588f1c1",
+        "contents": "824c5bba0f800e86d32e57d3d1843c531f090005cc89d9a837933e6601093d53",
         "dest": ".pub-cache/hosted-hashes/pub.dev",
-        "dest-filename": "wakelock_plus-1.5.2.sha256"
+        "dest-filename": "wakelock_plus-1.6.1.sha256"
     },
     {
         "type": "archive",
@@ -1430,16 +1444,16 @@
     {
         "type": "archive",
         "archive-type": "tar-gzip",
-        "url": "https://pub.dev/api/archives/win32-5.15.0.tar.gz",
-        "sha256": "d7cb55e04cd34096cd3a79b3330245f54cb96a370a1c27adb3c84b917de8b08e",
+        "url": "https://pub.dev/api/archives/win32-6.3.0.tar.gz",
+        "sha256": "ba6f4bba816c8d7e3c1580e170f3786d216951cc6b94babc3b814c08d2cb2738",
         "strip-components": 0,
-        "dest": ".pub-cache/hosted/pub.dev/win32-5.15.0"
+        "dest": ".pub-cache/hosted/pub.dev/win32-6.3.0"
     },
     {
         "type": "inline",
-        "contents": "d7cb55e04cd34096cd3a79b3330245f54cb96a370a1c27adb3c84b917de8b08e",
+        "contents": "ba6f4bba816c8d7e3c1580e170f3786d216951cc6b94babc3b814c08d2cb2738",
         "dest": ".pub-cache/hosted-hashes/pub.dev",
-        "dest-filename": "win32-5.15.0.sha256"
+        "dest-filename": "win32-6.3.0.sha256"
     },
     {
         "type": "archive",

@@ -141,7 +141,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/solsticedhiver/flarte.git
-        commit: 2750eb1ec56ddbedbcc46dd49fdfa044cf6d6e34
+        commit: 1d4fdcd437f0c59546fa5fc9e4d986e042341861
       - generated/sources/pubspec.json
     modules:
-      - generated/modules/flutter-sdk-3.44.4.json
+      - generated/modules/flutter-sdk-3.44.5.json
