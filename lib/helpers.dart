@@ -484,7 +484,7 @@ class VideoCardState extends State<VideoCard> {
                                         .removeWatched(widget.video.programId);
                                   }
                                 },
-                                icon: Icon(Icons.check_circle_outline,
+                                icon: Icon(Icons.check_circle,
                                     color: hasBeenPlayed
                                         ? Colors.deepOrange
                                         : Theme.of(context).disabledColor)));
